@@ -1,3 +1,10 @@
+# MacOS resource files
+.DS_Store
+Icon?
+
+# VS Code configs
+.vscode
+
 # Logs
 logs
 *.log

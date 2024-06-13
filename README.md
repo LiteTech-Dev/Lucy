@@ -1,2 +1,3 @@
-# mcpm
-Minecraft pack manager. 
+# MCPM
+
+Minecraft pack manager.

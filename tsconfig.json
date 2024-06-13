@@ -1,0 +1,13 @@
+{
+    // Visit https://aka.ms/tsconfig to read more about this file
+    // 不会写，@6ch补一下
+    "compilerOptions": {
+        "target": "ESNext",
+        "module": "ESNext",
+        "outDir": "dist",
+        "rootDir": "src",
+        "moduleResolution": "Node"
+    },
+    "include": ["src"],
+    "exclude": ["node_modules", "dist"]
+}

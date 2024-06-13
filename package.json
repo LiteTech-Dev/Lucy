@@ -1,0 +1,29 @@
+{
+  "dependencies": {
+    "@types/commander": "^2.12.2",
+    "commander": "^12.1.0",
+    "inquirer": "^9.2.23",
+    "typescript": "^5.4.5"
+  },
+  "name": "mcpm",
+  "version": "1.0.0",
+  "description": "Pack manager for Minecraft servers",
+  "main": "main.js",
+  "devDependencies": {
+    "@types/inquirer": "^9.0.7",
+    "@types/node": "^20.14.2"
+  },
+  "scripts": {
+    "test": "node cli-interface.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Arcadi4/mcpm.git"
+  },
+  "author": "4rcadia",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Arcadi4/mcpm/issues"
+  },
+  "homepage": "https://github.com/Arcadi4/mcpm#readme","type": "module"
+}
