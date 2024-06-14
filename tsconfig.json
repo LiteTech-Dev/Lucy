@@ -6,6 +6,10 @@
         "module": "ESNext",
         "outDir": "dist",
         "rootDir": "src",
+        "noImplicitAny": true,
+        "resolveJsonModule": true,
+        "strictNullChecks": true,
+        "removeComments": true,
         "moduleResolution": "Node"
     },
     "include": ["src"],

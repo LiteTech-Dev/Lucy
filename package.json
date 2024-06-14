@@ -3,6 +3,7 @@
     "@types/commander": "^2.12.2",
     "commander": "^12.1.0",
     "inquirer": "^9.2.23",
+    "js-yaml": "^4.1.0",
     "typescript": "^5.4.5"
   },
   "name": "mcpm",
@@ -11,6 +12,7 @@
   "main": "main.js",
   "devDependencies": {
     "@types/inquirer": "^9.0.7",
+    "@types/js-yaml": "^4.0.9",
     "@types/node": "^20.14.2"
   },
   "scripts": {
@@ -25,5 +27,6 @@
   "bugs": {
     "url": "https://github.com/Arcadi4/mcpm/issues"
   },
-  "homepage": "https://github.com/Arcadi4/mcpm#readme","type": "module"
+  "homepage": "https://github.com/Arcadi4/mcpm#readme",
+  "type": "module"
 }

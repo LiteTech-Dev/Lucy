@@ -23,7 +23,15 @@ mcpm.command("init")
         if (doInit.confirm === true) {
             initialization();
             console.log("MCPM initialized.");
+        } else {
+            console.log("Stopped.");
         }
     });
+
+// mcpm.command("install")
+//     .description("Install a package")
+//     .action(() => {});
+// mcpm.command("update").description();
+// mcpm.command("upgrade").description();
 
 mcpm.parse(process.argv);
