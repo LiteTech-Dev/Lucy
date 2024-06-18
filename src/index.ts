@@ -12,6 +12,7 @@ mcpm.command("init")
     .description("Initialize MCPM at current directory")
     .action(async () => {
         const initConfirmation = [
+            // 本地化
             {
                 type: "confirm",
                 name: "confirm",
