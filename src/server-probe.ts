@@ -9,7 +9,7 @@ interface MCDR {
 }
 
 export function checkMCDR(path: string = "."): MCDR | null {
-    const mcdrConfigFilePath = path + "/config.yml";
+    const mcdrConfigFilePath = path + "/config.yml"; // change this
     if (fs.existsSync(mcdrConfigFilePath)) {
         const mcdrConfigYAML = fs.readFileSync(mcdrConfigFilePath, "utf-8");
         const mcdrConfig = yaml.load(mcdrConfigYAML) as {

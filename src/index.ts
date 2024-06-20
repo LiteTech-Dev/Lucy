@@ -1,25 +1,24 @@
 import { Command } from "commander";
 import inquirer from "inquirer";
-import { initialization } from "./initialization";
+
+import { initialization } from "./initialization.js";
+import { initConfirmation } from "./prompts.js";
+import "./directory.js";
+import { getMCPMDir } from "./directory.js";
 
 const mcpm = new Command();
 
 // Parent command
-mcpm.name("mcpm").description("Minecraft Pack Manager");
+mcpm.name("mcpm")
+    .description("Minecraft Pack Manager")
+    .action(() => {
+        console.log(getMCPMDir());
+    }); // 本地化
 
 // Sub-command `mcpm init`
 mcpm.command("init")
     .description("Initialize MCPM at current directory")
     .action(async () => {
-        const initConfirmation = [
-            // 本地化
-            {
-                type: "confirm",
-                name: "confirm",
-                message: "Initialize at current directory?",
-                default: false,
-            },
-        ];
         const doInit = await inquirer.prompt(initConfirmation);
         if (doInit.confirm === true) {
             initialization();

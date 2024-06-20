@@ -1,6 +1,6 @@
 import { Question } from "inquirer";
 
-const initConfirmation: Question[] = [
+export const initConfirmation: Question[] = [
     {
         type: "confirm",
         name: "confirm",
