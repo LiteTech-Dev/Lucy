@@ -20,9 +20,8 @@ export function checkMCPMDir(): boolean {
     return fs.existsSync("./.mcpm");
 }
 
-export function getMCPMDir(): path.ParsedPath | null {
+export function getMCPMDir(): path.ParsedPath {
     if (checkMCPMDir()) {
         return path.parse("./.mcpm");
-    }
-    return null;
+    } else throw "";
 }

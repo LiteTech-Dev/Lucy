@@ -1,6 +1,7 @@
 import * as fs from "fs";
+import "";
 
-export async function initialization(): Promise<void> {
+export function initialization(): void {
     fs.mkdirSync(".mcpm");
     // const MCDR = serverProbe.checkMCDR;
 }
