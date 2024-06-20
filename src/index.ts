@@ -3,14 +3,23 @@ import inquirer from "inquirer";
 
 import { initialization } from "./initialization.js";
 import { initConfirmation } from "./prompts.js";
-import "./directory.js";
 import { getMCPMDir } from "./directory.js";
+import i18n from "i18next";
+import init from "i18next-fs-backend";
+
+i18n.use(init).init({
+    lng: "en",
+    fallbackLng: "en",
+    backend: {
+        loadPath: `./assets/i18n/{{lng}}.json`,
+    },
+});
 
 const mcpm = new Command();
 
 // Parent command
 mcpm.name("mcpm")
-    .description("Minecraft Pack Manager")
+    .description(i18n.t("commandDescription"))
     .action(() => {
         console.log(getMCPMDir());
     }); // 本地化

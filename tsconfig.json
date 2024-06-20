@@ -11,6 +11,6 @@
         "strict": true,
         "moduleResolution": "NodeNext"
     },
-    "include": ["src/**/*"],
+    "include": ["src/**/*", "i18n"],
     "exclude": ["node_modules", "dist"]
 }
