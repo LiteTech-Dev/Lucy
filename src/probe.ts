@@ -1,9 +1,21 @@
-class server {
-    // minecraft: Minecraft;
+export class Server {
+    minecraft: Minecraft;
     fabric?: Fabric;
+    forge?: Forge;
     mcdr?: MCDR;
 
-    constructor() {}
+    constructor(
+        minecraft: Minecraft,
+        fabric?: Fabric,
+        forge?: Forge,
+        mcdr?: MCDR
+    ) {
+        this.minecraft = minecraft;
+        if (forge && fabric) throw "Coexistence of forge & fabric";
+        this.fabric = fabric;
+        this.forge = forge;
+        this.mcdr = mcdr;
+    }
 }
 
 class MCDR {
@@ -13,53 +25,29 @@ class MCDR {
 }
 
 class Minecraft {
-    // version: string;
-    constructor() {}
+    version: string;
+    constructor(version: string) {
+        this.version = version;
+    }
 }
 
 class Fabric {
-    // version: string;
-    constructor() {}
+    version: string;
+    constructor(version: string) {
+        this.version = version;
+    }
 }
 
 class Forge {
-    // version: string;
-    constructor() {}
+    version: string;
+    constructor(version: string) {
+        this.version = version;
+    }
 }
 
 class Bukkit {
-    // version: string;
-    constructor() {}
+    version: string;
+    constructor(version: string) {
+        this.version = version;
+    }
 }
-
-// export function checkMCDR(path: string = "."): MCDR | null {
-//     const mcdrConfigFilePath = path + "/config.yml"; // change this
-//     if (fs.existsSync(mcdrConfigFilePath)) {
-//         const mcdrConfigYAML = fs.readFileSync(mcdrConfigFilePath, "utf-8");
-//         const mcdrConfig = yaml.load(mcdrConfigYAML) as {
-//             working_directory: string;
-//             plugin_directories: string[];
-//         };
-//         const MCDR: MCDR = {
-//             serverPath: mcdrConfig.working_directory,
-//             pluginPaths: mcdrConfig.plugin_directories,
-//         };
-//         return MCDR;
-//     }
-//     return null;
-// }
-
-// interface Minecraft {
-//     version: string;
-// }
-
-// export function checkMinecraft(): Minecraft | null {}
-// Unsure how to implement yet.
-
-// interface Fabric {
-//     version: string;
-// }
-
-// export function checkFabric(path: string = "."): Fabric | null {
-//     const fabricLoaderPath = "libraries/net/fabricmc/fabric-loader";
-// }
