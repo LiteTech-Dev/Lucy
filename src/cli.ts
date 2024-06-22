@@ -1,5 +1,5 @@
 import { Command } from "commander";
-import { initialization } from "./initialization.js";
+import { FileSystem } from "./backend.js";
 
 const program = new Command();
 
@@ -9,7 +9,7 @@ program
     .command("init")
     .description("")
     .action(() => {
-        initialization();
+        const fileSystem = new FileSystem();
     });
 
 program.command("list");
@@ -27,5 +27,7 @@ program.command("enable");
 program.command("export");
 
 program.command("import");
+
+program.command("host");
 
 export { program };
