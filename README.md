@@ -1,9 +1,5 @@
-# MCPM
+# Lucy
 
-Minecraft pack manager.
+[EN] | [[中文](./README_CN.md)]
 
-## Commands
-
-### `mcpm init`
-
-Initialization MCPM at the current directory.
+The universal mod/plugin manager for Minecraft
