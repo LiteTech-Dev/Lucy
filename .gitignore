@@ -8,6 +8,10 @@ Icon?
 # Minecraft server for testing
 test-server
 
+# Lock files
+yarn.lock
+package-lock.json
+
 # Logs
 logs
 *.log

@@ -1,56 +1,40 @@
-import fs from "fs";
-import path from "path";
-import yauzl from "yauzl";
-import { Server } from "./server-modules.js";
+import { Server, ServerModule } from "./server.js";
 
-const mcpmPath = ".mcpm";
-
-// Service logic
+// Service logic, singleton
 class Service {
-    fileSystem: FileSystem = new FileSystem();
-    networking: Networking = new Networking();
-    server: Server = this.probeServer();
+    private static service: Service;
+    private server: Server = new Server();
 
-    private probeServer(): Server {
-        let server: Server = new Server();
-        return server;
+    // Constructor
+    private constructor() {
+        this.server = new Server();
+        this.detectServerModules();
     }
+
+    // Global access point
+    public static getService(): Service {
+        if (!Service.service) {
+            Service.service = new Service();
+        }
+        return Service.service;
+    }
+
+    // Assign values to server.modules
+    private detectServerModules(): void {
+        // Detect MCDR
+        this.server.modules.MCDR = {};
+        // Detect Minecraft
+        this.server.modules.Minecraft = {};
+        // Detect Fabric
+        // Detect Forge
+        // Detect Bukkit
+    }
+
+    // $ lucy init
+    public initialization(): void {}
 }
 
 // File related jobs
-class FileSystem {
-    private pwd: string = process.cwd();
-
-    public async readJsonFromJar(
-        jarPath: string, // This should be relative to pwd
-        target: string // This should be relative to the .jar file
-    ): Promise<JSON> {
-        if (/\.json$/i.test(target) === false) {
-            throw "Param 'target' do not point to a JSON file.";
-        }
-
-        const extractPath = path.join(this.pwd, mcpmPath);
-        const jarStream = fs.createReadStream(jarPath);
-
-        yauzl.open(jarPath, (err, zipfile) => {
-            if (err) throw err;
-            zipfile.on("entry", (stream) => {});
-        });
-
-        return JSON.parse("");
-    }
-
-    // public deleteFile() {}
-    // public writeToFile(){}
-
-    constructor() {
-        if (!fs.existsSync(mcpmPath)) {
-            fs.mkdirSync(mcpmPath);
-        }
-    }
-}
-
 // Network related jobs: fetch api, download, etc.
-class Networking {}
 
 export { Service };
