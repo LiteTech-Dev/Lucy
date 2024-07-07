@@ -1,16 +1,28 @@
 import { Command } from "commander";
-import { FileSystem } from "./backend.js";
+import { Service } from "./backend.js";
+import inquirer from "inquirer";
+import { prompts } from "./inquirer-prompts.js";
 
 const program = new Command();
 
-program.name("mcpm").description("");
+program
+    .name("mcpm")
+    .description("")
+    .action(() => {
+        console.log(
+            "A Lucy installation was not detected in the current directory."
+        );
+        inquirer.prompt(prompts.initConfirmation).then((answers) => {
+            if (answers.confirm) {
+                Service.getService().initialization();
+            }
+        });
+    });
 
 program
     .command("init")
     .description("")
-    .action(() => {
-        const fileSystem = new FileSystem();
-    });
+    .action(() => {});
 
 program.command("list");
 
