@@ -2,6 +2,7 @@ import { Command } from "commander";
 import { Service } from "./backend.js";
 import inquirer from "inquirer";
 import { prompts } from "./inquirer-prompts.js";
+import { FileUtil } from "./util/fileUtil.js";
 
 const program = new Command();
 
