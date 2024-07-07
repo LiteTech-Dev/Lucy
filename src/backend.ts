@@ -1,16 +1,15 @@
 import fs from "fs";
 import path from "path";
 import yauzl from "yauzl";
-import { Server } from "./probe.js";
+import { Server } from "./server-modules.js";
+
+const mcpmPath = ".mcpm";
 
 // Service logic
 class Service {
-    private generalOperations(): void {}
-
-    private commandInit(): void {
-        fs.mkdirSync(".mcpm");
-        this.probeServer();
-    }
+    fileSystem: FileSystem = new FileSystem();
+    networking: Networking = new Networking();
+    server: Server = this.probeServer();
 
     private probeServer(): Server {
         let server: Server = new Server();
@@ -21,7 +20,6 @@ class Service {
 // File related jobs
 class FileSystem {
     private pwd: string = process.cwd();
-    private mcpmPath = ".mcpm";
 
     public async readJsonFromJar(
         jarPath: string, // This should be relative to pwd
@@ -31,12 +29,12 @@ class FileSystem {
             throw "Param 'target' do not point to a JSON file.";
         }
 
-        const extractPath = path.join(this.pwd, this.mcpmPath);
+        const extractPath = path.join(this.pwd, mcpmPath);
         const jarStream = fs.createReadStream(jarPath);
 
         yauzl.open(jarPath, (err, zipfile) => {
             if (err) throw err;
-            zipfile.on("read", (stream) => {});
+            zipfile.on("entry", (stream) => {});
         });
 
         return JSON.parse("");
@@ -44,9 +42,15 @@ class FileSystem {
 
     // public deleteFile() {}
     // public writeToFile(){}
+
+    constructor() {
+        if (!fs.existsSync(mcpmPath)) {
+            fs.mkdirSync(mcpmPath);
+        }
+    }
 }
 
 // Network related jobs: fetch api, download, etc.
 class Networking {}
 
-export { Service, FileSystem, Networking };
+export { Service };

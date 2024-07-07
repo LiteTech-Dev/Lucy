@@ -1,4 +1,7 @@
-class ServerSha1 {
+// This file is for the uncompleted sha1 version checking, which is not used.
+// The unpackage method is prioritized.
+
+export class ServerSha1 {
     version: string;
     sha1: string;
     constructor(version: string, sha1: string) {
@@ -15,7 +18,7 @@ async function updateSha1Cache(): Promise<void> {
 
 async function createSha1Cache(): Promise<void> {
     const manifestData: any = await fetch(
-        "https://launchermeta.mojang.com/mc/game/"
+        "https://launchermeta.mojang.com/mc/game/version_manifest.json"
     );
 
     let servers: ServerSha1[];

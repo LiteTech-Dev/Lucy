@@ -17,7 +17,10 @@
     "name": "mcpm",
     "version": "1.0.0",
     "description": "Pack manager for Minecraft servers",
-    "main": "main.js",
+    "scripts": {
+        "build": "tsc && pkg ./dist --output ./app"
+    },
+    "main": "index.js",
     "devDependencies": {
         "@eslint/js": "^9.5.0",
         "@types/inquirer": "^9.0.7",

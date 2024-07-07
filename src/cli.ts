@@ -10,8 +10,6 @@ program
     .description("")
     .action(() => {
         const fileSystem = new FileSystem();
-
-        console.log(fileSystem.extractFromJar("server.jar", "version.json"));
     });
 
 program.command("list");
