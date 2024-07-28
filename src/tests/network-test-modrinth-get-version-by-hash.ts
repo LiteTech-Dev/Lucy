@@ -1,4 +1,4 @@
-import { ModrinthApiHandler } from "../util/network-utils.js";
+import { ModrinthApiHandler } from "../networkUtils/modrinthApiHandler.js";
 export async function runTest() {
     ModrinthApiHandler.getInstance()
         .getVersionByHash("2bece942d05315e512b468301523136c1d79d8b7")

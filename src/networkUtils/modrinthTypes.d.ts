@@ -1,11 +1,10 @@
-export { ModrinthProject };
-// export { ModrinthSearchArgs };
-// export { ModrinthSearchValidFacets };
-export { ModrinthSearchHits };
-export { ModrinthSearchProjectResult };
-export { ModrinthVersion };
+export type modrinthHashAlgorithm = "sha1" | "sha512";
+export type modrinthVersionHash = {
+    val: string;
+    algorithm: modrinthHashAlgorithm;
+};
 
-type ModrinthProject = {
+export type ModrinthProject = {
     slug: string[]; // my_project
     title: string; // My project
     description: string; // A short description
@@ -86,7 +85,7 @@ type ModrinthProject = {
 //     argValue: (string | string[] | boolean | number)[];
 // };
 
-type ModrinthSearchHits = {
+export type ModrinthSearchHits = {
     project_id: string;
     project_type: string;
     slug: string;
@@ -110,7 +109,7 @@ type ModrinthSearchHits = {
     color: number;
 };
 
-type ModrinthSearchProjectResult = {
+export type ModrinthSearchProjectResult = {
     hits: ModrinthSearchHits[];
     offset: number;
     limit: number;
@@ -121,7 +120,7 @@ type ModrinthSearchProjectResult = {
  * Raw format of JSON that Modrinth "version" api responses.
  * You should convert it to class.mod
  */
-type ModrinthVersion = {
+export type ModrinthVersion = {
     game_versions: string[];
     loaders: string[];
     id: string;
