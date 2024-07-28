@@ -3,6 +3,7 @@
         "@types/commander": "^2.12.2",
         "@types/semver": "^7.5.8",
         "@types/yauzl": "^2.10.3",
+        "axios": "^1.7.2",
         "chalk": "^5.3.0",
         "child_process": "^1.0.2",
         "commander": "^12.1.0",
@@ -18,7 +19,8 @@
     "version": "1.0.0",
     "description": "Pack manager for Minecraft servers",
     "scripts": {
-        "build": "tsc && pkg ./dist --output ./app"
+        "build": "tsc && pkg ./dist --output ./app",
+        "test-network-util": "tsc && cd src && node tests/test-hash-search.js/runTest()"
     },
     "main": "index.js",
     "devDependencies": {
