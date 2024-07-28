@@ -20,7 +20,9 @@
     "description": "Pack manager for Minecraft servers",
     "scripts": {
         "build": "tsc && pkg ./dist --output ./app",
-        "test-network-util": "tsc && cd src && node tests/test-hash-search.js/runTest()"
+        "test-network-get-version-by-hash": "tsc && cd dist && node tests/network-test-modrinth-get-verrsion-by-hash.js",
+        "test-network-modrinth-search": "tsc && cd dist && node tests/network-test-modrinth-search.js",
+        "test-network-modrinth-get-project": "tsc && cd dist && node tests/network-test-modrinth-get-project.js"
     },
     "main": "index.js",
     "devDependencies": {
