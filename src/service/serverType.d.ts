@@ -2,9 +2,9 @@ class Server {
     modules: { [key: string]: ServerModule } = {};
 }
 
-interface ServerModule {
+type ServerModule = {
     version?: string;
-}
+};
 
 export { Server };
 export type { ServerModule };

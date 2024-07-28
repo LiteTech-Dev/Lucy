@@ -1,4 +1,4 @@
-import { Server, ServerModule } from "./server.js";
+import { Server } from "./serverType.js";
 
 // Service logic, singleton
 class Service {
