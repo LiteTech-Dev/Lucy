@@ -9,7 +9,11 @@
         "strictNullChecks": true,
         "removeComments": true,
         "strict": true,
-        "moduleResolution": "NodeNext"
+        "moduleResolution": "NodeNext",
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "types": ["jest"]
     },
     "include": ["src/**/*", "i18n"],
     "exclude": ["node_modules", "dist"]

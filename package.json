@@ -18,14 +18,18 @@
     "version": "1.0.0",
     "description": "Pack manager for Minecraft servers",
     "scripts": {
-        "build": "tsc && pkg ./dist --output ./app"
+        "build": "tsc && pkg ./dist --output ./app",
+        "dev": "tsc && cd dist && node index.js",
+        "test": "tsc && cd dist && node tests/fileUtil.ExtractFromJar.test.js"
     },
     "main": "index.js",
     "devDependencies": {
         "@eslint/js": "^9.8.0",
         "@types/inquirer": "^9.0.7",
+        "@types/jest": "^29.5.12",
         "@types/js-yaml": "^4.0.9",
         "@types/node": "^20.14.2",
+        "babel-jest": "^29.7.0",
         "eslint-plugin-typescript": "^0.14.0",
         "globals": "^15.8.0",
         "typescript": "^5.4.5",
