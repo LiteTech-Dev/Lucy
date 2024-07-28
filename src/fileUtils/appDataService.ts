@@ -24,13 +24,14 @@ export class AppDataService {
         return fs.existsSync(this.appDataPath);
     }
 
-    public fileExists(target: string): boolean {
-        const targetPath = path.join(this.appDataPath, target);
-        return fs.existsSync(targetPath);
+    public exist(...targets: string[]): boolean {
+        return targets.every((target) =>
+            fs.existsSync(path.join(cwd(), target))
+        );
     }
 
     public async readFrom(target: string): Promise<string> {
-        if (!this.fileExists(target)) return "";
+        if (!this.exist(target)) return "";
         const targetPath = path.join(this.appDataPath, target);
         return new Promise((resolve, reject) => {
             fs.readFile(targetPath, "utf-8", (err, data) => {
@@ -52,7 +53,7 @@ export class AppDataService {
     }
 
     public async delete(target: string): Promise<void> {
-        if (!this.fileExists(target)) return;
+        if (!this.exist(target)) return;
         const targetPath = path.join(this.appDataPath, target);
         return new Promise((resolve, reject) => {
             fs.unlink(targetPath, (err) => {

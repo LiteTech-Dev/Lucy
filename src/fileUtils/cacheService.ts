@@ -2,6 +2,8 @@ import fs from "fs";
 import { tmpdir } from "os";
 import path from "path";
 
+// Do not use this yet, it is unsure if the caching is necessary
+
 export class CacheService {
     private static _instance: CacheService;
     private readonly cachePath = path.join(tmpdir(), "lucy");

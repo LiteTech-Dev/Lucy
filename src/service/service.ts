@@ -1,37 +1,20 @@
-import { Server } from "./serverType.js";
-
 // Service logic, singleton
 class Service {
-    private static service: Service;
-    private server: Server = new Server();
+    private static _instance: Service;
 
     // Constructor
-    private constructor() {
-        this.server = new Server();
-        this.detectServerModules();
-    }
+    private constructor() {}
 
     // Global access point
-    public static getService(): Service {
-        if (!Service.service) {
-            Service.service = new Service();
+    public static getInstance(): Service {
+        if (!Service._instance) {
+            Service._instance = new Service();
         }
-        return Service.service;
-    }
-
-    // Assign values to server.modules
-    private detectServerModules(): void {
-        // Detect MCDR
-        this.server.modules.MCDR = {};
-        // Detect Minecraft
-        this.server.modules.Minecraft = {};
-        // Detect Fabric
-        // Detect Forge
-        // Detect Bukkit
+        return Service._instance;
     }
 
     // $ lucy init
-    public initialization(): void {}
+    // public initialization(): void {}
 }
 
 // File related jobs

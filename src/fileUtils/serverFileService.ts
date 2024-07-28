@@ -16,6 +16,7 @@ export class ServerFileService {
 
     public async readFileFromZip(zip: string, target: string): Promise<string> {
         // Use this method for jar files
+        if (!this.exist(zip)) return "";
         const zipPath = path.join(cwd(), zip);
         return new Promise((resolve, reject) => {
             yauzl.open(zipPath, { lazyEntries: true }, (err, zipFile) => {
@@ -43,6 +44,7 @@ export class ServerFileService {
     }
 
     public async readFrom(target: string): Promise<string> {
+        if (!this.exist(target)) return "";
         const targetPath = path.join(cwd(), target);
         return new Promise((resolve, reject) => {
             fs.readFile(targetPath, "utf-8", (err, data) => {
@@ -50,5 +52,11 @@ export class ServerFileService {
                 resolve(data);
             });
         });
+    }
+
+    public exist(...targets: string[]): boolean {
+        return targets.every((target) =>
+            fs.existsSync(path.join(cwd(), target))
+        );
     }
 }

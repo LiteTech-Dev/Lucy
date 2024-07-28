@@ -1,5 +1,4 @@
 import { Command } from "commander";
-import { Service } from "./backend.js";
 import inquirer from "inquirer";
 import { prompts } from "./inquirer-prompts.js";
 
@@ -14,7 +13,7 @@ program
         );
         inquirer.prompt(prompts.initConfirmation).then((answers) => {
             if (answers.confirm) {
-                Service.getService().initialization();
+                console.log("Placeholder for initialization");
             }
         });
     });
