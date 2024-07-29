@@ -40,6 +40,10 @@
         "url": "git+https://github.com/Arcadi4/mcpm.git"
     },
     "author": "4rcadia",
+    "contributors": [
+        "6ch",
+        "WinterUnderTheSnow"
+    ],
     "license": "MIT",
     "bugs": {
         "url": "https://github.com/Arcadi4/mcpm/issues"
