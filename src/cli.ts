@@ -6,7 +6,7 @@ import { prompts } from "./inquirer-prompts.js";
 const program = new Command();
 
 program
-    .name("Lucy")
+    .name("lucy")
     .description("")
     .action(() => {
         console.log(

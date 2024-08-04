@@ -295,11 +295,11 @@
       "locked": false,
       "fontSize": 20,
       "fontFamily": 2,
-      "text": "Lucy目录\n(类似git的.git/目录)",
+      "text": "MCPM目录\n(类似git的.git/目录)",
       "textAlign": "center",
       "verticalAlign": "middle",
       "containerId": "SYQyoK5KseBqMBlH4poTk",
-      "originalText": "Lucy目录\n(类似git的.git/目录)",
+      "originalText": "MCPM目录\n(类似git的.git/目录)",
       "lineHeight": 1.15,
       "baseline": 42
     },
