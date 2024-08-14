@@ -5,9 +5,21 @@ import fs from "fs";
 
 export class Server {
     private static _instance: Server;
-    path: string = cwd();
+    path: string;
+    private modules: ServerModule[] = [];
 
-    private constructor() {}
+    private constructor() {
+        // Initialize MCDR
+        const mcdrConfig: McdrConfig | null = this.readMcdrConfig();
+
+        if (mcdrConfig) {
+            const mcdr = new Mcdr(mcdrConfig);
+            this.modules.push(mcdr);
+            this.path = mcdr.mcdrServerPath;
+        } else {
+            this.path = cwd();
+        }
+    }
 
     // Global access point
     public static getInstance(): Server {
@@ -17,13 +29,41 @@ export class Server {
         return Server._instance;
     }
 
-    // addModule(module: ServerModule) {
-    //     this[module.name] = module;
-    // }
+    public moduleExists(moduleName: string): boolean {
+        return this.modules.some((module) => module.name === moduleName);
+    }
+
+    private getModule(moduleName: string): ServerModule | null {
+        return (
+            this.modules.find((module) => module.name === moduleName) || null
+        );
+    }
+    private readMcdrConfig(): McdrConfig | null {
+        const mcdrConfigPath = path.resolve(cwd(), "config.yml");
+        let mcdrConfig: McdrConfig;
+
+        try {
+            const mcdrConfigYml: string = fs
+                .readFileSync(mcdrConfigPath)
+                .toString();
+            mcdrConfig = jsyaml.load(mcdrConfigYml) as McdrConfig;
+            if (Object.values(mcdrConfig).some((value) => !value)) return null;
+            return mcdrConfig;
+        } catch (error) {
+            // TODO: Log error properly
+            console.error("Error reading config:", error);
+        }
+
+        // Return null if reading config fails
+        return null;
+    }
 }
 
 class ServerModule {
     name!: string;
+    constructor(name: string) {
+        this.name = name;
+    }
 }
 
 interface McdrConfig {
@@ -31,20 +71,15 @@ interface McdrConfig {
     plugin_directories: string[];
 }
 
-// Not tested yet
-function getMcdr(this: Server): ServerModule {
-    const mcdr = new ServerModule() as ServerModule & {
-        mcdrServerPath: string;
-        mcdrPluginsPath: string[];
-    };
-    mcdr.name = "MCDR";
-    const mcdrConfigYml: string = fs
-        .readFileSync(path.join(cwd(), "config.yml"))
-        .toString();
-    const mcdrConfig: McdrConfig = jsyaml.load(mcdrConfigYml) as McdrConfig;
-    mcdr.mcdrServerPath = mcdrConfig.working_directory;
-    mcdr.mcdrPluginsPath = mcdrConfig.plugin_directories;
-    this.path = path.join(cwd(), mcdr.mcdrServerPath); // Audit Server's path
-    return mcdr;
+class Mcdr extends ServerModule {
+    mcdrServerPath: string = "";
+    mcdrPluginPaths: string[] = [];
+
+    constructor(config: McdrConfig) {
+        super("MCDR");
+        this.mcdrServerPath = config.working_directory;
+        this.mcdrPluginPaths = config.plugin_directories;
+    }
+}
 }
 
