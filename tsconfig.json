@@ -2,7 +2,7 @@
     // Visit https://aka.ms/tsconfig to read more about this file
     "compilerOptions": {
         "target": "ESNext",
-        "module": "NodeNext",
+        "module": "Node16",
         "outDir": "dist",
         "rootDir": "src",
         "noImplicitAny": true,
@@ -15,6 +15,6 @@
         "forceConsistentCasingInFileNames": true,
         "types": ["jest"]
     },
-    "include": ["src/**/*", "i18n"],
+    "include": ["src/**/*"],
     "exclude": ["node_modules", "dist"]
 }
