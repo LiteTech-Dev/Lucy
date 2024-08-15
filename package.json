@@ -18,7 +18,7 @@
     "description": "Pack manager for Minecraft servers",
     "scripts": {
         "build": "rm -rf dist && tsc && rollup -c && pkg dist/bundle.js --output ./build/lucy-macos-arm64 --targets node16",
-        "test": "tsc && jest ./dist"
+        "test": "jest"
     },
     "main": "dist/index.js",
     "devDependencies": {
