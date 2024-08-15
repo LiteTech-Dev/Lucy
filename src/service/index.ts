@@ -1,2 +1,2 @@
-import { Server } from "./classServer.js";
-export default Server;
+import { ServerHandler } from "./serverHandler.js";
+export default ServerHandler;

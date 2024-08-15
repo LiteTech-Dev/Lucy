@@ -2,6 +2,7 @@ import path from "path";
 import yauzl from "yauzl";
 import { cwd } from "process";
 import fs from "fs";
+import { FileNotFoundError } from "./fileError.js";
 
 export class ServerFileService {
     private static _instance: ServerFileService;
@@ -16,7 +17,7 @@ export class ServerFileService {
 
     public async readFileFromZip(zip: string, target: string): Promise<string> {
         // Use this method for jar files
-        if (!this.exist(zip)) return "";
+        if (!this.exist(zip)) throw FileNotFoundError;
         const zipPath = path.join(cwd(), zip);
         return new Promise((resolve, reject) => {
             yauzl.open(zipPath, { lazyEntries: true }, (err, zipFile) => {
@@ -30,7 +31,9 @@ export class ServerFileService {
                                 chunks.push(chunk);
                             });
                             readStream.on("end", () => {
-                                return resolve(chunks.concat().toString());
+                                return resolve(
+                                    Buffer.concat(chunks).toString()
+                                );
                             });
                             readStream.on("error", reject);
                         });
@@ -44,12 +47,12 @@ export class ServerFileService {
     }
 
     public async readFrom(target: string): Promise<string> {
-        if (!this.exist(target)) return "";
+        if (!this.exist(target)) throw FileNotFoundError;
         const targetPath = path.join(cwd(), target);
         return new Promise((resolve, reject) => {
             fs.readFile(targetPath, "utf-8", (err, data) => {
-                if (err) reject(err);
-                resolve(data);
+                if (err) return reject(err);
+                return resolve(data);
             });
         });
     }
