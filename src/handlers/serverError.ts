@@ -54,10 +54,24 @@ abstract class ModLoaderError extends ServerError {
     }
 }
 
-class MultipleModLoadersFoundError extends ModLoaderError {
+class CoexistenceOfFabricAndForgeError extends ModLoaderError {
     constructor() {
         super("There are multiple mod loaders found");
-        this.name = "MultipleModLoadersFoundError";
+        this.name = "CoexistenceOfFabricAndForgeError";
+    }
+}
+
+abstract class MinecraftError extends ServerError {
+    constructor(message: string) {
+        super(message);
+        this.name = "MinecraftError";
+    }
+}
+
+class MinecraftNotFoundError extends MinecraftError {
+    constructor() {
+        super("Minecraft not found");
+        this.name = "MinecraftNotFoundError";
     }
 }
 
@@ -66,5 +80,6 @@ export {
     MultipleExecutablesFoundError,
     McdrConfigNotFoundError,
     McdrConfigInvalidError,
-    MultipleModLoadersFoundError,
+    CoexistenceOfFabricAndForgeError,
+    MinecraftNotFoundError,
 };
