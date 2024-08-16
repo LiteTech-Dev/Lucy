@@ -6,8 +6,13 @@ import { FileNotFoundError } from "./fileError.js";
 
 export class ServerFileService {
     private static _instance: ServerFileService;
+    private path: string;
+    // Problem: this.path relies on serverHandler, however, serverHandler will likely call this calss on initialization
 
-    private constructor() {}
+    private constructor() {
+        this.path = cwd();
+        // TODO: use alternative if mcdr exists
+    }
 
     public static getInstance(): ServerFileService {
         if (!ServerFileService._instance)

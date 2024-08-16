@@ -26,8 +26,45 @@ class MultipleExecutablesFoundError extends ServerExecutableError {
     }
 }
 
+abstract class McdrError extends ServerError {
+    constructor(message: string) {
+        super(message);
+        this.name = "McdrError";
+    }
+}
+
+class McdrConfigNotFoundError extends McdrError {
+    constructor() {
+        super("MCDR config not found");
+        this.name = "McdrConfigNotFoundError";
+    }
+}
+
+class McdrConfigInvalidError extends McdrError {
+    constructor() {
+        super("MCDR config is invalid");
+        this.name = "McdrConfigInvalidError";
+    }
+}
+
+abstract class ModLoaderError extends ServerError {
+    constructor(message: string) {
+        super(message);
+        this.name = "ModLoaderError";
+    }
+}
+
+class MultipleModLoadersFoundError extends ModLoaderError {
+    constructor() {
+        super("There are multiple mod loaders found");
+        this.name = "MultipleModLoadersFoundError";
+    }
+}
+
 export {
-    ServerExecutableError,
     NoExecutableFoundError,
     MultipleExecutablesFoundError,
+    McdrConfigNotFoundError,
+    McdrConfigInvalidError,
+    MultipleModLoadersFoundError,
 };

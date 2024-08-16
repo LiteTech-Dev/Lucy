@@ -1,4 +1,4 @@
-class ServerModule {
+abstract class ServerModule {
     name!: string;
     constructor(name: string) {
         this.name = name;
@@ -8,6 +8,17 @@ class ServerModule {
 interface McdrConfig {
     working_directory: string;
     plugin_directories: string[];
+}
+
+function isMcdrConfig(obj: unknown): obj is McdrConfig {
+    if (typeof obj !== "object" || obj === null) return false;
+    const valid =
+        typeof (obj as McdrConfig).working_directory === "string" &&
+        Array.isArray((obj as McdrConfig).plugin_directories) &&
+        (obj as McdrConfig).plugin_directories.every(
+            (dir: unknown) => typeof dir === "string"
+        );
+    return valid;
 }
 
 class Mcdr extends ServerModule {
@@ -45,5 +56,8 @@ class Forge extends ServerModule {
     }
 }
 
-export { ServerModule, Mcdr, Minecraft, Fabric, Forge };
-export type { McdrConfig };
+type ModLoader = Fabric | Forge;
+
+export { Mcdr, Minecraft, Fabric, Forge };
+export type { McdrConfig, ModLoader };
+export { isMcdrConfig };
