@@ -2,7 +2,7 @@ import { cwd } from "process";
 // import properties from "properties-reader";
 
 import { Mcdr, McdrConfig, Minecraft, ModLoader } from "./classServerModule.js";
-import { readMcdrConfig, searchForServerExecutable } from "./utils.js";
+import { readMcdrConfig, searchForServerExecutable } from "./serverProbing.js";
 
 export class ServerHandler {
     private static _instance: ServerHandler;

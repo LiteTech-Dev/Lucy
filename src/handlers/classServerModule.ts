@@ -5,6 +5,17 @@ abstract class ServerModule {
     }
 }
 
+class ServerExecutable {
+    path: string;
+    minecraft: Minecraft;
+    modLoader?: ModLoader;
+    constructor(path: string, minecraft: Minecraft, modLoader?: ModLoader) {
+        this.path = path;
+        this.minecraft = minecraft;
+        this.modLoader = modLoader;
+    }
+}
+
 interface McdrConfig {
     working_directory: string;
     plugin_directories: string[];
@@ -34,6 +45,7 @@ class Mcdr extends ServerModule {
 
 class Minecraft extends ServerModule {
     version: string;
+    bukkit?: Bukkit;
     constructor(version: string) {
         super("Minecraft");
         this.version = version;
@@ -56,8 +68,17 @@ class Forge extends ServerModule {
     }
 }
 
+class Bukkit extends ServerModule {
+    version: string;
+    constructor(version: string) {
+        super("Bukkit");
+        this.version = version;
+    }
+}
+
 type ModLoader = Fabric | Forge;
 
 export { Mcdr, Minecraft, Fabric, Forge };
 export type { McdrConfig, ModLoader };
 export { isMcdrConfig };
+export { ServerExecutable };

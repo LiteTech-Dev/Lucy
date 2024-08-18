@@ -4,25 +4,23 @@ import { cwd } from "process";
 import fs from "fs";
 import { FileNotFoundError } from "./fileError.js";
 
-export class ServerFileService {
-    private static _instance: ServerFileService;
-    private path: string;
+export class ZipUtil {
+    private static _instance: ZipUtil;
     // Problem: this.path relies on serverHandler, however, serverHandler will likely call this calss on initialization
 
-    private constructor() {
-        this.path = cwd();
-        // TODO: use alternative if mcdr exists
-    }
+    private constructor() {}
 
-    public static getInstance(): ServerFileService {
-        if (!ServerFileService._instance)
-            ServerFileService._instance = new ServerFileService();
-        return ServerFileService._instance;
+    public static getInstance(): ZipUtil {
+        if (!ZipUtil._instance) ZipUtil._instance = new ZipUtil();
+        return ZipUtil._instance;
     }
 
     public async readFileFromZip(zip: string, target: string): Promise<string> {
         // Use this method for jar files
+
+        // Check if the file exists
         if (!this.exist(zip)) throw FileNotFoundError;
+
         const zipPath = path.join(cwd(), zip);
         return new Promise((resolve, reject) => {
             yauzl.open(zipPath, { lazyEntries: true }, (err, zipFile) => {
@@ -51,18 +49,29 @@ export class ServerFileService {
         });
     }
 
-    public async readFrom(target: string): Promise<string> {
-        if (!this.exist(target)) throw FileNotFoundError;
-        const targetPath = path.join(cwd(), target);
+    public async fileExistsInZip(
+        zip: string,
+        target: string
+    ): Promise<boolean> {
+        if (!this.exist(zip)) return false;
+
+        const zipPath = path.join(cwd(), zip);
         return new Promise((resolve, reject) => {
-            fs.readFile(targetPath, "utf-8", (err, data) => {
+            yauzl.open(zipPath, { lazyEntries: true }, (err, zipFile) => {
                 if (err) return reject(err);
-                return resolve(data);
+                zipFile.on("entry", (entry: yauzl.Entry) => {
+                    if (entry.fileName === target) {
+                        return resolve(true);
+                    } else {
+                        zipFile.readEntry();
+                    }
+                });
+                zipFile.readEntry();
             });
         });
     }
 
-    public exist(...targets: string[]): boolean {
+    private exist(...targets: string[]): boolean {
         return targets.every((target) =>
             fs.existsSync(path.join(cwd(), target))
         );

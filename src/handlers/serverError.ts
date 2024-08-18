@@ -26,6 +26,13 @@ class MultipleExecutablesFoundError extends ServerExecutableError {
     }
 }
 
+class InvalidExecutableError extends ServerExecutableError {
+    constructor() {
+        super("Invalid server executable");
+        this.name = "InvalidExecutableError";
+    }
+}
+
 abstract class McdrError extends ServerError {
     constructor(message: string) {
         super(message);
@@ -82,4 +89,5 @@ export {
     McdrConfigInvalidError,
     CoexistenceOfFabricAndForgeError,
     MinecraftNotFoundError,
+    InvalidExecutableError,
 };
