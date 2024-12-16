@@ -27,3 +27,12 @@ go.work.sum
 
 # IDE file
 .idea
+
+# System files
+.DS_Store
+
+# Binary output
+dist
+
+# Testing server
+test_server*
