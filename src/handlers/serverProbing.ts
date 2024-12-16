@@ -12,8 +12,6 @@ import {
 import {
     McdrConfigNotFoundError,
     McdrConfigInvalidError,
-    MultipleExecutablesFoundError,
-    NoExecutableFoundError,
     InvalidExecutableError,
 } from "./serverError.js";
 import { ZipUtil } from "../fileUtils/zipUtil.js";
@@ -82,7 +80,7 @@ async function validiateServerExecutable(
 
 export function searchForServerExecutable(
     pathToSearch: string
-): ServerExecutable {
+): ServerExecutable[] {
     // This function was still poorly defined
     // The process of validiating the executable includes determining the version and other imformation
 
@@ -106,16 +104,7 @@ export function searchForServerExecutable(
         }
     });
 
-    switch (validExecutables.length) {
-        case 0:
-            throw new NoExecutableFoundError();
-        case 1:
-            return validExecutables[0];
-        default:
-            throw new MultipleExecutablesFoundError();
-        // After throwing this, the caller should prompt the user to choose a default
-        // Then, the user's choice should be saved in the config file
-    }
+    return validExecutables;
 }
 
 function initVanilla(data: string): Minecraft {

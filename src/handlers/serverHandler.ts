@@ -1,8 +1,18 @@
 import { cwd } from "process";
 // import properties from "properties-reader";
 
-import { Mcdr, McdrConfig, Minecraft, ModLoader } from "./classServerModule.js";
+import {
+    Mcdr,
+    McdrConfig,
+    Minecraft,
+    ModLoader,
+    ServerExecutable,
+} from "./classServerModule.js";
 import { readMcdrConfig, searchForServerExecutable } from "./serverProbing.js";
+import {
+    MultipleExecutablesFoundError,
+    NoExecutableFoundError,
+} from "./serverError.js";
 
 export class ServerHandler {
     private static _instance: ServerHandler;
@@ -10,7 +20,7 @@ export class ServerHandler {
     private mcdr?: Mcdr;
     private minecraft: Minecraft = new Minecraft("1.0");
     path: string = cwd();
-    executable: string = "";
+    executable: ServerExecutable;
 
     private constructor() {
         // Initialize MCDR
@@ -24,12 +34,17 @@ export class ServerHandler {
         }
 
         // Search for server jar
-        try {
-            this.executable = searchForServerExecutable(this.path);
-        } catch (err) {
-            // TODO: Return this to the user
-            // If no executable is found, exit and notify the user
-            // If multiple executables are found, let them choose a default
+        const validExecutables = searchForServerExecutable(this.path);
+        switch (validExecutables.length) {
+            case 0:
+                throw NoExecutableFoundError;
+
+            case 1:
+                this.executable = validExecutables[0];
+                break;
+
+            default:
+                throw MultipleExecutablesFoundError;
         }
 
         // Analyze the executable to initialize minecraft and modLoader
