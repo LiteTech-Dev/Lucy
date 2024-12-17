@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/urfave/cli/v3"
 	"lucy/probe"
+	"strings"
 )
 
 var Frontend = "cli"
@@ -20,21 +21,28 @@ var Cli = &cli.Command{
 			Action:  noArgAction,
 			Commands: []*cli.Command{
 				{
-					Name:   "mod",
-					Usage:  "Add new mod(s)",
-					Action: addMod,
+					Name:  "mod",
+					Usage: "Add new mod(s)",
 				},
 			},
 		},
 		{
 			Name:    "info",
-			Usage:   "List everything installed on your server",
+			Usage:   "Display information of the current server",
 			Aliases: []string{"i"},
 			Action: func(ctx context.Context, cmd *cli.Command) error {
-				fmt.Println(probe.GetServerInfo().ServerWorkPath)
-				fmt.Println(probe.GetServerInfo().ModLoaderType)
-				fmt.Println(probe.GetServerInfo().ModLoaderVersion)
-				fmt.Println(probe.GetServerInfo().GameVersion)
+				serverInfo := probe.GetServerInfo()
+				fmt.Printf("Minecraft v%s\n", serverInfo.Executable.GameVersion)
+				fmt.Printf(
+					"%s%s ",
+					strings.ToUpper(serverInfo.Executable.ModLoaderType[:1]),
+					serverInfo.Executable.ModLoaderType[1:],
+				)
+				if serverInfo.Executable.ModLoaderType != "vanilla" {
+					fmt.Printf("v%s\n", serverInfo.Executable.ModLoaderVersion)
+				} else {
+					fmt.Printf("\n")
+				}
 				return nil
 			},
 		},
