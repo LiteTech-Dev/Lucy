@@ -6,7 +6,8 @@ import (
 )
 
 const mcdrConfigFileName = "config.yml"
-const fabricPropertiesFileName = "install.properties"
+const fabricAttributeFileName = "install.properties"
+const vanillaAttributeFileName = "version.json"
 
 // GetServerInfo
 // Sequence:

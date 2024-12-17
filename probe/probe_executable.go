@@ -52,6 +52,15 @@ func analyzeServerExecutable(executableFile string) *types.ServerExecutable {
 				)[0], "=",
 			)[1]
 			return &serverExecutable
+		case vanillaAttributeFileName:
+			versionDotJson := types.VersionDotJson{}
+			serverExecutable.ModLoaderType = "vanilla"
+			r, _ := f.Open()
+			data, _ := io.ReadAll(r)
+			_ = json.Unmarshal(data, &versionDotJson)
+			serverExecutable.GameVersion = versionDotJson.Id
+			serverExecutable.ModLoaderVersion = ""
+			return &serverExecutable
 		}
 	}
 
