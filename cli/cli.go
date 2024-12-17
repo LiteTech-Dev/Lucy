@@ -7,6 +7,7 @@ import (
 	"lucy/probe"
 )
 
+var Frontend = "cli"
 var Cli = &cli.Command{
 	Name:   "lucy",
 	Usage:  "The Minecraft server-side package manager",
@@ -26,11 +27,14 @@ var Cli = &cli.Command{
 			},
 		},
 		{
-			Name:    "list",
+			Name:    "info",
 			Usage:   "List everything installed on your server",
-			Aliases: []string{"ls"},
+			Aliases: []string{"i"},
 			Action: func(ctx context.Context, cmd *cli.Command) error {
-				fmt.Println(probe.GetServerFiles().ServerWorkPath)
+				fmt.Println(probe.GetServerInfo().ServerWorkPath)
+				fmt.Println(probe.GetServerInfo().ModLoaderType)
+				fmt.Println(probe.GetServerInfo().ModLoaderVersion)
+				fmt.Println(probe.GetServerInfo().GameVersion)
 				return nil
 			},
 		},

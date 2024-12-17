@@ -1,7 +1,7 @@
 package types
 
-// ServerFiles components that do not exist, use an empty string
-type ServerFiles struct {
+// ServerInfo components that do not exist, use an empty string
+type ServerInfo struct {
 	HasMcdr        bool
 	McdrConfigPath string
 
@@ -10,7 +10,7 @@ type ServerFiles struct {
 	McdrPluginPaths []string
 	ExecutablePath  string
 
-	MinecraftVersion string
+	GameVersion      string
 	ModLoaderType    string
 	ModLoaderVersion string
 }
