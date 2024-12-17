@@ -3,7 +3,6 @@ package types
 // ServerInfo components that do not exist, use an empty string
 type ServerInfo struct {
 	HasMcdr         bool
-	McdrConfigPath  string
 	McdrPluginPaths []string
 
 	ServerWorkPath string

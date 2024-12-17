@@ -24,7 +24,7 @@ func getMcdr() (exists bool, config *types.McdrConfig) {
 	defer func(configFile *os.File) {
 		err := configFile.Close()
 		if err != nil {
-
+			log.Fatal(err)
 		}
 	}(configFile)
 

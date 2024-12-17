@@ -33,6 +33,9 @@ var Cli = &cli.Command{
 			Action: func(ctx context.Context, cmd *cli.Command) error {
 				serverInfo := probe.GetServerInfo()
 				fmt.Printf("Minecraft v%s\n", serverInfo.Executable.GameVersion)
+				if serverInfo.HasMcdr {
+					fmt.Printf("Managed by MCDR\n")
+				}
 				fmt.Printf(
 					"%s%s ",
 					strings.ToUpper(serverInfo.Executable.ModLoaderType[:1]),
