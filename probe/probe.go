@@ -21,6 +21,8 @@ const fabricPropertiesFileName = "install.properties"
 // 3. From the jar we can detect Minecraft, Forge and(or) Fabric versions
 func GetServerInfo() types.ServerInfo {
 	var serverFiles types.ServerInfo
+
+	// MCDR Stage
 	if mcdrExists, mcdrConfig := getMcdr(); mcdrExists {
 		serverFiles.HasMcdr = true
 		serverFiles.McdrConfigPath = path.Join(
@@ -28,15 +30,25 @@ func GetServerInfo() types.ServerInfo {
 		)
 		serverFiles.McdrPluginPaths = mcdrConfig.PluginDirectories
 	}
+
+	// Executable Stage
+	var suspectedExecutables []types.ServerExecutable
 	serverFiles.ServerWorkPath = getServerWorkPath()
 	for _, jarFile := range findJarFiles(serverFiles.ServerWorkPath) {
-		// TODO: Add multiple jar files detection here
 		if gameVersion, modLoaderType, modLoaderVersion := analyzeServerExecutable(jarFile); gameVersion != "" {
-			serverFiles.GameVersion = gameVersion
-			serverFiles.ModLoaderType = modLoaderType
-			serverFiles.ModLoaderVersion = modLoaderVersion
-			break
+			suspectedExecutables = append(
+				suspectedExecutables, types.ServerExecutable{
+					Path: gameVersion, GameVersion: modLoaderType,
+					ModLoaderType: modLoaderVersion, ModLoaderVersion: jarFile,
+				},
+			)
 		}
+	}
+	if len(suspectedExecutables) == 1 {
+		serverFiles.Executable = suspectedExecutables[0]
+	} else if len(suspectedExecutables) > 1 {
+		// TODO: Replace this with prompting the user to select one
+		serverFiles.Executable = suspectedExecutables[0]
 	}
 	return serverFiles
 }
@@ -129,4 +141,8 @@ func analyzeServerExecutable(executableFile string) (
 	}
 
 	return "", "", ""
+}
+
+func promtUserToSelectJarFile(jarFiles []string) string {
+	return ""
 }
