@@ -9,7 +9,7 @@ type ServerInfo struct {
 	ServerWorkPath string
 	ModPath        string
 
-	Executable ServerExecutable
+	Executable *ServerExecutable
 }
 
 type ServerExecutable struct {

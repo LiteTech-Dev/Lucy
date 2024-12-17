@@ -27,16 +27,11 @@ func GetServerInfo() types.ServerInfo {
 	}
 
 	// Executable Stage
-	var suspectedExecutables []types.ServerExecutable
+	var suspectedExecutables []*types.ServerExecutable
 	serverFiles.ServerWorkPath = getServerWorkPath()
 	for _, jarFile := range findJarFiles(serverFiles.ServerWorkPath) {
-		if gameVersion, modLoaderType, modLoaderVersion := analyzeServerExecutable(jarFile); gameVersion != "" {
-			suspectedExecutables = append(
-				suspectedExecutables, types.ServerExecutable{
-					Path: gameVersion, GameVersion: modLoaderType,
-					ModLoaderType: modLoaderVersion, ModLoaderVersion: jarFile,
-				},
-			)
+		if exec := analyzeServerExecutable(jarFile); exec != nil {
+			suspectedExecutables = append(suspectedExecutables, exec)
 		}
 	}
 	if len(suspectedExecutables) == 1 {
