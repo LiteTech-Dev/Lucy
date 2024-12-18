@@ -18,7 +18,7 @@ import (
 // SubcmdSearch
 // Search syntax:
 // lucy search <query>
-// Query can either be a single word or a string in the format of "loader/name"
+// Query can either be a single word or a string in the format of "platform/package"
 // Example: lucy search carpet
 // Example: lucy search fabric/carpet
 // Example: lucy search mcdr/prime-backup
@@ -84,13 +84,15 @@ func SubcmdSearch(ctx context.Context, cmd *cli.Command) error {
 // 			["server_side:optional","server_side:required"],
 // 			["project_type:mod"]
 // 		]
+// https://docs.modrinth.com/api/operations/searchprojects/
 
-// https://api.modrinth.com/v2/search?limit=20&index=relevance&query=Carpet&facets=%5B%5B%22categories:'forge'%22,%22categories:'fabric'%22,%22categories:'quilt'%22,%22categories:'liteloader'%22,%22categories:'modloader'%22,%22categories:'rift'%22,%22categories:'neoforge'%22%5D,%5B%22project_type:mod%22%5D%5D
-
-func constructModrinthSearchUrl(q string) (url string) {
+func constructModrinthSearchUrl(packageName string) (url string) {
 	var urlBuilder strings.Builder
+	// For some reason the non-encoded url do not work???
+	// Not even when it is re-encoded
+	// TODO: Find out why as non-encoded url is easier to construct
 	templateUrl, _ := template.New("template_url").Parse(`https://api.modrinth.com/v2/search?limit=100&index=relevance&query={{.}}&facets=%5B%5B%22categories:'forge'%22,%22categories:'fabric'%22,%22categories:'quilt'%22,%22categories:'liteloader'%22,%22categories:'modloader'%22,%22categories:'rift'%22,%22categories:'neoforge'%22%5D,%5B%22project_type:mod%22%5D%5D`)
-	_ = templateUrl.Execute(&urlBuilder, q)
+	_ = templateUrl.Execute(&urlBuilder, packageName)
 	return urlBuilder.String()
 }
 
