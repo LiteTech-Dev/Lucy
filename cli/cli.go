@@ -18,10 +18,11 @@ var Cli = &cli.Command{
 			Name:  "search",
 			Usage: "Search for mods and plugins",
 			Flags: []cli.Flag{
+				// TODO: This flag is not yet implemented
 				&cli.StringFlag{
 					Name:     "source",
 					Aliases:  []string{"s"},
-					Usage:    "Specify the source to search from `SOURCE`",
+					Usage:    "To search from `SOURCE`",
 					Value:    "modrinth",
 					Required: false,
 					Validator: func(s string) error {
@@ -39,17 +40,10 @@ var Cli = &cli.Command{
 			Usage:   "Add new mods, plugins, or server modules",
 			Aliases: []string{"a"},
 			Action:  noArgAction,
-			Commands: []*cli.Command{
-				{
-					Name:  "mod",
-					Usage: "Add new mod(s)",
-				},
-			},
 		},
 		{
-			Name:    "info",
-			Usage:   "Display information of the current server",
-			Aliases: []string{"i"},
+			Name:  "status",
+			Usage: "Display basic information of the current server",
 			Action: func(ctx context.Context, cmd *cli.Command) error {
 				serverInfo := probe.GetServerInfo()
 
