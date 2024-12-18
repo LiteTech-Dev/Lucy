@@ -11,7 +11,6 @@ import (
 var Frontend = "cli"
 
 var Cli = &cli.Command{
-
 	Name:   "lucy",
 	Usage:  "The Minecraft server-side package manager",
 	Action: noArgAction,
@@ -28,7 +27,12 @@ func noArgAction(_ context.Context, cmd *cli.Command) error {
 	return nil
 }
 
-// Parse the platform/package syntax
+// Search syntax:
+// lucy search <query>
+// Query can either be a single word or a string in the format of "platform/package"
+// Example: lucy search carpet
+// Example: lucy search fabric/carpet
+// Example: lucy search mcdr/prime-backup
 func parsePackageSyntax(query string) (platform string, packageName string) {
 	split := strings.Split(query, "/")
 	if len(split) == 1 {
