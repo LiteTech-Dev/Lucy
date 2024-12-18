@@ -14,7 +14,30 @@ import (
 	"text/tabwriter"
 )
 
-func SubcmdInfo(ctx context.Context, cmd *cli.Command) error {
+var SubcmdInfo = &cli.Command{
+	Name:  "info",
+	Usage: "Display information of a mod or plugin",
+	Flags: []cli.Flag{
+		// TODO: This flag is not yet implemented
+		&cli.StringFlag{
+			Name:    "source",
+			Aliases: []string{"s"},
+			Usage:   "To fetch info from `SOURCE`",
+			Value:   "modrinth",
+		},
+		// TODO: This flag is not yet implemented
+		&cli.BoolFlag{
+			Name:     "raw",
+			Aliases:  []string{"r"},
+			Usage:    "Print raw Markdown output",
+			Value:    false,
+			Required: false,
+		},
+	},
+	Action: ActionInfo,
+}
+
+func ActionInfo(ctx context.Context, cmd *cli.Command) error {
 	platform, packageName := parsePackageSyntax(cmd.Args().First())
 	switch platform {
 	case "":

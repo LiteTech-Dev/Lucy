@@ -8,7 +8,13 @@ import (
 	"strings"
 )
 
-func SubcmdStatus(ctx context.Context, cmd *cli.Command) error {
+var SubcmdStatus = &cli.Command{
+	Name:   "status",
+	Usage:  "Display basic information of the current server",
+	Action: ActionStatus,
+}
+
+func ActionStatus(ctx context.Context, cmd *cli.Command) error {
 	serverInfo := probe.GetServerInfo()
 
 	// Print game version

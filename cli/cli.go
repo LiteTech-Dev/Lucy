@@ -2,72 +2,23 @@ package cli
 
 import (
 	"context"
-	"fmt"
 	"github.com/urfave/cli/v3"
 	"strings"
 )
 
+// Frontend
+// This changes when user runs the web interface
 var Frontend = "cli"
+
 var Cli = &cli.Command{
+
 	Name:   "lucy",
 	Usage:  "The Minecraft server-side package manager",
 	Action: noArgAction,
 	Commands: []*cli.Command{
-		{
-			Name:  "info",
-			Usage: "Display information of a mod or plugin",
-			Flags: []cli.Flag{
-				// TODO: This flag is not yet implemented
-				&cli.StringFlag{
-					Name:    "source",
-					Aliases: []string{"s"},
-					Usage:   "To fetch info from `SOURCE`",
-					Value:   "modrinth",
-				},
-				// TODO: This flag is not yet implemented
-				&cli.BoolFlag{
-					Name:     "raw",
-					Aliases:  []string{"r"},
-					Usage:    "Print raw Markdown output",
-					Value:    false,
-					Required: false,
-				},
-			},
-
-			Action: SubcmdInfo,
-		},
-		{
-			Name:  "search",
-			Usage: "Search for mods and plugins",
-			Flags: []cli.Flag{
-				// TODO: This flag is not yet implemented
-				&cli.StringFlag{
-					Name:     "source",
-					Aliases:  []string{"s"},
-					Usage:    "To search from `SOURCE`",
-					Value:    "modrinth",
-					Required: false,
-					Validator: func(s string) error {
-						if s != "modrinth" && s != "curseforge" {
-							return fmt.Errorf("unsupported source: %s", s)
-						}
-						return nil
-					},
-				},
-			},
-			Action: SubcmdSearch,
-		},
-		{
-			Name:    "add",
-			Usage:   "Add new mods, plugins, or server modules",
-			Aliases: []string{"a"},
-			Action:  noArgAction,
-		},
-		{
-			Name:   "status",
-			Usage:  "Display basic information of the current server",
-			Action: SubcmdStatus,
-		},
+		SubcmdStatus,
+		SubcmdInfo,
+		SubcmdSearch,
 	},
 }
 
