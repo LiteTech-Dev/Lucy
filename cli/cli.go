@@ -15,6 +15,29 @@ var Cli = &cli.Command{
 	Action: noArgAction,
 	Commands: []*cli.Command{
 		{
+			Name:  "info",
+			Usage: "Display information of a mod or plugin",
+			Flags: []cli.Flag{
+				// TODO: This flag is not yet implemented
+				&cli.StringFlag{
+					Name:    "source",
+					Aliases: []string{"s"},
+					Usage:   "To fetch info from `SOURCE`",
+					Value:   "modrinth",
+				},
+				// TODO: This flag is not yet implemented
+				&cli.BoolFlag{
+					Name:     "raw",
+					Aliases:  []string{"r"},
+					Usage:    "Print raw Markdown output",
+					Value:    false,
+					Required: false,
+				},
+			},
+
+			Action: SubcmdInfo,
+		},
+		{
 			Name:  "search",
 			Usage: "Search for mods and plugins",
 			Flags: []cli.Flag{
@@ -77,4 +100,16 @@ var Cli = &cli.Command{
 func noArgAction(_ context.Context, cmd *cli.Command) error {
 	cli.ShowAppHelpAndExit(cmd, 0)
 	return nil
+}
+
+// Parse the platform/package syntax
+func parsePackageSyntax(query string) (platform string, packageName string) {
+	split := strings.Split(query, "/")
+	if len(split) == 1 {
+		return "all", split[0]
+	} else if len(split) == 2 {
+		return split[0], split[1]
+	} else {
+		return "", ""
+	}
 }
