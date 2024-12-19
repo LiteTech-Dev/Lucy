@@ -4,11 +4,10 @@ package types
 type ServerInfo struct {
 	HasMcdr         bool
 	McdrPluginPaths []string
-
-	ServerWorkPath string
-	ModPath        string
-
-	Executable *ServerExecutable
+	ServerWorkPath  string
+	ModPath         string
+	HasLucy         bool
+	Executable      *ServerExecutable
 }
 
 type ServerExecutable struct {

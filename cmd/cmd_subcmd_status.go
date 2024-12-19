@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/urfave/cli/v3"
 	"lucy/probe"
-	"os"
 	"strings"
 )
 
@@ -26,7 +25,7 @@ func ActionStatus(ctx context.Context, cmd *cli.Command) error {
 		fmt.Printf("Managed by MCDR\n")
 	}
 
-	// Print mod loader type and version
+	// Print mod loader types and version
 	fmt.Printf(
 		"%s%s ",
 		strings.ToUpper(serverInfo.Executable.ModLoaderType[:1]),
@@ -39,9 +38,9 @@ func ActionStatus(ctx context.Context, cmd *cli.Command) error {
 	}
 
 	// Print lucy status
-	if _, err := os.Stat(".lucy"); err == nil {
-		fmt.Println("Lucy installed")
-	} else if os.IsNotExist(err) {
+	if serverInfo.HasLucy {
+		fmt.Println("Managed by Lucy")
+	} else {
 		fmt.Println("Lucy not installed")
 		fmt.Println("Run `lucy init` to install Lucy")
 	}
