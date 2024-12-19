@@ -51,3 +51,9 @@ func GetServerInfo() types.ServerInfo {
 
 	return serverInfo
 }
+
+// Some functions that gets a single piece of information
+func HasLucy() bool {
+	_, err := os.Stat(".lucy")
+	return err == nil
+}
