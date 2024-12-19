@@ -3,6 +3,7 @@ package probe
 import (
 	"lucy/types"
 	"os"
+	"path"
 )
 
 const mcdrConfigFileName = "config.yml"
@@ -40,6 +41,11 @@ func GetServerInfo() types.ServerInfo {
 	} else if len(suspectedExecutables) > 1 {
 		// TODO: Replace this with prompting the user to select one
 		serverInfo.Executable = suspectedExecutables[0]
+	}
+
+	// Further directory detection
+	if serverInfo.Executable.ModLoaderType == "fabric" || serverInfo.Executable.ModLoaderType == "forge" {
+		serverInfo.ModPath = path.Join(serverInfo.ServerWorkPath, "mods")
 	}
 
 	// Check for lucy installation
