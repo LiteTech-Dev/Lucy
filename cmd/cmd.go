@@ -45,5 +45,3 @@ func parsePackageSyntax(query string) (platform string, packageName string) {
 		return "", ""
 	}
 }
-
-const LucyDir = ".lucy"

@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"github.com/urfave/cli/v3"
+	"lucy/util"
 	"os"
 )
 
@@ -13,6 +14,6 @@ var SubcmdInit = &cli.Command{
 }
 
 func InitAction(ctx context.Context, cmd *cli.Command) error {
-	os.Mkdir(LucyDir, 0755)
+	os.Mkdir(util.LucyPath, 0755)
 	return nil
 }
