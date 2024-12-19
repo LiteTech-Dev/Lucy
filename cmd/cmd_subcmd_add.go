@@ -79,13 +79,9 @@ func getNewestMorinthProjectVersion(slug string) (newestVersion types.ModrinthPr
 		for _, gameVersion := range version.GameVersions {
 			// This if statement is a bit long and unreadable
 			// TODO: Refactor
-			if reflect.DeepEqual(
-				newestVersion,
-				types.ModrinthProjectVersion{},
-			) ||
-				(gameVersion == serverInfo.Executable.GameVersion &&
-					version.VersionType == "release" &&
-					version.DatePublished.After(newestVersion.DatePublished)) {
+			if gameVersion == serverInfo.Executable.GameVersion &&
+				version.VersionType == "release" &&
+				version.DatePublished.After(newestVersion.DatePublished) {
 				newestVersion = version
 			}
 		}
