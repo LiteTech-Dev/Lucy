@@ -44,14 +44,14 @@ func ActionInfo(ctx context.Context, cmd *cli.Command) error {
 		return errors.New("invalid query format")
 	case "all":
 		// TODO: Wide range search
-		res, _ := http.Get(constructMorinthInfoURL(packageName))
+		res, _ := http.Get(constructModrinthProjectUrl(packageName))
 		modrinthProject := types.ModrinthProject{}
 		data, _ := io.ReadAll(res.Body)
 		json.Unmarshal(data, &modrinthProject)
 		generateInfoOutput(modrinthProject)
 	case "fabric":
 		// TODO: Fabric specific search
-		res, _ := http.Get(constructMorinthInfoURL(packageName))
+		res, _ := http.Get(constructModrinthProjectUrl(packageName))
 		modrinthProject := types.ModrinthProject{}
 		data, _ := io.ReadAll(res.Body)
 		json.Unmarshal(data, &modrinthProject)
@@ -70,6 +70,6 @@ func generateInfoOutput(modrinthProject types.ModrinthProject) {
 	writer.Flush()
 }
 
-func constructMorinthInfoURL(packageName string) (url string) {
+func constructModrinthProjectUrl(packageName string) (url string) {
 	return "https://api.modrinth.com/v2/project/" + packageName
 }

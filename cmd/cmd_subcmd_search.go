@@ -94,7 +94,7 @@ func searchModrinth(
 	packageName string,
 	showClientPackage bool,
 	indexBy string,
-) (result types.ModrinthSearchRes) {
+) (result types.ModrinthSearchResults) {
 	// Construct the search url
 	const facetsCategoryAll = `["categories:'forge'","categories:'fabric'","categories:'quilt'","categories:'liteloader'","categories:'modloader'","categories:'rift'","categories:'neoforge'"]`
 	const facetsCategoryForge = `["categories:'forge'"]`

@@ -29,9 +29,11 @@ func noArgAction(_ context.Context, cmd *cli.Command) error {
 	return nil
 }
 
-// Search syntax:
-// lucy search <query>
-// Query can either be a single word or a string in the format of "platform/package"
+// Package syntax:
+// A package can either be specified by its name or string in the format of "platform/package"
+// The package name is the slug of the package
+// TODO: Tolerate substitution between '-' and '_'
+// TODO: Tolerate case-sensitivity
 // Example: lucy search carpet
 // Example: lucy search fabric/carpet
 // Example: lucy search mcdr/prime-backup

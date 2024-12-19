@@ -45,7 +45,7 @@ type ModrinthProject struct {
 	MonetizationStatus   string        `json:"monetization_status"`
 }
 
-type ModrinthSearchRes struct {
+type ModrinthSearchResults struct {
 	Hits []struct {
 		ProjectId         string    `json:"project_id"`
 		ProjectType       string    `json:"project_type"`
@@ -72,4 +72,34 @@ type ModrinthSearchRes struct {
 	Offset    int `json:"offset"`
 	Limit     int `json:"limit"`
 	TotalHits int `json:"total_hits"`
+}
+
+type ModrinthProjectVersion struct {
+	GameVersions    []string    `json:"game_versions"`
+	Loaders         []string    `json:"loaders"`
+	Id              string      `json:"id"`
+	ProjectId       string      `json:"project_id"`
+	AuthorId        string      `json:"author_id"`
+	Featured        bool        `json:"featured"`
+	Name            string      `json:"name"`
+	VersionNumber   string      `json:"version_number"`
+	Changelog       string      `json:"changelog"`
+	ChangelogUrl    interface{} `json:"changelog_url"`
+	DatePublished   time.Time   `json:"date_published"`
+	Downloads       int         `json:"downloads"`
+	VersionType     string      `json:"version_type"`
+	Status          string      `json:"status"`
+	RequestedStatus interface{} `json:"requested_status"`
+	Files           []struct {
+		Hashes struct {
+			Sha1   string `json:"sha1"`
+			Sha512 string `json:"sha512"`
+		} `json:"hashes"`
+		Url      string      `json:"url"`
+		Filename string      `json:"filename"`
+		Primary  bool        `json:"primary"`
+		Size     int         `json:"size"`
+		FileType interface{} `json:"file_type"`
+	} `json:"files"`
+	Dependencies []interface{} `json:"dependencies"`
 }
