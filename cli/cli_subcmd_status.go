@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/urfave/cli/v3"
 	"lucy/probe"
+	"os"
 	"strings"
 )
 
@@ -35,6 +36,14 @@ func ActionStatus(ctx context.Context, cmd *cli.Command) error {
 		fmt.Printf("v%s\n", serverInfo.Executable.ModLoaderVersion)
 	} else {
 		fmt.Printf("\n")
+	}
+
+	// Print lucy status
+	if _, err := os.Stat(".lucy"); err == nil {
+		fmt.Println("Lucy installed")
+	} else if os.IsNotExist(err) {
+		fmt.Println("Lucy not installed")
+		fmt.Println("Run `lucy init` to install Lucy")
 	}
 
 	return nil

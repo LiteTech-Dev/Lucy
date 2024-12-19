@@ -18,6 +18,8 @@ var Cli = &cli.Command{
 		SubcmdStatus,
 		SubcmdInfo,
 		SubcmdSearch,
+		SubcmdAdd,
+		SubcmdInit,
 	},
 }
 
@@ -43,3 +45,5 @@ func parsePackageSyntax(query string) (platform string, packageName string) {
 		return "", ""
 	}
 }
+
+const LucyDir = ".lucy"

@@ -1,6 +1,9 @@
 package cli
 
-import "github.com/urfave/cli/v3"
+import (
+	"context"
+	"github.com/urfave/cli/v3"
+)
 
 var SubcmdAdd = &cli.Command{
 	Name:  "add",
@@ -14,4 +17,8 @@ var SubcmdAdd = &cli.Command{
 		},
 	},
 	Action: noArgAction,
+}
+
+func ActionAdd(ctx context.Context, cmd *cli.Command) error {
+	return nil
 }
