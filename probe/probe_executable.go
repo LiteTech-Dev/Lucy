@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-func getExecutable() (executable *types.ServerExecutable) {
+func getServerExecutable() (executable *types.ServerExecutable) {
 	var suspectedExecutables []*types.ServerExecutable
 	for _, jarFile := range findJarFiles(getServerWorkPath()) {
 		if exec := analyzeServerExecutable(jarFile); exec != nil {
