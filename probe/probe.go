@@ -2,6 +2,7 @@ package probe
 
 import (
 	"errors"
+	"github.com/joho/godotenv"
 	"lucy/types"
 	"os"
 	"path"
@@ -69,9 +70,15 @@ func getServerWorkPath() string {
 	return "."
 }
 
+func getServerDotProperties() *types.ServerDotProperties {
+	propertiesPath := path.Join(getServerWorkPath(), "server.properties")
+	propertiesMap, _ := godotenv.Unmarshal(propertiesPath)
+	return (*types.ServerDotProperties)(&propertiesMap)
+}
+
 func getSavePath() string {
-	// TODO: Read server.properties to get the world name
-	return path.Join(getServerWorkPath(), "world")
+	levelName := (*getServerDotProperties())["level-name"]
+	return path.Join(getServerWorkPath(), levelName)
 }
 
 func CheckIsRunning() bool {
