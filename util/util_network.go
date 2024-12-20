@@ -28,10 +28,10 @@ func DownloadFile(
 		panic("Lucy is not installed")
 	}
 
-	out, err := os.Create(path.Join(LucyPath, "downloads", subdir, filename))
+	out, err := os.Create(path.Join(LucyDownloadDir, subdir, filename))
 	if os.IsNotExist(err) {
-		os.MkdirAll(path.Join(LucyPath, "downloads", subdir), os.ModePerm)
-		out, _ = os.Create(path.Join(LucyPath, "downloads", subdir, filename))
+		os.MkdirAll(path.Join(LucyDownloadDir, subdir), os.ModePerm)
+		out, _ = os.Create(path.Join(LucyDownloadDir, subdir, filename))
 	}
 	defer out.Close()
 
