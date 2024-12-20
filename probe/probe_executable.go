@@ -11,6 +11,22 @@ import (
 	"strings"
 )
 
+func getExecutable() (executable *types.ServerExecutable) {
+	var suspectedExecutables []*types.ServerExecutable
+	for _, jarFile := range findJarFiles(getServerWorkPath()) {
+		if exec := analyzeServerExecutable(jarFile); exec != nil {
+			suspectedExecutables = append(suspectedExecutables, exec)
+		}
+	}
+	if len(suspectedExecutables) == 1 {
+		executable = suspectedExecutables[0]
+	} else if len(suspectedExecutables) > 1 {
+		// TODO: Replace this with prompting the user to select one
+		executable = suspectedExecutables[0]
+	}
+	return
+}
+
 func findJarFiles(dir string) (jarFiles []string) {
 	entries, _ := os.ReadDir(dir)
 	for _, entry := range entries {

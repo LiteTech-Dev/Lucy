@@ -9,6 +9,9 @@ import (
 	"syscall"
 )
 
+// IMPORTANT: Inside this package, any call to GetServerInfo() have the risk
+// to cause a stack overflow.
+
 const mcdrConfigFileName = "config.yml"
 const fabricAttributeFileName = "install.properties"
 const vanillaAttributeFileName = "version.json"
@@ -20,8 +23,6 @@ const vanillaAttributeFileName = "version.json"
 //     the user to select one
 //  3. From the jar we can detect Minecraft, Forge and(or) Fabric versions
 //  4. Then search for related dirs (mods/, config/, plugins/, etc.)
-//
-// TODO: refactor to separate functions
 func GetServerInfo() types.ServerInfo {
 	var serverInfo types.ServerInfo
 
@@ -29,18 +30,7 @@ func GetServerInfo() types.ServerInfo {
 	serverInfo.ServerWorkPath = getServerWorkPath()
 
 	// Executable Stage
-	var suspectedExecutables []*types.ServerExecutable
-	for _, jarFile := range findJarFiles(serverInfo.ServerWorkPath) {
-		if exec := analyzeServerExecutable(jarFile); exec != nil {
-			suspectedExecutables = append(suspectedExecutables, exec)
-		}
-	}
-	if len(suspectedExecutables) == 1 {
-		serverInfo.Executable = suspectedExecutables[0]
-	} else if len(suspectedExecutables) > 1 {
-		// TODO: Replace this with prompting the user to select one
-		serverInfo.Executable = suspectedExecutables[0]
-	}
+	serverInfo.Executable = getExecutable()
 
 	// Further directory detection
 	if serverInfo.Executable.ModLoaderType == "fabric" || serverInfo.Executable.ModLoaderType == "forge" {
