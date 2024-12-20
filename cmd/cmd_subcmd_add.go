@@ -2,16 +2,11 @@ package cmd
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"github.com/urfave/cli/v3"
-	"io"
+	"lucy/modrinth"
 	"lucy/probe"
-	"lucy/types"
 	"lucy/util"
-	"net/http"
-	url2 "net/url"
-	"reflect"
 )
 
 var SubcmdAdd = &cli.Command{
@@ -56,7 +51,7 @@ func ActionAdd(_ context.Context, cmd *cli.Command) error {
 		return errors.New("platform mismatch")
 	}
 
-	newestVersion := getNewestMorinthProjectVersion(packageName)
+	newestVersion := modrinth.GetNewestProjectVersion(packageName)
 	file := util.DownloadFile(
 		// Not sure how to deal with multiple files
 		// As the motivation for publishers to provide multiple files is unclear
@@ -69,49 +64,4 @@ func ActionAdd(_ context.Context, cmd *cli.Command) error {
 	util.InstallMod(file)
 
 	return nil
-}
-
-func getNewestMorinthProjectVersion(slug string) (newestVersion types.ModrinthProjectVersion) {
-	newestVersion = types.ModrinthProjectVersion{}
-	versions := getModrinthProjectVersions(slug)
-	serverInfo := probe.GetServerInfo()
-	for _, version := range versions {
-		for _, gameVersion := range version.GameVersions {
-			if gameVersion == serverInfo.Executable.GameVersion &&
-				version.VersionType == "release" &&
-				version.DatePublished.After(newestVersion.DatePublished) {
-				newestVersion = version
-			}
-		}
-	}
-	if reflect.DeepEqual(newestVersion, types.ModrinthProjectVersion{}) {
-		errors.New("no available version found")
-	}
-
-	return
-}
-
-func constructModrinthProjectVersionsUrl(slug string) (url string) {
-	url, _ = url2.JoinPath(
-		"https://api.modrinth.com/v2/project",
-		slug,
-		"version",
-	)
-	return
-}
-
-func getModrinthProjectVersions(slug string) (versions []types.ModrinthProjectVersion) {
-	res, _ := http.Get(constructModrinthProjectVersionsUrl(slug))
-	data, _ := io.ReadAll(res.Body)
-	json.Unmarshal(data, &versions)
-	return
-}
-
-func getModrinthProjectId(slug string) (id string) {
-	res, _ := http.Get(constructModrinthProjectUrl(slug))
-	modrinthProject := types.ModrinthProject{}
-	data, _ := io.ReadAll(res.Body)
-	json.Unmarshal(data, &modrinthProject)
-	id = modrinthProject.Id
-	return
 }

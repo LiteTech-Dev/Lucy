@@ -8,6 +8,7 @@ import (
 	"github.com/mitchellh/go-wordwrap"
 	"github.com/urfave/cli/v3"
 	"io"
+	"lucy/modrinth"
 	"lucy/types"
 	"net/http"
 	"os"
@@ -44,14 +45,14 @@ func ActionInfo(ctx context.Context, cmd *cli.Command) error {
 		return errors.New("invalid query format")
 	case "all":
 		// TODO: Wide range search
-		res, _ := http.Get(constructModrinthProjectUrl(packageName))
+		res, _ := http.Get(modrinth.ConstructProjectUrl(packageName))
 		modrinthProject := types.ModrinthProject{}
 		data, _ := io.ReadAll(res.Body)
 		json.Unmarshal(data, &modrinthProject)
 		generateInfoOutput(modrinthProject)
 	case "fabric":
 		// TODO: Fabric specific search
-		res, _ := http.Get(constructModrinthProjectUrl(packageName))
+		res, _ := http.Get(modrinth.ConstructProjectUrl(packageName))
 		modrinthProject := types.ModrinthProject{}
 		data, _ := io.ReadAll(res.Body)
 		json.Unmarshal(data, &modrinthProject)
@@ -68,8 +69,4 @@ func generateInfoOutput(modrinthProject types.ModrinthProject) {
 	wrappedBody := wordwrap.WrapString(modrinthProject.Body, uint(maxWidth))
 	fmt.Fprintln(writer, wrappedBody)
 	writer.Flush()
-}
-
-func constructModrinthProjectUrl(packageName string) (url string) {
-	return "https://api.modrinth.com/v2/project/" + packageName
 }
