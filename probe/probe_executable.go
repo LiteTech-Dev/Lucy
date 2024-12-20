@@ -68,7 +68,7 @@ func analyzeServerExecutable(executableFile string) *types.ServerExecutable {
 			)[1]
 			return &serverExecutable
 		case vanillaAttributeFileName:
-			versionDotJson := types.VersionDotJson{}
+			versionDotJson := types.JarVersionDotJson{}
 			serverExecutable.ModLoaderType = "vanilla"
 			r, _ := f.Open()
 			data, _ := io.ReadAll(r)

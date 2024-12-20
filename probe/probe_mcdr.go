@@ -12,7 +12,7 @@ import (
 // MCDR detects its installation under cwd by check whether the config.yml file exists
 // No validation is performed, for empty fields the default value will be filled
 // Therefore to align with it, we only detect for the existence of the config.yml file
-func getMcdr() (exists bool, config *types.McdrConfig) {
+func getMcdr() (exists bool, config *types.McdrConfigDotYml) {
 	if _, err := os.Stat(mcdrConfigFileName); os.IsNotExist(err) {
 		return false, nil
 	}
@@ -33,7 +33,7 @@ func getMcdr() (exists bool, config *types.McdrConfig) {
 		log.Fatal(err)
 	}
 
-	config = new(types.McdrConfig)
+	config = new(types.McdrConfigDotYml)
 	if err := yaml.Unmarshal(configData, config); err != nil {
 		log.Fatal(err)
 	}

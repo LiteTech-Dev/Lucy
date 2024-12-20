@@ -80,10 +80,10 @@ func getServerWorkPath() string {
 	return "."
 }
 
-func getServerDotProperties() *types.ServerDotProperties {
+func getServerDotProperties() *types.MinecraftServerDotProperties {
 	propertiesPath := path.Join(getServerWorkPath(), "server.properties")
 	propertiesMap, _ := godotenv.Unmarshal(propertiesPath)
-	return (*types.ServerDotProperties)(&propertiesMap)
+	return (*types.MinecraftServerDotProperties)(&propertiesMap)
 }
 
 func getSavePath() string {

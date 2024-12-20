@@ -1,6 +1,36 @@
 package types
 
-type McdrConfig struct {
+import "time"
+
+// I am using the ContextFilenameDotExtension to name structs for a specific
+// file. Not sure whether this a good thing to do.
+
+// MinecraftServerDotProperties is not universal across game versions. Therefore,
+// it is just a map[string]string. Just remember to check the game version before
+// calling any newly added property.
+type MinecraftServerDotProperties map[string]string
+
+// JarVersionDotJson (version.json) do not exist across all game versions.
+// TODO: Backtrack the last version with this file
+// TODO: Implement an alternative version check method (checksum)
+type JarVersionDotJson struct {
+	Id              string `json:"id"`
+	Name            string `json:"name"`
+	WorldVersion    int    `json:"world_version"`
+	SeriesId        string `json:"series_id"`
+	ProtocolVersion int    `json:"protocol_version"`
+	PackVersion     struct {
+		Resource int `json:"resource"`
+		Data     int `json:"data"`
+	} `json:"pack_version"`
+	BuildTime     time.Time `json:"build_time"`
+	JavaComponent string    `json:"java_component"`
+	JavaVersion   int       `json:"java_version"`
+	Stable        bool      `json:"stable"`
+	UseEditor     bool      `json:"use_editor"`
+}
+
+type McdrConfigDotYml struct {
 	Language         string `yaml:"language"`
 	WorkingDirectory string `yaml:"working_directory"`
 	StartCommand     string `yaml:"start_command"`
