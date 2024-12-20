@@ -17,7 +17,7 @@ func DownloadFile(
 	subdir string,
 	filename string,
 ) (outFile *os.File) {
-	if !probe.HasLucy() {
+	if !probe.CheckHasLucy() {
 		// This is a very bad implementation
 		// Not sure whether I should check for Lucy's existence here
 		// Maybe we should assume all callers have checked it??

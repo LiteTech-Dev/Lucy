@@ -1,9 +1,11 @@
 package probe
 
 import (
+	"errors"
 	"lucy/types"
 	"os"
 	"path"
+	"syscall"
 )
 
 const mcdrConfigFileName = "config.yml"
@@ -17,17 +19,13 @@ const vanillaAttributeFileName = "version.json"
 //     the user to select one
 //  3. From the jar we can detect Minecraft, Forge and(or) Fabric versions
 //  4. Then search for related dirs (mods/, config/, plugins/, etc.)
+//
+// TODO: refactor to separate functions
 func GetServerInfo() types.ServerInfo {
 	var serverInfo types.ServerInfo
 
 	// MCDR Stage
-	if hasMcdr, mcdrConfig := getMcdr(); hasMcdr {
-		serverInfo.HasMcdr = true
-		serverInfo.ServerWorkPath = mcdrConfig.WorkingDirectory
-		serverInfo.McdrPluginPaths = mcdrConfig.PluginDirectories
-	} else {
-		serverInfo.ServerWorkPath = "."
-	}
+	serverInfo.ServerWorkPath = getServerWorkPath()
 
 	// Executable Stage
 	var suspectedExecutables []*types.ServerExecutable
@@ -47,19 +45,48 @@ func GetServerInfo() types.ServerInfo {
 	if serverInfo.Executable.ModLoaderType == "fabric" || serverInfo.Executable.ModLoaderType == "forge" {
 		serverInfo.ModPath = path.Join(serverInfo.ServerWorkPath, "mods")
 	}
+	serverInfo.SavePath = getSavePath()
 
 	// Check for lucy installation
-	if _, err := os.Stat(".lucy"); err == nil {
-		serverInfo.HasLucy = true
-	} else if os.IsNotExist(err) {
-		serverInfo.HasLucy = false
-	}
+	serverInfo.HasLucy = CheckHasLucy()
+
+	// Check if the server is running
+	serverInfo.IsRunning = CheckIsRunning()
 
 	return serverInfo
 }
 
 // Some functions that gets a single piece of information
-func HasLucy() bool {
+func CheckHasLucy() bool {
 	_, err := os.Stat(".lucy")
 	return err == nil
+}
+
+func getServerWorkPath() string {
+	if hasMcdr, mcdrConfig := getMcdr(); hasMcdr {
+		return mcdrConfig.WorkingDirectory
+	}
+	return "."
+}
+
+func getSavePath() string {
+	// TODO: Read server.properties to get the world name
+	return path.Join(getServerWorkPath(), "world")
+}
+
+func CheckIsRunning() bool {
+	lockPath := path.Join(
+		getSavePath(),
+		"session.lock",
+	)
+	file, _ := os.OpenFile(lockPath, os.O_RDWR, 0666)
+	defer file.Close()
+
+	err := syscall.Flock(int(file.Fd()), syscall.LOCK_EX|syscall.LOCK_NB)
+	if errors.Is(err, syscall.EWOULDBLOCK) {
+		return true
+	}
+	syscall.Flock(int(file.Fd()), syscall.LOCK_UN)
+
+	return false
 }

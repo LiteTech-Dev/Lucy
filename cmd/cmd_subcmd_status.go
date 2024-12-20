@@ -37,6 +37,13 @@ func ActionStatus(ctx context.Context, cmd *cli.Command) error {
 		fmt.Printf("\n")
 	}
 
+	// Print active status
+	if serverInfo.IsRunning {
+		fmt.Println("Currently running")
+	} else {
+		fmt.Println("Currently stopped")
+	}
+
 	// Print lucy status
 	if serverInfo.HasLucy {
 		fmt.Println("Managed by Lucy")

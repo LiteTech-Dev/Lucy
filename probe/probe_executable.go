@@ -12,7 +12,6 @@ import (
 )
 
 func findJarFiles(dir string) (jarFiles []string) {
-	jarFiles = make([]string, 0)
 	entries, _ := os.ReadDir(dir)
 	for _, entry := range entries {
 		if entry.IsDir() {

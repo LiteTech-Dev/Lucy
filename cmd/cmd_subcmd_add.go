@@ -77,8 +77,6 @@ func getNewestMorinthProjectVersion(slug string) (newestVersion types.ModrinthPr
 	serverInfo := probe.GetServerInfo()
 	for _, version := range versions {
 		for _, gameVersion := range version.GameVersions {
-			// This if statement is a bit long and unreadable
-			// TODO: Refactor
 			if gameVersion == serverInfo.Executable.GameVersion &&
 				version.VersionType == "release" &&
 				version.DatePublished.After(newestVersion.DatePublished) {

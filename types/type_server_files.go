@@ -6,7 +6,9 @@ type ServerInfo struct {
 	McdrPluginPaths []string
 	ServerWorkPath  string
 	ModPath         string
+	SavePath        string
 	HasLucy         bool
+	IsRunning       bool
 	Executable      *ServerExecutable
 }
 
