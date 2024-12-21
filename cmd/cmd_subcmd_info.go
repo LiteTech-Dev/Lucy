@@ -3,12 +3,12 @@ package cmd
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/mitchellh/go-wordwrap"
 	"github.com/urfave/cli/v3"
 	"io"
 	"lucy/modrinth"
+	"lucy/syntax"
 	"lucy/types"
 	"net/http"
 	"os"
@@ -39,27 +39,29 @@ var SubcmdInfo = &cli.Command{
 }
 
 func ActionInfo(ctx context.Context, cmd *cli.Command) error {
-	platform, packageName := parsePackageSyntax(cmd.Args().First())
-	switch platform {
-	case "":
-		return errors.New("invalid query format")
-	case "all":
+	// TODO: Error handling
+	_, p := syntax.Parse(cmd.Args().First())
+
+	switch p.Platform {
+	case syntax.AllPlatform:
 		// TODO: Wide range search
-		res, _ := http.Get(modrinth.ConstructProjectUrl(packageName))
+		res, _ := http.Get(modrinth.ConstructProjectUrl(p.PackageName))
 		modrinthProject := types.ModrinthProject{}
 		data, _ := io.ReadAll(res.Body)
 		json.Unmarshal(data, &modrinthProject)
 		generateInfoOutput(modrinthProject)
-	case "fabric":
+	case syntax.Fabric:
 		// TODO: Fabric specific search
-		res, _ := http.Get(modrinth.ConstructProjectUrl(packageName))
+		res, _ := http.Get(modrinth.ConstructProjectUrl(p.PackageName))
 		modrinthProject := types.ModrinthProject{}
 		data, _ := io.ReadAll(res.Body)
 		json.Unmarshal(data, &modrinthProject)
 		generateInfoOutput(modrinthProject)
-	case "forge":
+	case syntax.Forge:
+		// TODO: Forge support
 		println("Not yet implemented")
 	}
+
 	return nil
 }
 

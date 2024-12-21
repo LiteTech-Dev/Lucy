@@ -8,23 +8,17 @@ import (
 )
 
 var selectExecutableTemplate = &promptui.SelectTemplates{
-	Active:   formatExecutableChoice("●", "bold"),
-	Inactive: formatExecutableChoice("○", ""),
-	Selected: formatExecutableChoice("✔︎", "bold"),
+	Active:   `{{ "●" | blue }} {{ .Path | bold }} [2m(Minecraft {{ .GameVersion }}, {{ if eq .ModLoaderType "vanilla" }}Vanilla{{ else }}{{ .ModLoaderType | capitalize }} v{{ .ModLoaderVersion }}{{ end }})[0m`,
+	Inactive: `{{ "○" | blue }} {{ .Path }} [2m(Minecraft {{ .GameVersion }}, {{ if eq .ModLoaderType "vanilla" }}Vanilla{{ else }}{{ .ModLoaderType | capitalize }} v{{ .ModLoaderVersion }}{{ end }})[0m`,
+	Selected: `{{ "✔︎" | green }} {{ .Path | bold }} [2m(Minecraft {{ .GameVersion }}, {{ if eq .ModLoaderType "vanilla" }}Vanilla{{ else }}{{ .ModLoaderType | capitalize }} v{{ .ModLoaderVersion }}{{ end }})[0m`,
 	Help:     "",
-	FuncMap:  appendFuncMap(),
-}
-
-func formatExecutableChoice(bullet, style string) string {
-	return `{{ "` + bullet + `" | blue }} {{ .Path | ` + style + ` }} [2m(Minecraft {{ .GameVersion }}, {{ if eq .ModLoaderType "vanilla" }}Vanilla{{ else }}{{ .ModLoaderType | capitalize }} v{{ .ModLoaderVersion }}{{ end }})[0m`
-}
-
-func appendFuncMap() template.FuncMap {
-	funcMap := promptui.FuncMap
-	funcMap["capitalize"] = func(s string) string {
-		return strings.ToUpper(s[:1]) + s[1:]
-	}
-	return funcMap
+	FuncMap: func() (funcMap template.FuncMap) {
+		funcMap = promptui.FuncMap
+		funcMap["capitalize"] = func(s string) (cap string) {
+			return strings.ToUpper(s[:1]) + s[1:]
+		}
+		return
+	}(),
 }
 
 func PromptSelectExecutable(executables []*types.ServerExecutable) int {

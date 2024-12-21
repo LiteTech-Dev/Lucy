@@ -1,5 +1,7 @@
 package types
 
+import "lucy/syntax"
+
 // ServerInfo components that do not exist, use an empty string
 type ServerInfo struct {
 	HasMcdr         bool
@@ -15,6 +17,6 @@ type ServerInfo struct {
 type ServerExecutable struct {
 	Path             string
 	GameVersion      string
-	ModLoaderType    string
+	ModLoaderType    syntax.Platform
 	ModLoaderVersion string
 }

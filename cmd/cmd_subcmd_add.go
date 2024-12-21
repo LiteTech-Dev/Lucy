@@ -6,6 +6,7 @@ import (
 	"github.com/urfave/cli/v3"
 	"lucy/modrinth"
 	"lucy/probe"
+	"lucy/syntax"
 	"lucy/util"
 )
 
@@ -34,24 +35,25 @@ var SubcmdAdd = &cli.Command{
 func ActionAdd(_ context.Context, cmd *cli.Command) error {
 	// TODO: Platform specification
 	// TODO: Platform compatibility check
+	// TODO: Error handling
 
-	platform, packageName := parsePackageSyntax(cmd.Args().First())
+	_, p := syntax.Parse(cmd.Args().First())
 	serverInfo := probe.GetServerInfo()
 
 	if !serverInfo.HasLucy {
 		return errors.New("lucy is not installed, run `lucy init` before downloading mods")
 	}
 
-	if platform == "mcdr" && !serverInfo.HasMcdr {
+	if p.Platform == syntax.Mcdr && !serverInfo.HasMcdr {
 		// TODO: Deal with this
 		println("MCDR is not installed, cannot download MCDR plugins")
 		return errors.New("no mcdr")
-	} else if platform != "all" && platform != serverInfo.Executable.ModLoaderType {
+	} else if p.Platform != syntax.AllPlatform && p.Platform != serverInfo.Executable.ModLoaderType {
 		// TODO: Deal with this
 		return errors.New("platform mismatch")
 	}
 
-	newestVersion := modrinth.GetNewestProjectVersion(packageName)
+	newestVersion := modrinth.GetNewestProjectVersion(p.PackageName)
 	file := util.DownloadFile(
 		// Not sure how to deal with multiple files
 		// As the motivation for publishers to provide multiple files is unclear

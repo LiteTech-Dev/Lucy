@@ -1,11 +1,14 @@
 package modrinth
 
-import "net/url"
+import (
+	"lucy/syntax"
+	"net/url"
+)
 
-func constructProjectVersionsUrl(slug string) (urlString string) {
+func constructProjectVersionsUrl(slug syntax.PackageName) (urlString string) {
 	urlString, _ = url.JoinPath(
 		"https://api.modrinth.com/v2/project",
-		slug,
+		string(slug),
 		"version",
 	)
 	return
@@ -13,6 +16,6 @@ func constructProjectVersionsUrl(slug string) (urlString string) {
 
 // TODO: Refactor ConstructProjectUrl() to private function
 
-func ConstructProjectUrl(packageName string) (url string) {
-	return "https://api.modrinth.com/v2/project/" + packageName
+func ConstructProjectUrl(packageName syntax.PackageName) (url string) {
+	return string("https://api.modrinth.com/v2/project/" + packageName)
 }

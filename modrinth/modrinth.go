@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"io"
 	"lucy/probe"
+	"lucy/syntax"
 	"lucy/types"
 	"net/http"
 	url2 "net/url"
@@ -16,7 +17,7 @@ import (
 // For Modrinth search API, see:
 // https://docs.modrinth.com/api/operations/searchprojects/
 
-func GetNewestProjectVersion(slug string) (newestVersion types.ModrinthProjectVersion) {
+func GetNewestProjectVersion(slug syntax.PackageName) (newestVersion types.ModrinthProjectVersion) {
 	newestVersion = types.ModrinthProjectVersion{}
 	versions := GetProjectVersions(slug)
 	serverInfo := probe.GetServerInfo()
@@ -36,14 +37,14 @@ func GetNewestProjectVersion(slug string) (newestVersion types.ModrinthProjectVe
 	return
 }
 
-func GetProjectVersions(slug string) (versions []types.ModrinthProjectVersion) {
+func GetProjectVersions(slug syntax.PackageName) (versions []types.ModrinthProjectVersion) {
 	res, _ := http.Get(constructProjectVersionsUrl(slug))
 	data, _ := io.ReadAll(res.Body)
 	json.Unmarshal(data, &versions)
 	return
 }
 
-func GetProjectId(slug string) (id string) {
+func GetProjectId(slug syntax.PackageName) (id string) {
 	res, _ := http.Get(ConstructProjectUrl(slug))
 	modrinthProject := types.ModrinthProject{}
 	data, _ := io.ReadAll(res.Body)
@@ -55,8 +56,8 @@ func GetProjectId(slug string) (id string) {
 // TODO: Search() is way too long, refactor
 
 func Search(
-	platform string,
-	packageName string,
+	platform syntax.Platform,
+	packageName syntax.PackageName,
 	showClientPackage bool,
 	indexBy string,
 ) (result types.ModrinthSearchResults) {
@@ -72,11 +73,11 @@ func Search(
 	)
 	var facetsArray []string
 	switch platform {
-	case "all":
+	case syntax.AllPlatform:
 		facetsArray = append(facetsArray, facetsCategoryAll)
-	case "forge":
+	case syntax.Forge:
 		facetsArray = append(facetsArray, facetsCategoryForge)
-	case "fabric":
+	case syntax.Fabric:
 		facetsArray = append(facetsArray, facetsCategoryFabric)
 	}
 	if !showClientPackage {
@@ -97,7 +98,7 @@ func Search(
 	_ = templateUrl.Execute(
 		&urlBuilder,
 		map[string]string{
-			"packageName":   packageName,
+			"packageName":   string(packageName),
 			"indexBy":       indexBy,
 			"facetsEncoded": facetsEncoded,
 		},

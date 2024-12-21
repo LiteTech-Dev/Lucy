@@ -7,6 +7,7 @@ import (
 	"github.com/urfave/cli/v3"
 	"golang.org/x/term"
 	"lucy/modrinth"
+	"lucy/syntax"
 	"os"
 	"text/tabwriter"
 )
@@ -60,17 +61,19 @@ var SubcmdSearch = &cli.Command{
 }
 
 func ActionSearch(_ context.Context, cmd *cli.Command) error {
-	platform, packageName := parsePackageSyntax(cmd.Args().First())
+	// TODO: Error handling
+	_, p := syntax.Parse(cmd.Args().First())
 	// indexBy can be: relevance (default), downloads, follows, newest, updated
 	indexBy := cmd.String("index")
 	showClientPackage := cmd.Bool("client")
 
 	res := modrinth.Search(
-		platform,
-		packageName,
+		p.Platform,
+		p.PackageName,
 		showClientPackage,
 		indexBy,
 	)
+
 	if cmd.Bool("debug") {
 		jsonOutput, _ := json.MarshalIndent(res, "", "  ")
 		fmt.Println(string(jsonOutput))

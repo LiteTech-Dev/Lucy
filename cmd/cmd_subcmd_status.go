@@ -28,7 +28,7 @@ func ActionStatus(ctx context.Context, cmd *cli.Command) error {
 	// Print mod loader types and version
 	fmt.Printf(
 		"%s%s ",
-		strings.ToUpper(serverInfo.Executable.ModLoaderType[:1]),
+		strings.ToUpper(string(serverInfo.Executable.ModLoaderType[:1])),
 		serverInfo.Executable.ModLoaderType[1:],
 	)
 	if serverInfo.Executable.ModLoaderType != "vanilla" {
