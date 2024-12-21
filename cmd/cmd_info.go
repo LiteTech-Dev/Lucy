@@ -46,14 +46,14 @@ func ActionInfo(ctx context.Context, cmd *cli.Command) error {
 		modrinthProject := &types.ModrinthProject{}
 		data, _ := io.ReadAll(res.Body)
 		json.Unmarshal(data, modrinthProject)
-		output.GenerateInfoOutput(modrinthProject)
+		output.GenerateInfo(modrinthProject)
 	case syntax.Fabric:
 		// TODO: Fabric specific search
 		res, _ := http.Get(modrinth.ConstructProjectUrl(p.PackageName))
 		modrinthProject := &types.ModrinthProject{}
 		data, _ := io.ReadAll(res.Body)
 		json.Unmarshal(data, modrinthProject)
-		output.GenerateInfoOutput(modrinthProject)
+		output.GenerateInfo(modrinthProject)
 	case syntax.Forge:
 		// TODO: Forge support
 		println("Not yet implemented")
@@ -63,7 +63,7 @@ func ActionInfo(ctx context.Context, cmd *cli.Command) error {
 			_ = fmt.Errorf("plugin not found")
 			return nil
 		}
-		output.GenerateInfoOutput(mcdrPlugin)
+		output.GenerateInfo(mcdrPlugin)
 	}
 
 	return nil

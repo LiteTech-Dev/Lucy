@@ -44,6 +44,11 @@ func getServerInfo() types.ServerInfo {
 	var err error
 	var serverInfo types.ServerInfo
 	// MCDR Stage
+	var mcdrConfig *types.McdrConfigDotYml
+	serverInfo.HasMcdr, mcdrConfig = getMcdr()
+	if serverInfo.HasMcdr {
+		serverInfo.McdrPluginPaths = mcdrConfig.PluginDirectories
+	}
 	serverInfo.ServerWorkPath = getServerWorkPath()
 
 	// Executable Stage

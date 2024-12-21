@@ -3,37 +3,57 @@ package output
 import (
 	"fmt"
 	"lucy/types"
+	"os"
 	"text/tabwriter"
 )
 
-func printKey(writer *tabwriter.Writer, title string) {
-	fmt.Fprintf(writer, "%s\t", Bold(Magenta(title)))
+var keyValueWriter = tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
+
+func printKey(title string) {
+	fmt.Fprintf(keyValueWriter, "%s\t", bold(mangeta(title)))
 }
 
-func printAuthors(writer *tabwriter.Writer, name string, link string) {
-	fmt.Fprintf(writer, "%s %s\n", name, Faint(link))
+func printValue(value string) {
+	fmt.Fprintf(keyValueWriter, "%s\n", value)
 }
 
-func printInfo(writer *tabwriter.Writer, key string, value string) {
-	fmt.Fprintf(writer, "%s\t%s\n", Bold(Magenta(key)), value)
+func printFieldWithAnnotation(value string, annotation string) {
+	fmt.Fprintf(keyValueWriter, "%s %s\n", value, faint(annotation))
 }
 
-func printLabels(writer *tabwriter.Writer, labels []string, maxWidth int) {
+func printField(key string, value string) {
+	fmt.Fprintf(keyValueWriter, "%s\t%s\n", bold(mangeta(key)), value)
+}
+
+func printLabels(labels []string, maxWidth int) {
+	if len(labels) == 0 {
+		fmt.Fprintf(keyValueWriter, "\n")
+	} else if len(labels) == 1 {
+		printValue(labels[0])
+		return
+	}
+
 	width := 0
 	for _, label := range labels {
-		fmt.Fprintf(writer, "%s", label)
+		fmt.Fprintf(keyValueWriter, "%s", label)
 		if label != labels[len(labels)-1] {
-			fmt.Fprintf(writer, ", ")
+			fmt.Fprintf(keyValueWriter, ", ")
 		}
 		width += len(label) + 2
 		if width > maxWidth {
-			fmt.Fprintf(writer, "\n%s\t", Bold(Magenta("")))
+			fmt.Fprintf(keyValueWriter, "\n%s\t", bold(mangeta("")))
 			width = 0
 		}
 	}
 	if width > 0 {
-		fmt.Fprintf(writer, "\n")
-
+		fmt.Fprintf(keyValueWriter, "\n")
 	}
 }
 
+func printVersions(
+	versions []string,
+	versionType types.MinecraftVersion, maxWidth int,
+) {
+	// TODO: filter by version type
+	printLabels(versions, maxWidth)
+}
