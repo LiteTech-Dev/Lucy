@@ -2,7 +2,6 @@ package modrinth
 
 import (
 	"encoding/json"
-	"errors"
 	"html/template"
 	"io"
 	"lucy/probe"
@@ -10,34 +9,34 @@ import (
 	"lucy/types"
 	"net/http"
 	url2 "net/url"
-	"reflect"
 	"strings"
 )
 
 // For Modrinth search API, see:
 // https://docs.modrinth.com/api/operations/searchprojects/
 
-func GetNewestProjectVersion(slug syntax.PackageName) (newestVersion types.ModrinthProjectVersion) {
-	newestVersion = types.ModrinthProjectVersion{}
-	versions := GetProjectVersions(slug)
+func GetNewestProjectVersion(slug syntax.PackageName) (newestVersion *types.ModrinthProjectVersion) {
+	newestVersion = nil
+	versions := getProjectVersions(slug)
 	serverInfo := probe.GetServerInfo()
 	for _, version := range versions {
 		for _, gameVersion := range version.GameVersions {
 			if gameVersion == serverInfo.Executable.GameVersion &&
 				version.VersionType == "release" &&
-				version.DatePublished.After(newestVersion.DatePublished) {
+				(newestVersion == nil || version.DatePublished.After(newestVersion.DatePublished)) {
 				newestVersion = version
 			}
 		}
 	}
-	if reflect.DeepEqual(newestVersion, types.ModrinthProjectVersion{}) {
-		errors.New("no available version found")
+
+	if newestVersion == nil {
+		println("No suitable version found for", slug)
 	}
 
 	return
 }
 
-func GetProjectVersions(slug syntax.PackageName) (versions []types.ModrinthProjectVersion) {
+func getProjectVersions(slug syntax.PackageName) (versions []*types.ModrinthProjectVersion) {
 	res, _ := http.Get(constructProjectVersionsUrl(slug))
 	data, _ := io.ReadAll(res.Body)
 	json.Unmarshal(data, &versions)
@@ -60,7 +59,7 @@ func Search(
 	packageName syntax.PackageName,
 	showClientPackage bool,
 	indexBy string,
-) (result types.ModrinthSearchResults) {
+) (result *types.ModrinthSearchResults) {
 	// Construct the search url
 	const (
 		facetsCategoryAll    = `["categories:'forge'","categories:'fabric'","categories:'quilt'","categories:'liteloader'","categories:'modloader'","categories:'rift'","categories:'neoforge'"]`
