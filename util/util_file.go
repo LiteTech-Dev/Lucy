@@ -37,10 +37,11 @@ func CopyToCache(file *os.File) {
 // all its parent directories. This is used to prevent any unexpected access to
 // externally manages files.
 func preventExternalFile(file string) {
-	for ; file == path.Dir(file); file = path.Dir(file) {
+	for ; file != path.Dir(file); file = path.Dir(file) {
 		if path.Base(file) == LucyPath {
 			return
 		}
 	}
+	fmt.Println("trying to access external file", file)
 	panic("incorrect file")
 }
