@@ -48,7 +48,7 @@ func ActionAdd(_ context.Context, cmd *cli.Command) error {
 		// TODO: Deal with this
 		println("MCDR is not installed, cannot download MCDR plugins")
 		return errors.New("no mcdr")
-	} else if p.Platform != syntax.AllPlatform && p.Platform != serverInfo.Executable.ModLoaderType {
+	} else if p.Platform != syntax.AllPlatform && string(p.Platform) != serverInfo.Executable.ModLoaderType {
 		// TODO: Deal with this
 		return errors.New("platform mismatch")
 	}

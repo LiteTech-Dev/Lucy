@@ -6,7 +6,7 @@ import (
 	"errors"
 	"io"
 	"log"
-	"lucy/prompts"
+	"lucy/output"
 	"lucy/types"
 	"os"
 	"path"
@@ -31,8 +31,8 @@ func getServerExecutable() (err error, executable *types.ServerExecutable) {
 		memoizedExecutable = suspectedExecutables[0]
 		return nil, memoizedExecutable
 	} else if len(suspectedExecutables) > 1 {
-		selectedExecutable := prompts.PromptSelectExecutable(suspectedExecutables)
-		memoizedExecutable = suspectedExecutables[selectedExecutable]
+		index := output.PromptSelectExecutable(suspectedExecutables)
+		memoizedExecutable = suspectedExecutables[index]
 		return nil, memoizedExecutable
 	}
 	return NoExecutableFoundError, nil

@@ -1,4 +1,4 @@
-package prompts
+package output
 
 import (
 	"github.com/manifoldco/promptui"
@@ -11,7 +11,6 @@ var selectExecutableTemplate = &promptui.SelectTemplates{
 	Active:   `{{ "●" | blue }} {{ .Path | bold }} [2m(Minecraft {{ .GameVersion }}, {{ if eq .ModLoaderType "vanilla" }}Vanilla{{ else }}{{ .ModLoaderType | capitalize }} v{{ .ModLoaderVersion }}{{ end }})[0m`,
 	Inactive: `{{ "○" | blue }} {{ .Path }} [2m(Minecraft {{ .GameVersion }}, {{ if eq .ModLoaderType "vanilla" }}Vanilla{{ else }}{{ .ModLoaderType | capitalize }} v{{ .ModLoaderVersion }}{{ end }})[0m`,
 	Selected: `{{ "✔︎" | green }} {{ .Path | bold }} [2m(Minecraft {{ .GameVersion }}, {{ if eq .ModLoaderType "vanilla" }}Vanilla{{ else }}{{ .ModLoaderType | capitalize }} v{{ .ModLoaderVersion }}{{ end }})[0m`,
-	Help:     "",
 	FuncMap: func() (funcMap template.FuncMap) {
 		funcMap = promptui.FuncMap
 		funcMap["capitalize"] = func(s string) (cap string) {
@@ -28,7 +27,6 @@ func PromptSelectExecutable(executables []*types.ServerExecutable) int {
 		Templates: selectExecutableTemplate,
 	}
 	index, _, _ := selectExecutable.Run()
-	PromptRememberExecutable()
 	return index
 }
 
