@@ -100,7 +100,7 @@ func generateSearchOutput(slugs []syntax.PackageName) {
 	columns := termWidth / (maxSlugLen + 2)
 
 	writer := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
-	fmt.Printf("Found %d results\n", len(slugs))
+	fmt.Printf("Found %d results from Modrinth\n", len(slugs))
 	for i := 0; i < len(slugs); i += 1 {
 		if (i+1)%columns == 0 || i == len(slugs)-1 {
 			fmt.Fprintf(writer, "%s\n", slugs[i])
