@@ -80,16 +80,16 @@ func ActionSearch(_ context.Context, cmd *cli.Command) error {
 		return nil
 	}
 
-	var slugs []string
+	var slugs []syntax.PackageName
 	for _, hit := range res.Hits {
-		slugs = append(slugs, hit.Slug)
+		slugs = append(slugs, syntax.PackageName(hit.Slug))
 	}
 	generateSearchOutput(slugs)
 
 	return nil
 }
 
-func generateSearchOutput(slugs []string) {
+func generateSearchOutput(slugs []syntax.PackageName) {
 	termWidth, _, _ := term.GetSize(int(os.Stdout.Fd()))
 	maxSlugLen := 0
 	for i := 0; i < len(slugs); i += 1 {

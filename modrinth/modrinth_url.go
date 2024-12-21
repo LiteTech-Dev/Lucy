@@ -17,5 +17,5 @@ func constructProjectVersionsUrl(slug syntax.PackageName) (urlString string) {
 // TODO: Refactor ConstructProjectUrl() to private function
 
 func ConstructProjectUrl(packageName syntax.PackageName) (url string) {
-	return string("https://api.modrinth.com/v2/project/" + packageName)
+	return "https://api.modrinth.com/v2/project/" + string(packageName)
 }
