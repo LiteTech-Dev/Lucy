@@ -3,15 +3,24 @@ package probe
 import (
 	"archive/zip"
 	"encoding/json"
+	"errors"
 	"io"
 	"log"
+	"lucy/prompts"
 	"lucy/types"
 	"os"
 	"path"
 	"strings"
 )
 
-func getServerExecutable() (executable *types.ServerExecutable) {
+var NoExecutableFoundError = errors.New("no executable found")
+var memoizedExecutable *types.ServerExecutable
+
+func getServerExecutable() (err error, executable *types.ServerExecutable) {
+	if memoizedExecutable != nil {
+		return nil, memoizedExecutable
+	}
+
 	var suspectedExecutables []*types.ServerExecutable
 	for _, jarFile := range findJarFiles(getServerWorkPath()) {
 		if exec := analyzeServerExecutable(jarFile); exec != nil {
@@ -19,12 +28,14 @@ func getServerExecutable() (executable *types.ServerExecutable) {
 		}
 	}
 	if len(suspectedExecutables) == 1 {
-		executable = suspectedExecutables[0]
+		memoizedExecutable = suspectedExecutables[0]
+		return nil, memoizedExecutable
 	} else if len(suspectedExecutables) > 1 {
-		// TODO: Replace this with prompting the user to select one
-		executable = suspectedExecutables[0]
+		selectedExecutable := prompts.PromptSelectExecutable(suspectedExecutables)
+		memoizedExecutable = suspectedExecutables[selectedExecutable]
+		return nil, memoizedExecutable
 	}
-	return
+	return NoExecutableFoundError, nil
 }
 
 func findJarFiles(dir string) (jarFiles []string) {
@@ -42,6 +53,7 @@ func findJarFiles(dir string) (jarFiles []string) {
 
 func analyzeServerExecutable(executableFile string) *types.ServerExecutable {
 	serverExecutable := types.ServerExecutable{}
+	serverExecutable.Path = executableFile
 	zipReader, _ := zip.OpenReader(executableFile)
 	defer func(r *zip.ReadCloser) {
 		err := r.Close()

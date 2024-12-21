@@ -41,13 +41,16 @@ func GetServerInfo() types.ServerInfo {
 //  3. From the jar we can detect Minecraft, Forge and(or) Fabric versions
 //  4. Then search for related dirs (mods/, config/, plugins/, etc.)
 func getServerInfo() types.ServerInfo {
+	var err error
 	var serverInfo types.ServerInfo
-
 	// MCDR Stage
 	serverInfo.ServerWorkPath = getServerWorkPath()
 
 	// Executable Stage
-	serverInfo.Executable = getServerExecutable()
+	err, serverInfo.Executable = getServerExecutable()
+	if errors.Is(err, NoExecutableFoundError) {
+		panic(err)
+	}
 
 	// Further directory detection
 	serverInfo.ModPath = getServerModPath()
@@ -66,9 +69,10 @@ func getServerInfo() types.ServerInfo {
 // as GetServerInfo() applies a memoization mechanism. Every time a serverInfo
 // is needed, just call GetServerInfo() without the concern of redundant calculation.
 func getServerModPath() string {
-	var exec = getServerExecutable()
-	if getServerExecutable().ModLoaderType == "fabric" || exec.ModLoaderType == "forge" {
-		return path.Join(getServerWorkPath(), "mods")
+	_, exec := getServerExecutable()
+	modLoaderType := exec.ModLoaderType
+	if modLoaderType == "fabric" || modLoaderType == "forge" {
+		return "mods"
 	}
 	return ""
 }
