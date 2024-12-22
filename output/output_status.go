@@ -3,6 +3,7 @@ package output
 import (
 	"lucy/tools"
 	"lucy/types"
+	"strconv"
 )
 
 func GenerateStatus(data types.ServerInfo) {
@@ -10,21 +11,19 @@ func GenerateStatus(data types.ServerInfo) {
 
 	// Print game version
 	printKey("Minecraft")
-	printFieldWithAnnotation(data.Executable.GameVersion, data.Executable.Path)
+	printValueAnnot(data.Executable.GameVersion, data.Executable.Path)
 
 	// Print active status
-	printField(
-		"Activity",
-		tools.Trenary(
-			func() bool { return data.IsRunning },
-			"Active",
-			"Inactive",
-		),
-	)
+	if data.IsRunning {
+		printKey("Activity")
+		printValueAnnot("Currently Running", "pid "+strconv.Itoa(data.Pid))
+	} else {
+		printField("Activity", "Inactive")
+	}
 
 	// Print mod loader types and version
 	printKey("Modding")
-	printFieldWithAnnotation(
+	printValueAnnot(
 		captalize(data.Executable.ModLoaderType),
 		tools.Trenary(
 			func() bool { return data.Executable.ModLoaderType != "vanilla" },

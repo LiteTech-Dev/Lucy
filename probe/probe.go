@@ -2,7 +2,7 @@ package probe
 
 import (
 	"errors"
-	"github.com/joho/godotenv"
+	"gopkg.in/ini.v1"
 	"lucy/types"
 	"os"
 	"path"
@@ -65,7 +65,7 @@ func getServerInfo() types.ServerInfo {
 	serverInfo.HasLucy = checkHasLucy()
 
 	// Check if the server is running
-	serverInfo.IsRunning = checkIsRunning()
+	serverInfo.IsRunning, serverInfo.Pid = checkServerFileLock()
 
 	return serverInfo
 }
@@ -91,30 +91,43 @@ func getServerWorkPath() string {
 
 func getServerDotProperties() *types.MinecraftServerDotProperties {
 	propertiesPath := path.Join(getServerWorkPath(), "server.properties")
-	propertiesMap, _ := godotenv.Unmarshal(propertiesPath)
-	return (*types.MinecraftServerDotProperties)(&propertiesMap)
+	file, _ := ini.Load(propertiesPath)
+	properties := make(map[string]string)
+	for _, section := range file.Sections() {
+		for _, key := range section.Keys() {
+			properties[key.Name()] = key.String()
+		}
+	}
+	return (*types.MinecraftServerDotProperties)(&properties)
 }
 
 func getSavePath() string {
-	levelName := (*getServerDotProperties())["level-name"]
+	serverProperties := getServerDotProperties()
+	levelName := (*serverProperties)["level-name"]
 	return path.Join(getServerWorkPath(), levelName)
 }
 
-func checkIsRunning() bool {
+func checkServerFileLock() (locked bool, pid int) {
 	lockPath := path.Join(
 		getSavePath(),
 		"session.lock",
 	)
-	file, _ := os.OpenFile(lockPath, os.O_RDWR, 0666)
+	file, err := os.OpenFile(lockPath, os.O_RDWR, 0666)
 	defer file.Close()
 
-	err := syscall.Flock(int(file.Fd()), syscall.LOCK_EX|syscall.LOCK_NB)
+	err = syscall.Flock(int(file.Fd()), syscall.LOCK_EX|syscall.LOCK_NB)
 	if errors.Is(err, syscall.EWOULDBLOCK) {
-		return true
+		var fl syscall.Flock_t
+		fl.Type = syscall.F_WRLCK
+		fl.Whence = 0
+		fl.Start = 0
+		fl.Len = 0
+		err = syscall.FcntlFlock(file.Fd(), syscall.F_GETLK, &fl)
+		return true, int(fl.Pid)
 	}
-	syscall.Flock(int(file.Fd()), syscall.LOCK_UN)
 
-	return false
+	syscall.Flock(int(file.Fd()), syscall.LOCK_UN)
+	return false, 0
 }
 
 func checkHasLucy() bool {

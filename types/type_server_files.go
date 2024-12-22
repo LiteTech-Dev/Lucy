@@ -9,6 +9,7 @@ type ServerInfo struct {
 	SavePath        string
 	HasLucy         bool
 	IsRunning       bool
+	Pid             int
 	Executable      *ServerExecutable
 }
 

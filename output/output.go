@@ -17,7 +17,7 @@ func printValue(value string) {
 	fmt.Fprintf(keyValueWriter, "%s\n", value)
 }
 
-func printFieldWithAnnotation(value string, annotation string) {
+func printValueAnnot(value string, annotation string) {
 	fmt.Fprintf(keyValueWriter, "%s %s\n", value, faint(annotation))
 }
 

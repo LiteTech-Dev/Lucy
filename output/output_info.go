@@ -22,7 +22,7 @@ func GenerateInfo(data interface{}) {
 			if i != 0 {
 				printKey("")
 			}
-			printFieldWithAnnotation(author.Name, author.Link)
+			printValueAnnot(author.Name, author.Link)
 		}
 		printField("Source", v.Repository)
 	default:
