@@ -3,6 +3,7 @@ package probe
 import (
 	"errors"
 	"gopkg.in/ini.v1"
+	"lucy/syntax"
 	"lucy/types"
 	"os"
 	"path"
@@ -26,45 +27,47 @@ var once sync.Once
 func GetServerInfo() types.ServerInfo {
 	once.Do(
 		func() {
-			serverInfo = getServerInfo()
+			serverInfo = buildServerInfo()
 		},
 	)
 	return serverInfo
 }
 
-// getServerInfo
+// buildServerInfo
 // Sequence:
 //  1. Check for MCDR
 //  2. Locate and unzip the jar file, if multiple valid jar files exist, prompt
 //     the user to select one
 //  3. From the jar we can detect Minecraft, Forge and(or) Fabric versions
 //  4. Then search for related dirs (mods/, config/, plugins/, etc.)
-func getServerInfo() types.ServerInfo {
+func buildServerInfo() types.ServerInfo {
 	var err error
 	var serverInfo types.ServerInfo
 	// MCDR Stage
-	var mcdrConfig *types.McdrConfigDotYml
-	serverInfo.HasMcdr, mcdrConfig = getMcdr()
-	if serverInfo.HasMcdr {
-		serverInfo.McdrPluginPaths = mcdrConfig.PluginDirectories
+	var mcdrConfig = getMcdrConfig()
+	if mcdrConfig != nil {
+		serverInfo.Modules.Mcdr = &types.Mcdr{
+			Name:        syntax.Mcdr,
+			PluginPaths: mcdrConfig.PluginDirectories,
+		}
 	}
 	serverInfo.ServerWorkPath = getServerWorkPath()
 
 	// Executable Stage
 	err, serverInfo.Executable = getServerExecutable()
 	if errors.Is(err, NoExecutableFoundError) {
+		// TODO: Do not panic, deal properly with output
 		panic(err)
 	}
 
 	// Further directory detection
-	serverInfo.ModPath = getServerModPath()
 	serverInfo.SavePath = getSavePath()
 
 	// Check for lucy installation
 	serverInfo.HasLucy = checkHasLucy()
 
 	// Check if the server is running
-	serverInfo.IsRunning, serverInfo.Pid = checkServerFileLock()
+	serverInfo.Activity = checkServerFileLock()
 
 	return serverInfo
 }
@@ -74,21 +77,21 @@ func getServerInfo() types.ServerInfo {
 // is needed, just call GetServerInfo() without the concern of redundant calculation.
 func getServerModPath() string {
 	_, exec := getServerExecutable()
-	modLoaderType := exec.ModLoaderType
-	if modLoaderType == "fabric" || modLoaderType == "forge" {
+	modLoaderType := exec.Type
+	if modLoaderType == syntax.Fabric || modLoaderType == syntax.Forge {
 		return "mods"
 	}
 	return ""
 }
 
 func getServerWorkPath() string {
-	if hasMcdr, mcdrConfig := getMcdr(); hasMcdr {
+	if mcdrConfig := getMcdrConfig(); mcdrConfig != nil {
 		return mcdrConfig.WorkingDirectory
 	}
 	return "."
 }
 
-func getServerDotProperties() *types.MinecraftServerDotProperties {
+func getServerDotProperties() *MinecraftServerDotProperties {
 	propertiesPath := path.Join(getServerWorkPath(), "server.properties")
 	file, _ := ini.Load(propertiesPath)
 	properties := make(map[string]string)
@@ -97,7 +100,7 @@ func getServerDotProperties() *types.MinecraftServerDotProperties {
 			properties[key.Name()] = key.String()
 		}
 	}
-	return (*types.MinecraftServerDotProperties)(&properties)
+	return (*MinecraftServerDotProperties)(&properties)
 }
 
 func getSavePath() string {

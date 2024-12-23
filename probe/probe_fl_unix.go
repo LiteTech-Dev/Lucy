@@ -5,12 +5,13 @@ package probe
 
 import (
 	"errors"
+	"lucy/types"
 	"os"
 	"path"
 	"syscall"
 )
 
-func checkServerFileLock() (locked bool, pid int) {
+func checkServerFileLock() *types.Activity {
 	lockPath := path.Join(
 		getSavePath(),
 		"session.lock",
@@ -19,7 +20,7 @@ func checkServerFileLock() (locked bool, pid int) {
 	defer file.Close()
 
 	if err != nil {
-		return false, 0
+		return nil
 	}
 
 	err = syscall.Flock(int(file.Fd()), syscall.LOCK_EX|syscall.LOCK_NB)
@@ -30,9 +31,12 @@ func checkServerFileLock() (locked bool, pid int) {
 		fl.Start = 0
 		fl.Len = 0
 		err = syscall.FcntlFlock(file.Fd(), syscall.F_GETLK, &fl)
-		return true, int(fl.Pid)
+		return &types.Activity{
+			Active: true,
+			Pid:    int(fl.Pid),
+		}
 	}
 	syscall.Flock(int(file.Fd()), syscall.LOCK_UN)
 
-	return false, 0
+	return nil
 }

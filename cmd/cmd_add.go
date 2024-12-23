@@ -44,11 +44,11 @@ func ActionAdd(_ context.Context, cmd *cli.Command) error {
 		return errors.New("lucy is not installed, run `lucy init` before downloading mods")
 	}
 
-	if p.Platform == syntax.Mcdr && !serverInfo.HasMcdr {
+	if p.Platform == syntax.Mcdr && serverInfo.Modules.Mcdr == nil {
 		// TODO: Deal with this
 		println("MCDR is not installed, cannot download MCDR plugins")
 		return errors.New("no mcdr")
-	} else if p.Platform != syntax.AllPlatform && string(p.Platform) != serverInfo.Executable.ModLoaderType {
+	} else if p.Platform != syntax.AllPlatform && p.Platform != serverInfo.Executable.Type {
 		// TODO: Deal with this
 		return errors.New("platform mismatch")
 	}

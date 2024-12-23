@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"lucy/output"
+	"lucy/syntax"
 	"lucy/types"
 	"os"
 	"path"
@@ -65,7 +66,7 @@ func analyzeServerExecutable(executableFile string) *types.ServerExecutable {
 	for _, f := range zipReader.File {
 		switch f.Name {
 		case fabricAttributeFileName:
-			serverExecutable.ModLoaderType = "fabric"
+			serverExecutable.Type = syntax.Fabric
 			r, _ := f.Open()
 			data, _ := io.ReadAll(r)
 			serverExecutable.GameVersion = strings.Split(
@@ -73,20 +74,19 @@ func analyzeServerExecutable(executableFile string) *types.ServerExecutable {
 					string(data), "\n",
 				)[1], "=",
 			)[1]
-			serverExecutable.ModLoaderVersion = strings.Split(
+			serverExecutable.GameVersion = strings.Split(
 				strings.Split(
 					string(data), "\n",
 				)[0], "=",
 			)[1]
 			return &serverExecutable
 		case vanillaAttributeFileName:
-			versionDotJson := types.JarVersionDotJson{}
-			serverExecutable.ModLoaderType = "vanilla"
+			versionDotJson := JarVersionDotJson{}
+			serverExecutable.Type = syntax.Minecraft
 			r, _ := f.Open()
 			data, _ := io.ReadAll(r)
 			_ = json.Unmarshal(data, &versionDotJson)
 			serverExecutable.GameVersion = versionDotJson.Id
-			serverExecutable.ModLoaderVersion = ""
 			return &serverExecutable
 		}
 	}

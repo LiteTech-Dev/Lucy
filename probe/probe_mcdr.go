@@ -4,7 +4,6 @@ import (
 	"gopkg.in/yaml.v3"
 	"io"
 	"log"
-	"lucy/types"
 	"os"
 )
 
@@ -12,11 +11,10 @@ import (
 // MCDR detects its installation under cwd by check whether the config.yml file exists
 // No validation is performed, for empty fields the default value will be filled
 // Therefore to align with it, we only detect for the existence of the config.yml file
-func getMcdr() (exists bool, config *types.McdrConfigDotYml) {
+func getMcdrConfig() (onfig *McdrConfigDotYml) {
 	if _, err := os.Stat(mcdrConfigFileName); os.IsNotExist(err) {
-		return false, nil
+		return nil
 	}
-	exists = true
 	configFile, err := os.Open(mcdrConfigFileName)
 	if err != nil {
 		log.Fatal(err)
@@ -33,7 +31,7 @@ func getMcdr() (exists bool, config *types.McdrConfigDotYml) {
 		log.Fatal(err)
 	}
 
-	config = new(types.McdrConfigDotYml)
+	config := McdrConfigDotYml{}
 	if err := yaml.Unmarshal(configData, config); err != nil {
 		log.Fatal(err)
 	}

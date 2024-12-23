@@ -1,9 +1,6 @@
-package types
+package probe
 
 import "time"
-
-// I am using the ContextFilenameDotExtension to name structs for a specific
-// file. Not sure whether this a good thing to do.
 
 // MinecraftServerDotProperties is not universal across game versions. Therefore,
 // it is just a map[string]string. Just remember to check the game version before

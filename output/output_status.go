@@ -14,29 +14,24 @@ func GenerateStatus(data types.ServerInfo) {
 	printValueAnnot(data.Executable.GameVersion, data.Executable.Path)
 
 	// Print active status
-	if data.IsRunning {
+	if data.Activity != nil {
 		printKey("Activity")
-		printValueAnnot("Currently Running", "pid "+strconv.Itoa(data.Pid))
+		printValueAnnot(
+			"Currently Running",
+			"pid "+strconv.Itoa(data.Activity.Pid),
+		)
 	} else {
 		printField("Activity", "Inactive")
 	}
 
 	// Print mod loader types and version
-	printKey("Modding")
-	printValueAnnot(
-		captalize(data.Executable.ModLoaderType),
-		tools.Trenary(
-			func() bool { return data.Executable.ModLoaderType != "vanilla" },
-			"v"+data.Executable.ModLoaderVersion,
-			"",
-		),
-	)
+	printField("Modding", captalize(string(data.Executable.Type)))
 
 	// Print MCDR status
-	if data.HasMcdr {
+	if data.Modules.Mcdr != nil {
 		printField("MCDR", "Installed")
 		printKey("MCDR Plugins")
-		printLabels(data.McdrPluginPaths, 1)
+		printLabels(data.Modules.Mcdr.PluginPaths, 1)
 	}
 
 	// Print lucy status
