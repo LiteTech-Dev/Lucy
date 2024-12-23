@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-func GenerateStatus(data types.ServerInfo) {
+func GenerateStatus(data *types.ServerInfo) {
 	defer keyValueWriter.Flush()
 
 	// Print game version

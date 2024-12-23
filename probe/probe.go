@@ -24,13 +24,13 @@ var once sync.Once
 // As we can assume that the environment do not change while the program is
 // running, a sync.Once is used to prevent further calls to this function. Rather,
 // the cached serverInfo is used as the return value.
-func GetServerInfo() types.ServerInfo {
+func GetServerInfo() *types.ServerInfo {
 	once.Do(
 		func() {
 			serverInfo = buildServerInfo()
 		},
 	)
-	return serverInfo
+	return &serverInfo
 }
 
 // buildServerInfo
@@ -41,34 +41,77 @@ func GetServerInfo() types.ServerInfo {
 //  3. From the jar we can detect Minecraft, Forge and(or) Fabric versions
 //  4. Then search for related dirs (mods/, config/, plugins/, etc.)
 func buildServerInfo() types.ServerInfo {
-	var err error
+	var wg sync.WaitGroup
+	var mu sync.Mutex
 	var serverInfo types.ServerInfo
+	serverInfo.Modules = &types.ServerModules{}
+
+	wg.Add(6)
+
 	// MCDR Stage
-	var mcdrConfig = getMcdrConfig()
-	if mcdrConfig != nil {
-		serverInfo.Modules.Mcdr = &types.Mcdr{
-			Name:        syntax.Mcdr,
-			PluginPaths: mcdrConfig.PluginDirectories,
+	go func() {
+		defer wg.Done()
+		mcdrConfig := getMcdrConfig()
+		if mcdrConfig != nil {
+			mu.Lock()
+			serverInfo.Modules.Mcdr = &types.Mcdr{
+				Name:        syntax.Mcdr,
+				PluginPaths: mcdrConfig.PluginDirectories,
+			}
+			mu.Unlock()
 		}
-	}
-	serverInfo.ServerWorkPath = getServerWorkPath()
+	}()
+
+	// Server Work Path
+	go func() {
+		defer wg.Done()
+		workPath := getServerWorkPath()
+		mu.Lock()
+		serverInfo.ServerWorkPath = workPath
+		mu.Unlock()
+	}()
 
 	// Executable Stage
-	err, serverInfo.Executable = getServerExecutable()
-	if errors.Is(err, NoExecutableFoundError) {
-		// TODO: Do not panic, deal properly with output
-		panic(err)
-	}
+	go func() {
+		defer wg.Done()
+		err, executable := getServerExecutable()
+		if errors.Is(err, NoExecutableFoundError) {
+			// TODO: Do not panic, deal properly with output
+			panic(err)
+		}
+		mu.Lock()
+		serverInfo.Executable = executable
+		mu.Unlock()
+	}()
 
-	// Further directory detection
-	serverInfo.SavePath = getSavePath()
+	// Save Path
+	go func() {
+		defer wg.Done()
+		savePath := getSavePath()
+		mu.Lock()
+		serverInfo.SavePath = savePath
+		mu.Unlock()
+	}()
 
-	// Check for lucy installation
-	serverInfo.HasLucy = checkHasLucy()
+	// Check for Lucy installation
+	go func() {
+		defer wg.Done()
+		hasLucy := checkHasLucy()
+		mu.Lock()
+		serverInfo.HasLucy = hasLucy
+		mu.Unlock()
+	}()
 
 	// Check if the server is running
-	serverInfo.Activity = checkServerFileLock()
+	go func() {
+		defer wg.Done()
+		activity := checkServerFileLock()
+		mu.Lock()
+		serverInfo.Activity = activity
+		mu.Unlock()
+	}()
 
+	wg.Wait()
 	return serverInfo
 }
 
