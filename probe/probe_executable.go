@@ -14,30 +14,27 @@ import (
 	"strings"
 )
 
-var NoExecutableFoundError = errors.New("no executable found")
-var memoizedExecutable *types.ServerExecutable
-
-func getServerExecutable() (err error, executable *types.ServerExecutable) {
-	if memoizedExecutable != nil {
-		return nil, memoizedExecutable
-	}
-
-	var suspectedExecutables []*types.ServerExecutable
-	for _, jarFile := range findJarFiles(getServerWorkPath()) {
-		if exec := analyzeServerExecutable(jarFile); exec != nil {
-			suspectedExecutables = append(suspectedExecutables, exec)
+var getServerExecutable = memoize(
+	func() types.ServerExecutable {
+		var suspectedExecutables []*types.ServerExecutable
+		for _, jarFile := range findJarFiles(getServerWorkPath()) {
+			if exec := analyzeServerExecutable(jarFile); exec != nil {
+				suspectedExecutables = append(suspectedExecutables, exec)
+			}
 		}
-	}
-	if len(suspectedExecutables) == 1 {
-		memoizedExecutable = suspectedExecutables[0]
-		return nil, memoizedExecutable
-	} else if len(suspectedExecutables) > 1 {
-		index := output.PromptSelectExecutable(suspectedExecutables)
-		memoizedExecutable = suspectedExecutables[index]
-		return nil, memoizedExecutable
-	}
-	return NoExecutableFoundError, nil
-}
+
+		switch len(suspectedExecutables) {
+		case 0:
+			output.CreateFatal(errors.New("no server executable found"))
+			return types.ServerExecutable{} // unreachable
+		case 1:
+			return *suspectedExecutables[0]
+		default:
+			index := output.PromptSelectExecutable(suspectedExecutables)
+			return *suspectedExecutables[index]
+		}
+	},
+)
 
 func findJarFiles(dir string) (jarFiles []string) {
 	entries, _ := os.ReadDir(dir)
@@ -52,8 +49,8 @@ func findJarFiles(dir string) (jarFiles []string) {
 	return
 }
 
-func analyzeServerExecutable(executableFile string) *types.ServerExecutable {
-	serverExecutable := types.ServerExecutable{}
+func analyzeServerExecutable(executableFile string) (serverExecutable *types.ServerExecutable) {
+	serverExecutable = &types.ServerExecutable{}
 	serverExecutable.Path = executableFile
 	zipReader, _ := zip.OpenReader(executableFile)
 	defer func(r *zip.ReadCloser) {
@@ -79,7 +76,7 @@ func analyzeServerExecutable(executableFile string) *types.ServerExecutable {
 					string(data), "\n",
 				)[0], "=",
 			)[1]
-			return &serverExecutable
+			return
 		case vanillaAttributeFileName:
 			versionDotJson := JarVersionDotJson{}
 			serverExecutable.Type = syntax.Minecraft
@@ -87,7 +84,7 @@ func analyzeServerExecutable(executableFile string) *types.ServerExecutable {
 			data, _ := io.ReadAll(r)
 			_ = json.Unmarshal(data, &versionDotJson)
 			serverExecutable.GameVersion = versionDotJson.Id
-			return &serverExecutable
+			return
 		}
 	}
 

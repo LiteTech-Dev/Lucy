@@ -27,7 +27,7 @@ func ActionStatus(_ context.Context, cmd *cli.Command) error {
 		data, _ := json.MarshalIndent(serverInfo, "", "  ")
 		fmt.Println(string(data))
 	} else {
-		output.GenerateStatus(serverInfo)
+		output.GenerateStatus(&serverInfo)
 	}
 	return nil
 }

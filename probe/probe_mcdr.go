@@ -4,6 +4,7 @@ import (
 	"gopkg.in/yaml.v3"
 	"io"
 	"log"
+	"lucy/output"
 	"os"
 )
 
@@ -11,29 +12,27 @@ import (
 // MCDR detects its installation under cwd by check whether the config.yml file exists
 // No validation is performed, for empty fields the default value will be filled
 // Therefore to align with it, we only detect for the existence of the config.yml file
-func getMcdrConfig() (onfig *McdrConfigDotYml) {
-	if _, err := os.Stat(mcdrConfigFileName); os.IsNotExist(err) {
-		return nil
-	}
-	configFile, err := os.Open(mcdrConfigFileName)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer func(configFile *os.File) {
-		err := configFile.Close()
+var getMcdrConfig = memoize(
+	func() (config *McdrConfigDotYml) {
+		if _, err := os.Stat(mcdrConfigFileName); os.IsNotExist(err) {
+			return nil
+		}
+		config = &McdrConfigDotYml{}
+
+		configFile, err := os.Open(mcdrConfigFileName)
 		if err != nil {
+			output.CreateWarning(err)
+		}
+
+		configData, err := io.ReadAll(configFile)
+		if err != nil {
+			output.CreateWarning(err)
+		}
+
+		if err := yaml.Unmarshal(configData, config); err != nil {
 			log.Fatal(err)
 		}
-	}(configFile)
 
-	configData, err := io.ReadAll(configFile)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	config := McdrConfigDotYml{}
-	if err := yaml.Unmarshal(configData, config); err != nil {
-		log.Fatal(err)
-	}
-	return
-}
+		return
+	},
+)

@@ -2,15 +2,12 @@ package main
 
 import (
 	"context"
-	"log"
 	"lucy/cmd"
+	"lucy/output"
 	"os"
 )
 
-const LucyDir = ".lucy"
-
 func main() {
-	if err := cmd.Cli.Run(context.Background(), os.Args); err != nil {
-		log.Fatal(err)
-	}
+	cmd.Cli.Run(context.Background(), os.Args)
+	output.PrintMessagesAndExit(0)
 }

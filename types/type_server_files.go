@@ -5,13 +5,14 @@ import (
 	"os/exec"
 )
 
-// ServerInfo components that do not exist, use an empty string
+// ServerInfo components that do not exist, use an empty string. Note Executable
+// must exist, otherwise the program will exit; therefore, it is not a pointer.
 type ServerInfo struct {
 	ServerWorkPath string
 	SavePath       string
 	ModPath        string
 	HasLucy        bool
-	Executable     *ServerExecutable
+	Executable     ServerExecutable
 	BootCommand    *exec.Cmd
 	Activity       *Activity
 	Modules        *ServerModules
