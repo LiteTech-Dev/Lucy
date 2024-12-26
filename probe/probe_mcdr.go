@@ -4,7 +4,7 @@ import (
 	"gopkg.in/yaml.v3"
 	"io"
 	"log"
-	"lucy/output"
+	"lucy/logger"
 	"os"
 )
 
@@ -21,12 +21,12 @@ var getMcdrConfig = memoize(
 
 		configFile, err := os.Open(mcdrConfigFileName)
 		if err != nil {
-			output.CreateWarning(err)
+			logger.CreateWarning(err)
 		}
 
 		configData, err := io.ReadAll(configFile)
 		if err != nil {
-			output.CreateWarning(err)
+			logger.CreateWarning(err)
 		}
 
 		if err := yaml.Unmarshal(configData, config); err != nil {

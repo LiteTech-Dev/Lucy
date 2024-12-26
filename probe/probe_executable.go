@@ -6,6 +6,7 @@ import (
 	"errors"
 	"io"
 	"log"
+	"lucy/logger"
 	"lucy/output"
 	"lucy/syntax"
 	"lucy/types"
@@ -25,7 +26,7 @@ var getServerExecutable = memoize(
 
 		switch len(suspectedExecutables) {
 		case 0:
-			output.CreateFatal(errors.New("no server executable found"))
+			logger.CreateFatal(errors.New("no server executable found"))
 			return types.ServerExecutable{} // unreachable
 		case 1:
 			return *suspectedExecutables[0]
