@@ -14,7 +14,7 @@ import (
 	"net/http"
 )
 
-var SubcmdInfo = &cli.Command{
+var subcmdInfo = &cli.Command{
 	Name:  "info",
 	Usage: "Display information of a mod or plugin",
 	Flags: []cli.Flag{

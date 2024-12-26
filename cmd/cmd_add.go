@@ -12,7 +12,7 @@ import (
 	"lucy/util"
 )
 
-var SubcmdAdd = &cli.Command{
+var subcmdAdd = &cli.Command{
 	Name:  "add",
 	Usage: "Add new mods, plugins, or server modules",
 	Flags: []cli.Flag{

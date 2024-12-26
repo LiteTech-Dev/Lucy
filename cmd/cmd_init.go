@@ -5,7 +5,7 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
-var SubcmdInit = &cli.Command{
+var subcmdInit = &cli.Command{
 	Name:   "init",
 	Usage:  "Initialize Lucy on current directory",
 	Action: InitAction,

@@ -9,7 +9,7 @@ import (
 	"lucy/probe"
 )
 
-var SubcmdStatus = &cli.Command{
+var subcmdStatus = &cli.Command{
 	Name:   "status",
 	Usage:  "Display basic information of the current server",
 	Action: ActionStatus,

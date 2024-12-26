@@ -12,7 +12,7 @@ import (
 	"text/tabwriter"
 )
 
-var SubcmdSearch = &cli.Command{
+var subcmdSearch = &cli.Command{
 	Name:  "search",
 	Usage: "Search for mods and plugins",
 	Flags: []cli.Flag{
