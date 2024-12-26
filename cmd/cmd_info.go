@@ -8,8 +8,8 @@ import (
 	"io"
 	"lucy/lucytypes"
 	"lucy/mcdr"
-	"lucy/modrinth"
 	"lucy/output"
+	"lucy/sources/modrinth"
 	"lucy/syntax"
 	"net/http"
 )

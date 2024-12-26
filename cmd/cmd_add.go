@@ -6,8 +6,8 @@ import (
 	"github.com/urfave/cli/v3"
 	"lucy/logger"
 	"lucy/lucyerrors"
-	"lucy/modrinth"
 	"lucy/probe"
+	"lucy/sources/modrinth"
 	"lucy/syntax"
 	"lucy/util"
 )

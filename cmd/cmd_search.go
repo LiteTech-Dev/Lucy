@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/urfave/cli/v3"
 	"golang.org/x/term"
-	"lucy/modrinth"
+	"lucy/sources/modrinth"
 	"lucy/syntax"
 	"os"
 	"text/tabwriter"
