@@ -64,6 +64,7 @@ func actionAdd(_ context.Context, cmd *cli.Command) error {
 		"mod",
 		newestVersion.Files[0].Filename,
 	)
+
 	if err != nil {
 		if errors.Is(err, lucyerrors.NoLucyError) {
 			logger.CreateWarning(err)
@@ -73,7 +74,10 @@ func actionAdd(_ context.Context, cmd *cli.Command) error {
 		}
 	}
 
-	util.MoveFile(downloadFile, serverInfo.ModPath)
+	err = util.MoveFile(downloadFile, serverInfo.ModPath)
+	if err != nil {
+		logger.CreateError(errors.New("error on installation: " + err.Error()))
+	}
 
 	return nil
 }
