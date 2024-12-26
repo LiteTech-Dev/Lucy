@@ -1,7 +1,6 @@
 package logger
 
 import (
-	"fmt"
 	"github.com/emirpasic/gods/lists/singlylinkedlist"
 	"lucy/lucytypes"
 	"lucy/output"
@@ -12,10 +11,12 @@ var messageQueue = singlylinkedlist.New()
 var DisplayLevel = lucytypes.LogLevel(2)
 
 func WriteAll() {
+	if messageQueue.Size() > 0 {
+		defer println()
+	}
 	for messageQueue.Empty() == false {
 		popLogItem()
 	}
-	fmt.Println()
 }
 
 func CreateInfo(err error) {

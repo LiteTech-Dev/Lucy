@@ -10,11 +10,11 @@ import (
 )
 
 var LogFile = getLogFile()
-var LogWriter = io.MultiWriter(os.Stderr, LogFile)
 
 func WriteLogItem(message *lucytypes.LogItem) {
 	fmt.Println()
-	_, _ = io.WriteString(LogWriter, formatLogItem(message))
+	_, _ = io.WriteString(os.Stderr, formatLogItem(message))
+	_, _ = io.WriteString(LogFile, formatUncolorLogItem(message)+"\n")
 	fmt.Println()
 }
 
@@ -29,7 +29,21 @@ func formatLogItem(message *lucytypes.LogItem) string {
 	case 3:
 		return red("[FATAL] ") + message.Content.Error()
 	}
-	return "Wrong level"
+	return faint("[UNKNOWN] ") + message.Content.Error()
+}
+
+func formatUncolorLogItem(message *lucytypes.LogItem) string {
+	switch message.Level {
+	case 0:
+		return "[INFO] " + message.Content.Error()
+	case 1:
+		return "[WARNING] " + message.Content.Error()
+	case 2:
+		return "[ERROR] " + message.Content.Error()
+	case 3:
+		return "[FATAL] " + message.Content.Error()
+	}
+	return "[UNKNOWN] " + message.Content.Error()
 }
 
 func getLogDir() string {
