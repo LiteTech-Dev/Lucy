@@ -4,8 +4,8 @@ import (
 	"errors"
 	"gopkg.in/ini.v1"
 	"lucy/logger"
+	"lucy/lucytypes"
 	"lucy/syntax"
-	"lucy/types"
 	"os"
 	"path"
 	"sync"
@@ -31,10 +31,10 @@ var GetServerInfo = memoize(buildServerInfo)
 //     the user to select one
 //  3. From the jar we can detect Minecraft, Forge and(or) Fabric versions
 //  4. Then search for related dirs (mods/, config/, plugins/, etc.)
-func buildServerInfo() types.ServerInfo {
+func buildServerInfo() lucytypes.ServerInfo {
 	var wg sync.WaitGroup
-	var serverInfo types.ServerInfo
-	serverInfo.Modules = &types.ServerModules{}
+	var serverInfo lucytypes.ServerInfo
+	serverInfo.Modules = &lucytypes.ServerModules{}
 
 	wg.Add(6)
 
@@ -43,7 +43,7 @@ func buildServerInfo() types.ServerInfo {
 		defer wg.Done()
 		mcdrConfig := getMcdrConfig()
 		if mcdrConfig != nil {
-			serverInfo.Modules.Mcdr = &types.Mcdr{
+			serverInfo.Modules.Mcdr = &lucytypes.Mcdr{
 				Name:        syntax.Mcdr,
 				PluginPaths: mcdrConfig.PluginDirectories,
 			}

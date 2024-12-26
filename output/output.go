@@ -2,7 +2,7 @@ package output
 
 import (
 	"fmt"
-	"lucy/types"
+	"lucy/lucytypes"
 	"os"
 	"text/tabwriter"
 )
@@ -52,7 +52,7 @@ func printLabels(labels []string, maxWidth int) {
 
 func printVersions(
 	versions []string,
-	versionType types.MinecraftVersion, maxWidth int,
+	versionType lucytypes.MinecraftVersion, maxWidth int,
 ) {
 	// TODO: filter by version type
 	printLabels(versions, maxWidth)

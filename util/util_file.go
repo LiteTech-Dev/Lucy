@@ -1,9 +1,7 @@
 package util
 
 import (
-	"fmt"
 	"io"
-	"lucy/probe"
 	"os"
 	"path"
 )
@@ -15,33 +13,13 @@ func InstallLucy() {
 	// 	TODO: create empty config
 }
 
-func InstallMod(file *os.File) {
-	preventExternalFile(file.Name())
-	filename := path.Base(file.Name())
-	fmt.Println("Installing mod", filename)
-	serverInfo := probe.GetServerInfo()
-	os.Rename(
-		file.Name(),
-		path.Join(serverInfo.ModPath, filename),
-	)
+func MoveFile(src *os.File, dest string) (err error) {
+	err = os.Rename(src.Name(), dest)
+	return
 }
 
-func CopyToCache(file *os.File) {
-	preventExternalFile(file.Name())
-	filename := path.Base(file.Name())
+func CopyToCache(f *os.File) {
+	filename := path.Base(f.Name())
 	cacheFile, _ := os.Create(path.Join(LucyCacheDir, filename))
-	_, _ = io.Copy(cacheFile, file)
-}
-
-// preventExternalFile panics when the passed in string do not contain .lucy in
-// all its parent directories. This is used to prevent any unexpected access to
-// externally manages files.
-func preventExternalFile(file string) {
-	for ; file != path.Dir(file); file = path.Dir(file) {
-		if path.Base(file) == LucyPath {
-			return
-		}
-	}
-	fmt.Println("trying to access external file", file)
-	panic("incorrect file")
+	_, _ = io.Copy(cacheFile, f)
 }

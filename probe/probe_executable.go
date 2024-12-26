@@ -7,17 +7,17 @@ import (
 	"io"
 	"log"
 	"lucy/logger"
+	"lucy/lucytypes"
 	"lucy/output"
 	"lucy/syntax"
-	"lucy/types"
 	"os"
 	"path"
 	"strings"
 )
 
 var getServerExecutable = memoize(
-	func() types.ServerExecutable {
-		var suspectedExecutables []*types.ServerExecutable
+	func() lucytypes.ServerExecutable {
+		var suspectedExecutables []*lucytypes.ServerExecutable
 		for _, jarFile := range findJarFiles(getServerWorkPath()) {
 			if exec := analyzeServerExecutable(jarFile); exec != nil {
 				suspectedExecutables = append(suspectedExecutables, exec)
@@ -27,7 +27,7 @@ var getServerExecutable = memoize(
 		switch len(suspectedExecutables) {
 		case 0:
 			logger.CreateFatal(errors.New("no server executable found"))
-			return types.ServerExecutable{} // unreachable
+			return lucytypes.ServerExecutable{} // unreachable
 		case 1:
 			return *suspectedExecutables[0]
 		default:
@@ -50,8 +50,8 @@ func findJarFiles(dir string) (jarFiles []string) {
 	return
 }
 
-func analyzeServerExecutable(executableFile string) (serverExecutable *types.ServerExecutable) {
-	serverExecutable = &types.ServerExecutable{}
+func analyzeServerExecutable(executableFile string) (serverExecutable *lucytypes.ServerExecutable) {
+	serverExecutable = &lucytypes.ServerExecutable{}
 	serverExecutable.Path = executableFile
 	zipReader, _ := zip.OpenReader(executableFile)
 	defer func(r *zip.ReadCloser) {

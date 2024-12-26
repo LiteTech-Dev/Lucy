@@ -5,14 +5,14 @@ package probe
 
 import (
 	"errors"
-	"lucy/types"
+	"lucy/lucytypes"
 	"os"
 	"path"
 	"syscall"
 )
 
 var checkServerFileLock = memoize(
-	func() *types.Activity {
+	func() *lucytypes.Activity {
 		if getSavePath() == "" {
 			return nil
 		}
@@ -36,7 +36,7 @@ var checkServerFileLock = memoize(
 			fl.Start = 0
 			fl.Len = 0
 			err = syscall.FcntlFlock(file.Fd(), syscall.F_GETLK, &fl)
-			return &types.Activity{
+			return &lucytypes.Activity{
 				Active: true,
 				Pid:    int(fl.Pid),
 			}

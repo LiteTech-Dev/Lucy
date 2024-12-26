@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"html/template"
 	"io"
+	"lucy/lucytypes"
 	"lucy/probe"
 	"lucy/syntax"
-	"lucy/types"
 	"net/http"
 	url2 "net/url"
 	"strings"
@@ -15,7 +15,7 @@ import (
 // For Modrinth search API, see:
 // https://docs.modrinth.com/api/operations/searchprojects/
 
-func GetNewestProjectVersion(slug syntax.PackageName) (newestVersion *types.ModrinthProjectVersion) {
+func GetNewestProjectVersion(slug syntax.PackageName) (newestVersion *lucytypes.ModrinthProjectVersion) {
 	newestVersion = nil
 	versions := getProjectVersions(slug)
 	serverInfo := probe.GetServerInfo()
@@ -36,7 +36,7 @@ func GetNewestProjectVersion(slug syntax.PackageName) (newestVersion *types.Modr
 	return
 }
 
-func getProjectVersions(slug syntax.PackageName) (versions []*types.ModrinthProjectVersion) {
+func getProjectVersions(slug syntax.PackageName) (versions []*lucytypes.ModrinthProjectVersion) {
 	res, _ := http.Get(constructProjectVersionsUrl(slug))
 	data, _ := io.ReadAll(res.Body)
 	json.Unmarshal(data, &versions)
@@ -45,7 +45,7 @@ func getProjectVersions(slug syntax.PackageName) (versions []*types.ModrinthProj
 
 func GetProjectId(slug syntax.PackageName) (id string) {
 	res, _ := http.Get(ConstructProjectUrl(slug))
-	modrinthProject := types.ModrinthProject{}
+	modrinthProject := lucytypes.ModrinthProject{}
 	data, _ := io.ReadAll(res.Body)
 	json.Unmarshal(data, &modrinthProject)
 	id = modrinthProject.Id
@@ -59,7 +59,7 @@ func Search(
 	packageName syntax.PackageName,
 	showClientPackage bool,
 	indexBy string,
-) (result *types.ModrinthSearchResults) {
+) (result *lucytypes.ModrinthSearchResults) {
 	// Construct the search url
 	const (
 		facetsCategoryAll    = `["categories:'forge'","categories:'fabric'","categories:'quilt'","categories:'liteloader'","categories:'modloader'","categories:'rift'","categories:'neoforge'"]`

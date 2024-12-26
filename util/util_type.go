@@ -1,9 +1,11 @@
 package util
 
-import "lucy/types"
+import (
+	"lucy/lucytypes"
+)
 
 type LucyEnvConfig struct {
-	LastRecordedInfo types.ServerInfo
+	LastRecordedInfo lucytypes.ServerInfo
 	BootCommand      string
 }
 

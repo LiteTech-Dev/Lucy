@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"github.com/urfave/cli/v3"
+	"lucy/logger"
+	"lucy/lucyerrors"
 	"lucy/modrinth"
 	"lucy/probe"
 	"lucy/syntax"
@@ -54,7 +56,7 @@ func ActionAdd(_ context.Context, cmd *cli.Command) error {
 	}
 
 	newestVersion := modrinth.GetNewestProjectVersion(p.PackageName)
-	file := util.DownloadFile(
+	downloadFile, err := util.DownloadFile(
 		// Not sure how to deal with multiple files
 		// As the motivation for publishers to provide multiple files is unclear
 		// TODO: Maybe add a prompt to let the user choose
@@ -62,8 +64,16 @@ func ActionAdd(_ context.Context, cmd *cli.Command) error {
 		"mod",
 		newestVersion.Files[0].Filename,
 	)
+	if err != nil {
+		if errors.Is(err, lucyerrors.NoLucyError) {
+			logger.CreateWarning(err)
+		} else {
+			logger.CreateError(errors.New("failed at downloading: " + err.Error()))
+			return nil
+		}
+	}
 
-	util.InstallMod(file)
+	util.MoveFile(downloadFile, serverInfo.ModPath)
 
 	return nil
 }

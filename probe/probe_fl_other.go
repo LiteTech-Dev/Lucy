@@ -2,8 +2,8 @@
 
 package probe
 
-import "lucy/types"
+import "lucy/lucytypes"
 
-func checkServerFileLock() *types.Activity {
+func checkServerFileLock() *lucytypes.Activity {
 	return nil
 }

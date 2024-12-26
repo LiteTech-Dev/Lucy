@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"github.com/urfave/cli/v3"
 	"io"
+	"lucy/lucytypes"
 	"lucy/mcdr"
 	"lucy/modrinth"
 	"lucy/output"
 	"lucy/syntax"
-	"lucy/types"
 	"net/http"
 )
 
@@ -43,14 +43,14 @@ func ActionInfo(ctx context.Context, cmd *cli.Command) error {
 	case syntax.AllPlatform:
 		// TODO: Wide range search
 		res, _ := http.Get(modrinth.ConstructProjectUrl(p.PackageName))
-		modrinthProject := &types.ModrinthProject{}
+		modrinthProject := &lucytypes.ModrinthProject{}
 		data, _ := io.ReadAll(res.Body)
 		json.Unmarshal(data, modrinthProject)
 		output.GenerateInfo(modrinthProject)
 	case syntax.Fabric:
 		// TODO: Fabric specific search
 		res, _ := http.Get(modrinth.ConstructProjectUrl(p.PackageName))
-		modrinthProject := &types.ModrinthProject{}
+		modrinthProject := &lucytypes.ModrinthProject{}
 		data, _ := io.ReadAll(res.Body)
 		json.Unmarshal(data, modrinthProject)
 		output.GenerateInfo(modrinthProject)

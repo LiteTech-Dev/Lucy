@@ -1,4 +1,4 @@
-package types
+package lucytypes
 
 import (
 	"lucy/syntax"

@@ -14,7 +14,7 @@ package syntax
 // Example: minecraft/minecraft@1.16.5
 
 import (
-	"errors"
+	"lucy/lucyerrors"
 	"strings"
 )
 
@@ -47,17 +47,13 @@ const (
 	NeoforgeAsPackage  = PackageName(Neoforge)
 )
 
-var InvalidPlatformError = errors.New("invalid platform")
-var PackageSyntaxError = errors.New("invalid package syntax")
-var EmptyPackageSyntaxError = errors.New("empty package string")
-
 // validatePlatform should be edited if you added anything
-func validatePlatform(value string) error {
-	switch Platform(value) {
+func validatePlatform(value Platform) error {
+	switch value {
 	case Fabric, Forge, Neoforge, Mcdr, Minecraft, AllPlatform:
 		return nil
 	default:
-		return InvalidPlatformError
+		return lucyerrors.InvalidPlatformError
 	}
 }
 
@@ -90,18 +86,18 @@ func Parse(str string) (err error, p *Package) {
 
 	switch len(slashSplit) {
 	case 0:
-		return EmptyPackageSyntaxError, nil
+		return lucyerrors.EmptyPackageSyntaxError, nil
 	case 1:
 		p.Platform = AllPlatform
 		atSplit = strings.Split(slashSplit[0], "@")
 	case 2:
-		if err := validatePlatform(slashSplit[0]); err != nil {
+		if err := validatePlatform(Platform(slashSplit[0])); err != nil {
 			return err, nil
 		}
 		p.Platform = Platform(slashSplit[0])
 		atSplit = strings.Split(slashSplit[1], "@")
 	default:
-		return PackageSyntaxError, nil
+		return lucyerrors.PackageSyntaxError, nil
 	}
 
 	switch len(atSplit) {
@@ -112,7 +108,7 @@ func Parse(str string) (err error, p *Package) {
 		p.PackageName = PackageName(atSplit[0])
 		p.PackageVersion = PackageVersion(atSplit[1])
 	default:
-		return PackageSyntaxError, nil
+		return lucyerrors.PackageSyntaxError, nil
 	}
 
 	return

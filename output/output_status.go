@@ -1,12 +1,12 @@
 package output
 
 import (
+	"lucy/lucytypes"
 	"lucy/tools"
-	"lucy/types"
 	"strconv"
 )
 
-func GenerateStatus(data *types.ServerInfo) {
+func GenerateStatus(data *lucytypes.ServerInfo) {
 	defer keyValueWriter.Flush()
 
 	// Print game version

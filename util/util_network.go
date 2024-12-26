@@ -5,7 +5,7 @@ import (
 	"github.com/schollz/progressbar/v3"
 	"golang.org/x/term"
 	"io"
-	"lucy/probe"
+	"lucy/lucyerrors"
 	"lucy/tools"
 	"net/http"
 	"os"
@@ -19,26 +19,19 @@ func DownloadFile(
 	url string,
 	subdir string,
 	filename string,
-) (outFile *os.File) {
-	serverInfo := probe.GetServerInfo()
-	if !serverInfo.HasLucy {
-		// This is a very bad implementation
-		// Not sure whether I should check for Lucy's existence here
-		// Maybe we should assume all callers have checked it??
-		// However, that might be redundant
-		// Another drawback is that we cannot provide specific error messages here
-		// Maybe a last check here is necessary
-		panic("Lucy is not installed")
+) (out *os.File, err error) {
+	if _, err := os.Stat(LucyPath); os.IsNotExist(err) {
+		return nil, lucyerrors.NoLucyError
 	}
 
-	out, err := os.Create(path.Join(LucyDownloadDir, subdir, filename))
+	out, err = os.Create(path.Join(LucyDownloadDir, subdir, filename))
 	if os.IsNotExist(err) {
 		os.MkdirAll(path.Join(LucyDownloadDir, subdir), os.ModePerm)
 		out, _ = os.Create(path.Join(LucyDownloadDir, subdir, filename))
 	}
 	defer out.Close()
 
-	res, _ := http.Get(url)
+	res, err := http.Get(url)
 	defer res.Body.Close()
 
 	fmt.Println("Downloading", url)
@@ -71,5 +64,5 @@ func DownloadFile(
 	io.Copy(writer, res.Body)
 	fmt.Println()
 
-	return out
+	return out, err
 }

@@ -3,7 +3,7 @@ package output
 import (
 	"fmt"
 	"io"
-	"lucy/types"
+	"lucy/lucytypes"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -11,13 +11,13 @@ import (
 
 var LogWriter = io.MultiWriter(os.Stderr, getLogFile())
 
-func WriteLogItem(message *types.LogItem) {
+func WriteLogItem(message *lucytypes.LogItem) {
 	fmt.Println()
 	_, _ = io.WriteString(LogWriter, formatLogItem(message))
 	fmt.Println()
 }
 
-func formatLogItem(message *types.LogItem) string {
+func formatLogItem(message *lucytypes.LogItem) string {
 	switch message.Level {
 	case 0:
 		return cyan("[INFO] ") + message.Content.Error()

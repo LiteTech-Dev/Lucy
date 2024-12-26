@@ -2,7 +2,7 @@ package output
 
 import (
 	"github.com/manifoldco/promptui"
-	"lucy/types"
+	"lucy/lucytypes"
 	"strings"
 	"text/template"
 )
@@ -20,7 +20,7 @@ var selectExecutableTemplate = &promptui.SelectTemplates{
 	}(),
 }
 
-func PromptSelectExecutable(executables []*types.ServerExecutable) int {
+func PromptSelectExecutable(executables []*lucytypes.ServerExecutable) int {
 	selectExecutable := promptui.Select{
 		Label:     "Multiple executables detected, select one",
 		Items:     executables,

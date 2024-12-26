@@ -1,4 +1,4 @@
-package types
+package lucytypes
 
 type McdrPluginInfo struct {
 	Id      string `json:"id"`
