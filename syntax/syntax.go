@@ -1,17 +1,28 @@
+// Package syntax defines the syntax for specifying packages and platforms.
+//
+// A package can either be specified by a string in the format of "platform/name@version".
+// Only the name is required, both platform and version can be omitted.
+//
+// PackageName is the slug of the package, using hyphens as separators. For example,
+// "fabric-api". It is not case-sensitive, however lowercase is recommended. Underline
+// '_' is equivalent to hyphen. The slug from a source API is preferred, if available.
+// Otherwise, the slug is obtained from the executable file.
+//
+// Platform is an enum of several string constants. There is a special syntax for
+// platforms only used when updating them (migration): "platform@version". Note
+// that the platform here are treated as packages names. "platform/platform@version"
+// is also tolerated, if both platform fields are the same.
+//
+// PackageVersion is the version of the package. If not specified, it defaults to "all".
+//
+// Valid Examples:
+//   - carpet
+//   - fabric/carpet@1.0.0
+//   - mcdr/prime-backup
+//   - fabric@12.0
+//   - minecraft@1.19
+//   - minecraft/minecraft@1.16.5
 package syntax
-
-// Package syntax:
-// A package can either be specified by its name or string in the format of
-// "platform/package@version". The package name is the slug of the package.
-// There is a special syntax for platforms only used when updating them (migration):
-// "platform@version", you must not specify any packages in this way. Minecraft
-// is both a package and a platform.
-// Example: carpet
-// Example: fabric/carpet@1.0.0
-// Example: mcdr/prime-backup
-// Example: fabric@12.0
-// Example: minecraft@1.19
-// Example: minecraft/minecraft@1.16.5
 
 import (
 	"lucy/lucyerrors"
@@ -19,13 +30,6 @@ import (
 )
 
 type Platform string
-type PackageName string
-type PackageVersion string
-type Package struct {
-	Platform
-	PackageName
-	PackageVersion
-}
 
 const (
 	Minecraft   Platform = "minecraft"
@@ -36,18 +40,25 @@ const (
 	AllPlatform Platform = "all"
 )
 
+type PackageName string
+type PackageVersion string
+type Package struct {
+	Platform Platform
+	Name     PackageName
+	Version  PackageVersion
+}
+
 const (
 	AllVersion PackageVersion = "all"
 )
 
-const (
+var (
 	MinecraftAsPackage = PackageName(Minecraft)
 	FabricAsPackage    = PackageName(Fabric)
 	ForgeAsPackage     = PackageName(Forge)
-	NeoforgeAsPackage  = PackageName(Neoforge)
 )
 
-// validatePlatform should be edited if you added anything
+// validatePlatform should be edited if you added a new platform.
 func validatePlatform(value Platform) error {
 	switch value {
 	case Fabric, Forge, Neoforge, Mcdr, Minecraft, AllPlatform:
@@ -102,11 +113,11 @@ func Parse(str string) (err error, p *Package) {
 
 	switch len(atSplit) {
 	case 1:
-		p.PackageName = PackageName(atSplit[0])
-		p.PackageVersion = AllVersion
+		p.Name = PackageName(atSplit[0])
+		p.Version = AllVersion
 	case 2:
-		p.PackageName = PackageName(atSplit[0])
-		p.PackageVersion = PackageVersion(atSplit[1])
+		p.Name = PackageName(atSplit[0])
+		p.Version = PackageVersion(atSplit[1])
 	default:
 		return lucyerrors.PackageSyntaxError, nil
 	}
