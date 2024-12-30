@@ -20,14 +20,14 @@ func DownloadFile(
 	subdir string,
 	filename string,
 ) (out *os.File, err error) {
-	if _, err := os.Stat(LucyPath); os.IsNotExist(err) {
+	if _, err := os.Stat(ProgramPath); os.IsNotExist(err) {
 		return nil, lucyerrors.NoLucyError
 	}
 
-	out, err = os.Create(path.Join(LucyDownloadDir, subdir, filename))
+	out, err = os.Create(path.Join(DownloadPath, subdir, filename))
 	if os.IsNotExist(err) {
-		os.MkdirAll(path.Join(LucyDownloadDir, subdir), os.ModePerm)
-		out, _ = os.Create(path.Join(LucyDownloadDir, subdir, filename))
+		os.MkdirAll(path.Join(DownloadPath, subdir), os.ModePerm)
+		out, _ = os.Create(path.Join(DownloadPath, subdir, filename))
 	}
 	defer out.Close()
 

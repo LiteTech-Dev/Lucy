@@ -1,8 +1,8 @@
 package util
 
 const (
-	LucyPath        = ".lucy"
-	LucyConfigPath  = ".lucy/config.json"
-	LucyDownloadDir = ".lucy/downloads"
-	LucyCacheDir    = ".lucy/cache"
+	ProgramPath  = ".lucy"
+	ConfigFile   = ProgramPath + "/config.json"
+	DownloadPath = ProgramPath + "/downloads"
+	CachePath    = ProgramPath + "/cache"
 )
