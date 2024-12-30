@@ -34,6 +34,13 @@ var Cli = &cli.Command{
 }
 
 func mainAction(_ context.Context, cmd *cli.Command) error {
+	// sources.MultiSourceDownload(
+	// 	[]string{
+	// 		"https://cdn.modrinth.com/data/P7dR8mSH/versions/nyAmoHlr/fabric-api-0.87.2%2B1.19.4.jar",
+	// 		"https://mediafilez.forgecdn.net/files/4834/896/fabric-api-0.87.2%2B1.19.4.jar",
+	// 	},
+	// 	"fabric-api-0.87.2+1.19.4.jar",
+	// )
 	if cmd.Bool("log-file") {
 		println("Log file at", output.LogFile.Name())
 	}
