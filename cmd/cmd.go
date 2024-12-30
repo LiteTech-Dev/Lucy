@@ -6,10 +6,12 @@ import (
 	"lucy/output"
 )
 
-// Frontend
-// This changes when user runs the web interface
+// Frontend should change when user do not run the program in CLI
 var Frontend = "cli"
 
+// Each subcommand (and its action function) should be in its own file
+
+// Cli is the main command for lucy
 var Cli = &cli.Command{
 	Name:   "lucy",
 	Usage:  "The Minecraft server-side package manager",
@@ -38,8 +40,11 @@ func mainAction(_ context.Context, cmd *cli.Command) error {
 	return nil
 }
 
-// addDefaultBehaviour is a high-order function that takes an action func and returns
-// an action func that prints help and exit when there's no args and flags.
+// addDefaultBehaviour is a high-order function that takes a cli.ActionFunc and
+// returns a cli.ActionFunc that prints help and exit when there's no args and flags.
+//
+// This function is not necessarily used for every action function, as some
+// action functions are expected to have no args and flags. E.g., `lucy status`.
 func addDefaultBehaviour(f cli.ActionFunc) cli.ActionFunc {
 	return func(ctx context.Context, cmd *cli.Command) error {
 		if cmd.Args().Len() == 0 && len(cmd.FlagNames()) == 0 {
