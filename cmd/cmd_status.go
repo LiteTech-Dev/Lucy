@@ -12,7 +12,7 @@ import (
 var subcmdStatus = &cli.Command{
 	Name:   "status",
 	Usage:  "Display basic information of the current server",
-	Action: ActionStatus,
+	Action: actionStatus,
 	Flags: []cli.Flag{
 		&cli.BoolFlag{
 			Name:  "debug",
@@ -21,7 +21,7 @@ var subcmdStatus = &cli.Command{
 	},
 }
 
-func ActionStatus(_ context.Context, cmd *cli.Command) error {
+func actionStatus(_ context.Context, cmd *cli.Command) error {
 	serverInfo := probe.GetServerInfo()
 	if cmd.Bool("debug") {
 		data, _ := json.MarshalIndent(serverInfo, "", "  ")

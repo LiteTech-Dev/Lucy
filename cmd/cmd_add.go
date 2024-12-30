@@ -23,10 +23,10 @@ var subcmdAdd = &cli.Command{
 			Value:   false,
 		},
 	},
-	Action: ActionAdd,
+	Action: actionAdd,
 }
 
-// ActionAdd
+// actionAdd
 // Now the strategy is:
 //
 //   - Most up to date
@@ -34,7 +34,7 @@ var subcmdAdd = &cli.Command{
 //   - Release version
 //
 // TODO: Version specification
-func ActionAdd(_ context.Context, cmd *cli.Command) error {
+func actionAdd(_ context.Context, cmd *cli.Command) error {
 	// TODO: Platform specification
 	// TODO: Platform compatibility check
 	// TODO: Error handling

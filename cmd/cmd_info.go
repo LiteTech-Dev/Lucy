@@ -32,10 +32,10 @@ var subcmdInfo = &cli.Command{
 			Value:   false,
 		},
 	},
-	Action: ActionInfo,
+	Action: actionInfo,
 }
 
-func ActionInfo(ctx context.Context, cmd *cli.Command) error {
+func actionInfo(ctx context.Context, cmd *cli.Command) error {
 	// TODO: Error handling
 	_, p := syntax.Parse(cmd.Args().First())
 

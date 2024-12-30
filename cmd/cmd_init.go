@@ -8,9 +8,9 @@ import (
 var subcmdInit = &cli.Command{
 	Name:   "init",
 	Usage:  "Initialize Lucy on current directory",
-	Action: InitAction,
+	Action: ActionInit,
 }
 
-func InitAction(ctx context.Context, cmd *cli.Command) error {
+func ActionInit(ctx context.Context, cmd *cli.Command) error {
 	return nil
 }

@@ -57,10 +57,10 @@ var subcmdSearch = &cli.Command{
 			Value:   false,
 		},
 	},
-	Action: ActionSearch,
+	Action: actionSearch,
 }
 
-func ActionSearch(_ context.Context, cmd *cli.Command) error {
+func actionSearch(_ context.Context, cmd *cli.Command) error {
 	// TODO: Error handling
 	_, p := syntax.Parse(cmd.Args().First())
 	// indexBy can be: relevance (default), downloads, follows, newest, updated
