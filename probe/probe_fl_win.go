@@ -6,13 +6,14 @@ package probe
 import (
 	"golang.org/x/sys/windows"
 	"lucy/lucytypes"
+	"lucy/tools"
 	"os"
 	"path"
 )
 
 // This is AI generated code, please check it before use.
 // I have no knowledge to Windows syscall.
-var checkServerFileLock = memoize(
+var checkServerFileLock = tools.Memoize(
 	func() *lucytypes.Activity {
 		lockPath := path.Join(
 			getSavePath(),

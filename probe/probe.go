@@ -6,6 +6,7 @@ import (
 	"lucy/logger"
 	"lucy/lucytypes"
 	"lucy/syntax"
+	"lucy/tools"
 	"os"
 	"path"
 	"sync"
@@ -22,7 +23,7 @@ const vanillaAttributeFileName = "version.json"
 // As we can assume that the environment do not change while the program is
 // running, a sync.Once is used to prevent further calls to this function. Rather,
 // the cached serverInfo is used as the return value.
-var GetServerInfo = memoize(buildServerInfo)
+var GetServerInfo = tools.Memoize(buildServerInfo)
 
 // buildServerInfo
 // Sequence:
@@ -93,7 +94,7 @@ func buildServerInfo() lucytypes.ServerInfo {
 // as GetServerInfo() applies a memoization mechanism. Every time a serverInfo
 // is needed, just call GetServerInfo() without the concern of redundant calculation.
 
-var getServerModPath = memoize(
+var getServerModPath = tools.Memoize(
 	func() string {
 		exec := getServerExecutable()
 		if exec.Type == syntax.Fabric || exec.Type == syntax.Forge {
@@ -103,7 +104,7 @@ var getServerModPath = memoize(
 	},
 )
 
-var getServerWorkPath = memoize(
+var getServerWorkPath = tools.Memoize(
 	func() string {
 		if mcdrConfig := getMcdrConfig(); mcdrConfig != nil {
 			return mcdrConfig.WorkingDirectory
@@ -112,7 +113,7 @@ var getServerWorkPath = memoize(
 	},
 )
 
-var getServerDotProperties = memoize(
+var getServerDotProperties = tools.Memoize(
 	func() MinecraftServerDotProperties {
 		propertiesPath := path.Join(getServerWorkPath(), "server.properties")
 		file, err := ini.Load(propertiesPath)
@@ -132,7 +133,7 @@ var getServerDotProperties = memoize(
 	},
 )
 
-var getSavePath = memoize(
+var getSavePath = tools.Memoize(
 	func() string {
 		serverProperties := getServerDotProperties()
 		if serverProperties == nil {
@@ -143,22 +144,9 @@ var getSavePath = memoize(
 	},
 )
 
-var checkHasLucy = memoize(
+var checkHasLucy = tools.Memoize(
 	func() bool {
 		_, err := os.Stat(".lucy")
 		return err == nil
 	},
 )
-
-func memoize[T any](f func() T) func() T {
-	var result T
-	var once sync.Once
-	return func() T {
-		once.Do(
-			func() {
-				result = f()
-			},
-		)
-		return result
-	}
-}

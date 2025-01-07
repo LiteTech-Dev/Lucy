@@ -10,12 +10,13 @@ import (
 	"lucy/lucytypes"
 	"lucy/output"
 	"lucy/syntax"
+	"lucy/tools"
 	"os"
 	"path"
 	"strings"
 )
 
-var getServerExecutable = memoize(
+var getServerExecutable = tools.Memoize(
 	func() lucytypes.ServerExecutable {
 		var suspectedExecutables []*lucytypes.ServerExecutable
 		for _, jarFile := range findJarFiles(getServerWorkPath()) {

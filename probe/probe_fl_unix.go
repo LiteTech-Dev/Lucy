@@ -6,12 +6,13 @@ package probe
 import (
 	"errors"
 	"lucy/lucytypes"
+	"lucy/tools"
 	"os"
 	"path"
 	"syscall"
 )
 
-var checkServerFileLock = memoize(
+var checkServerFileLock = tools.Memoize(
 	func() *lucytypes.Activity {
 		if getSavePath() == "" {
 			return nil
