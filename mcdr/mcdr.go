@@ -4,12 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/google/go-github/v50/github"
-	"lucy/lucytypes"
+	"lucy/apitypes"
 	"lucy/syntax"
 	"path"
 )
 
-func SearchMcdrPluginCatalogue(slug syntax.PackageName) (pluginInfo *lucytypes.McdrPluginInfo) {
+func SearchMcdrPluginCatalogue(slug syntax.PackageName) (pluginInfo *apitypes.McdrPluginInfo) {
 	plugins := getMcdrPluginCatalogue()
 
 	for _, plugin := range plugins {
@@ -37,7 +37,7 @@ func getMcdrPluginCatalogue() []*github.RepositoryContent {
 	return directoryContent
 }
 
-func getMcdrPluginInfo(pluginPath string) (pluginInfo *lucytypes.McdrPluginInfo) {
+func getMcdrPluginInfo(pluginPath string) (pluginInfo *apitypes.McdrPluginInfo) {
 	ctx := context.Background()
 	client := github.NewClient(nil)
 
@@ -48,7 +48,7 @@ func getMcdrPluginInfo(pluginPath string) (pluginInfo *lucytypes.McdrPluginInfo)
 		path.Join(pluginPath, "plugin_info.json"),
 		nil,
 	)
-	pluginInfo = &lucytypes.McdrPluginInfo{}
+	pluginInfo = &apitypes.McdrPluginInfo{}
 	content, _ := fileContent.GetContent()
 	_ = json.Unmarshal([]byte(content), pluginInfo)
 

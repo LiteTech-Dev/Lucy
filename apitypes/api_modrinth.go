@@ -1,4 +1,4 @@
-package lucytypes
+package apitypes
 
 import "time"
 

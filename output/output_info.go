@@ -2,20 +2,20 @@ package output
 
 import (
 	"fmt"
-	"lucy/lucytypes"
+	"lucy/apitypes"
 )
 
 func GenerateInfo(data interface{}) {
 	defer keyValueWriter.Flush()
 
 	switch v := data.(type) {
-	case *lucytypes.ModrinthProject:
+	case *apitypes.ModrinthProject:
 		printField("Name", v.Title)
 		printField("Description", v.Description)
 		printField("Downloads", fmt.Sprintf("%d", v.Downloads))
 		printKey("Game Versions")
 		printLabels(v.GameVersions, 60)
-	case *lucytypes.McdrPluginInfo:
+	case *apitypes.McdrPluginInfo:
 		printField("Name", v.Id)
 		printKey("Authors")
 		for i, author := range v.Authors {
