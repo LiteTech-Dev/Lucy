@@ -69,7 +69,7 @@ func actionSearch(_ context.Context, cmd *cli.Command) error {
 
 	res := modrinth.Search(
 		p.Platform,
-		p.PackageName,
+		p.Name,
 		showClientPackage,
 		indexBy,
 	)

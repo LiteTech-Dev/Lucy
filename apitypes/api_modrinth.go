@@ -1,5 +1,7 @@
 package apitypes
 
+// TODO: Rename this package to 'datatypes'
+
 import "time"
 
 type ModrinthProject struct {

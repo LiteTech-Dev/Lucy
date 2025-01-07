@@ -36,6 +36,19 @@ const (
 	AllPlatform Platform = "all"
 )
 
+var Platforms = []Platform{
+	Minecraft, Fabric, Forge, Neoforge, Mcdr, AllPlatform,
+}
+
+const (
+	MinecraftAsPackage = PackageName(Minecraft)
+	FabricAsPackage    = PackageName(Fabric)
+	ForgeAsPackage     = PackageName(Forge)
+	NeoforgeAsPackage  = PackageName(Neoforge)
+	McdrAsPackage      = PackageName(Mcdr)
+	AllAsPackage       = PackageName(AllPlatform)
+)
+
 // PackageName is the slug of the package, using hyphens as separators. For example,
 // "fabric-api". It is not case-sensitive, however lowercase is recommended. Underline
 // '_' is equivalent to hyphen. The slug from a source API is preferred, if available.
@@ -51,27 +64,47 @@ type Package struct {
 	Version  PackageVersion
 }
 
-// Validate should be edited if you added a new platform.
-func (p Platform) Validate() bool {
-	switch p {
-	case Fabric, Forge, Neoforge, Mcdr, Minecraft, AllPlatform:
-		return true
-	default:
-		return false
+// IsValid should be edited if you added a new platform.
+func (p Platform) IsValid() bool {
+	for _, valid := range Platforms {
+		if p == valid {
+			return true
+		}
 	}
+	return false
 }
 
 // PackageVersion is the version of the package. If not specified, it defaults to
 // "all". Most mods should use semver. An exception is Minecraft versions snapshots.
 // Therefore, the type MinecraftVersion is defined.
-type PackageVersion string
+type PackageVersion interface {
+	IsValidVersion() bool
+}
 
-const AllVersion = PackageVersion("all")
+type typeAllVersion string
 
-type MinecraftVersion PackageVersion
+func (s typeAllVersion) IsValidVersion() bool {
+	return s == "all"
+}
 
-func (v MinecraftVersion) IsSnapshot() bool {
-	return semver.IsValid(string("v" + v))
+const AllVersion = typeAllVersion("all")
+
+type MinecraftVersion string
+
+func (s MinecraftVersion) IsValidVersion() bool {
+	manifest, _ := GetVersionManifest()
+	for _, v := range manifest.Versions {
+		if string(s) == v.Id {
+			return true
+		}
+	}
+	return false
+}
+
+type ModVersion string
+
+func (s ModVersion) IsValidVersion() bool {
+	return semver.IsValid("v" + string(s))
 }
 
 // sanitize tolerates some common interchangeability between characters. This
@@ -109,7 +142,7 @@ func Parse(s string) (err error, p *Package) {
 		atSplit = strings.Split(slashSplit[0], "@")
 	case 2:
 		p.Platform = Platform(slashSplit[0])
-		if !p.Platform.Validate() {
+		if !p.Platform.IsValid() {
 			return lucyerrors.InvalidPlatformError, nil
 		}
 		atSplit = strings.Split(slashSplit[1], "@")
@@ -120,10 +153,20 @@ func Parse(s string) (err error, p *Package) {
 	switch len(atSplit) {
 	case 1:
 		p.Name = PackageName(atSplit[0])
+		if p.Name == MinecraftAsPackage {
+			p.Platform = Minecraft
+		}
 		p.Version = AllVersion
 	case 2:
 		p.Name = PackageName(atSplit[0])
-		p.Version = PackageVersion(atSplit[1])
+		if p.Name == MinecraftAsPackage {
+			p.Platform = Minecraft
+		}
+		if p.Platform == Minecraft {
+			p.Version = MinecraftVersion(atSplit[1])
+		} else {
+			p.Version = ModVersion(atSplit[1])
+		}
 	default:
 		return lucyerrors.PackageSyntaxError, nil
 	}

@@ -42,14 +42,14 @@ func actionInfo(ctx context.Context, cmd *cli.Command) error {
 	switch p.Platform {
 	case syntax.AllPlatform:
 		// TODO: Wide range search
-		res, _ := http.Get(modrinth.ConstructProjectUrl(p.PackageName))
+		res, _ := http.Get(modrinth.ConstructProjectUrl(p.Name))
 		modrinthProject := &apitypes.ModrinthProject{}
 		data, _ := io.ReadAll(res.Body)
 		json.Unmarshal(data, modrinthProject)
 		output.GenerateInfo(modrinthProject)
 	case syntax.Fabric:
 		// TODO: Fabric specific search
-		res, _ := http.Get(modrinth.ConstructProjectUrl(p.PackageName))
+		res, _ := http.Get(modrinth.ConstructProjectUrl(p.Name))
 		modrinthProject := &apitypes.ModrinthProject{}
 		data, _ := io.ReadAll(res.Body)
 		json.Unmarshal(data, modrinthProject)
@@ -58,7 +58,7 @@ func actionInfo(ctx context.Context, cmd *cli.Command) error {
 		// TODO: Forge support
 		println("Not yet implemented")
 	case syntax.Mcdr:
-		mcdrPlugin := mcdr.SearchMcdrPluginCatalogue(p.PackageName)
+		mcdrPlugin := mcdr.SearchMcdrPluginCatalogue(p.Name)
 		if mcdrPlugin == nil {
 			_ = fmt.Errorf("plugin not found")
 			return nil
