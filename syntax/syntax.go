@@ -16,6 +16,7 @@
 package syntax
 
 import (
+	"golang.org/x/mod/semver"
 	"lucy/lucyerrors"
 	"strings"
 )
@@ -43,60 +44,60 @@ const (
 // versions are valid package names. This literal is typically used when migrating
 // to another Minecraft version.
 type PackageName string
-type PackageVersion string
+
 type Package struct {
 	Platform Platform
 	Name     PackageName
 	Version  PackageVersion
 }
 
-const (
-	AllVersion PackageVersion = "all"
-)
-
-var (
-	MinecraftAsPackage = PackageName(Minecraft)
-	FabricAsPackage    = PackageName(Fabric)
-	ForgeAsPackage     = PackageName(Forge)
-)
-
-func validatePlatform(value Platform) error {
-	switch value {
 // Validate should be edited if you added a new platform.
+func (p Platform) Validate() bool {
+	switch p {
 	case Fabric, Forge, Neoforge, Mcdr, Minecraft, AllPlatform:
-		return nil
+		return true
 	default:
-		return lucyerrors.InvalidPlatformError
+		return false
 	}
 }
 
 // PackageVersion is the version of the package. If not specified, it defaults to
 // "all". Most mods should use semver. An exception is Minecraft versions snapshots.
 // Therefore, the type MinecraftVersion is defined.
+type PackageVersion string
+
+const AllVersion = PackageVersion("all")
+
+type MinecraftVersion PackageVersion
+
+func (v MinecraftVersion) IsSnapshot() bool {
+	return semver.IsValid(string("v" + v))
+}
+
 // sanitize tolerates some common interchangeability between characters. This
 // includes underscores, chinese full stops, and backslashes. It also converts
 // uppercase characters to lowercase.
-func Sanitize(str string) (cleanStr string) {
-	cleanStr = ""
-	for _, char := range str {
+func sanitize(s string) (clean string) {
+	clean = ""
+	for _, char := range s {
 		if char == '_' {
-			cleanStr += string('-')
+			clean += string('-')
 		} else if char == '\\' {
-			cleanStr += string('/')
+			clean += string('/')
 		} else if char == '。' {
-			cleanStr += string('.')
+			clean += string('.')
 		} else if char >= 'A' && char <= 'Z' {
-			cleanStr += strings.ToLower(string(char))
+			clean += strings.ToLower(string(char))
 		} else {
-			cleanStr += string(char)
+			clean += string(char)
 		}
 	}
 	return
 }
 
-func Parse(str string) (err error, p *Package) {
-	str = Sanitize(str)
-	slashSplit := strings.Split(str, "/")
+func Parse(s string) (err error, p *Package) {
+	s = sanitize(s)
+	slashSplit := strings.Split(s, "/")
 	p = &Package{}
 	var atSplit []string
 
@@ -107,10 +108,10 @@ func Parse(str string) (err error, p *Package) {
 		p.Platform = AllPlatform
 		atSplit = strings.Split(slashSplit[0], "@")
 	case 2:
-		if err := validatePlatform(Platform(slashSplit[0])); err != nil {
-			return err, nil
-		}
 		p.Platform = Platform(slashSplit[0])
+		if !p.Platform.Validate() {
+			return lucyerrors.InvalidPlatformError, nil
+		}
 		atSplit = strings.Split(slashSplit[1], "@")
 	default:
 		return lucyerrors.PackageSyntaxError, nil
