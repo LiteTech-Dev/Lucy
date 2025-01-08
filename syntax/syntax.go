@@ -129,9 +129,9 @@ func Parse(s string) (err error, p *Package) {
 			p.Platform = Minecraft
 		}
 		if p.Platform == Minecraft {
-			p.Version = MinecraftVersion(atSplit[1])
+			p.Version = PackageVersion{MinecraftVersion, atSplit[1]}
 		} else {
-			p.Version = ModVersion(atSplit[1])
+			p.Version = PackageVersion{SemanticVersion, atSplit[1]}
 		}
 	default:
 		return lucyerrors.PackageSyntaxError, nil
