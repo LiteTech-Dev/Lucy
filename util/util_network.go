@@ -53,7 +53,7 @@ func DownloadFile(
 		),
 		progressbar.OptionShowBytes(true),
 		progressbar.OptionSetWidth(
-			tools.Trenary(
+			tools.Ternary(
 				func() bool { return termWidth/3 > 40 },
 				termWidth/3,
 				40,

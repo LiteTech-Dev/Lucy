@@ -2,7 +2,8 @@ package tools
 
 import "sync"
 
-func Trenary[T any](expr func() bool, a T, b T) T {
+// Ternary gives a if expr == true, b if expr == false
+func Ternary[T any](expr func() bool, a T, b T) T {
 	if expr() {
 		return a
 	}

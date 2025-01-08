@@ -37,7 +37,7 @@ func GenerateStatus(data *lucytypes.ServerInfo) {
 	// Print lucy status
 	printField(
 		"Lucy",
-		tools.Trenary(
+		tools.Ternary(
 			func() bool { return data.HasLucy },
 			"Installed",
 			"Not Installed",
