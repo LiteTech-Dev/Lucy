@@ -37,10 +37,9 @@ func buildServerInfo() lucytypes.ServerInfo {
 	var serverInfo lucytypes.ServerInfo
 	serverInfo.Modules = &lucytypes.ServerModules{}
 
-	wg.Add(6)
-
 	// MCDR Stage
 	go func() {
+		wg.Add(1)
 		defer wg.Done()
 		mcdrConfig := getMcdrConfig()
 		if mcdrConfig != nil {
@@ -53,35 +52,41 @@ func buildServerInfo() lucytypes.ServerInfo {
 
 	// Server Work Path
 	go func() {
+		wg.Add(1)
 		defer wg.Done()
 		serverInfo.ServerWorkPath = getServerWorkPath()
 	}()
 
 	// Executable Stage
 	go func() {
+		wg.Add(1)
 		defer wg.Done()
 		serverInfo.Executable = getServerExecutable()
 	}()
 
 	// Save Path
 	go func() {
+		wg.Add(1)
 		defer wg.Done()
 		serverInfo.SavePath = getSavePath()
 	}()
 
 	// Check for Lucy installation
 	go func() {
+		wg.Add(1)
 		defer wg.Done()
 		serverInfo.HasLucy = checkHasLucy()
 	}()
 
 	// Check if the server is running
 	go func() {
+		wg.Add(1)
 		defer wg.Done()
 		serverInfo.Activity = checkServerFileLock()
 	}()
 
 	go func() {
+		wg.Add(1)
 		defer wg.Done()
 		serverInfo.ModPath = getServerModPath()
 	}()
