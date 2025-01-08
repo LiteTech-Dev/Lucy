@@ -13,7 +13,7 @@ func SearchMcdrPluginCatalogue(slug syntax.PackageName) (pluginInfo *apitypes.Mc
 	plugins := getMcdrPluginCatalogue()
 
 	for _, plugin := range plugins {
-		_, p := syntax.Parse(*plugin.Name)
+		p, _ := syntax.Parse(*plugin.Name)
 		if p.Name == slug {
 			return getMcdrPluginInfo(*plugin.Path)
 		}

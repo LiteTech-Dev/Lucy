@@ -15,10 +15,10 @@ type VersionFormat string
 const (
 	MinecraftVersion VersionFormat = "minecraft"
 	SemanticVersion  VersionFormat = "semver"
-	allVersion       VersionFormat = "all"
+	tAllVersion      VersionFormat = "all"
 )
 
-var AllVersion = PackageVersion{allVersion, ""}
+var AllVersion = PackageVersion{tAllVersion, ""}
 
 // PackageVersion is the version of the package. If not specified, it defaults to
 // "all". Most mods should use semver. An exception is Minecraft versions snapshots.
@@ -64,7 +64,7 @@ func GetVersionManifest() (manifest *apitypes.VersionManifest, err error) {
 // the same (or an error occurred), and 1 when v1 is newer than v2. 0 is returned
 // when either v1 or v2 is AllVersion
 func CompareMinecraftVersions(v1, v2 PackageVersion) (c int8, err error) {
-	if v1.format == allVersion || v2.format == allVersion {
+	if v1.format == tAllVersion || v2.format == tAllVersion {
 		return 0, nil
 	}
 

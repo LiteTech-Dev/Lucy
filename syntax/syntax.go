@@ -11,12 +11,12 @@
 //   - fabric@12.0
 //   - minecraft@1.19 (recommended)
 //   - minecraft/minecraft@1.16.5 (= minecraft@1.16.5)
-//   - minecraft/1.14.3 (= minecraft@1.14.3)
 //   - 1.8.9 (= minecraft@1.8.9)
 package syntax
 
 import (
-	"lucy/lucyerrors"
+	"errors"
+	"lucy/tools"
 	"strings"
 )
 
@@ -38,15 +38,6 @@ const (
 var Platforms = []Platform{
 	Minecraft, Fabric, Forge, Neoforge, Mcdr, AllPlatform,
 }
-
-const (
-	MinecraftAsPackage = PackageName(Minecraft)
-	FabricAsPackage    = PackageName(Fabric)
-	ForgeAsPackage     = PackageName(Forge)
-	NeoforgeAsPackage  = PackageName(Neoforge)
-	McdrAsPackage      = PackageName(Mcdr)
-	AllAsPackage       = PackageName(AllPlatform)
-)
 
 // PackageName is the slug of the package, using hyphens as separators. For example,
 // "fabric-api". It is not case-sensitive, however lowercase is recommended. Underline
@@ -94,47 +85,68 @@ func sanitize(s string) (clean string) {
 	return
 }
 
-func Parse(s string) (err error, p *Package) {
-	s = sanitize(s)
-	slashSplit := strings.Split(s, "/")
-	p = &Package{}
-	var atSplit []string
+var (
+	ESyntax = errors.New("invalid syntax")
+)
 
-	switch len(slashSplit) {
-	case 0:
-		return lucyerrors.EmptyPackageSyntaxError, nil
-	case 1:
-		p.Platform = AllPlatform
-		atSplit = strings.Split(slashSplit[0], "@")
-	case 2:
-		p.Platform = Platform(slashSplit[0])
-		if !p.Platform.IsValid() {
-			return lucyerrors.InvalidPlatformError, nil
-		}
-		atSplit = strings.Split(slashSplit[1], "@")
-	default:
-		return lucyerrors.PackageSyntaxError, nil
+func Parse(s string) (p *Package, err error) {
+	s = sanitize(s)
+	p.Platform, p.Name, p.Version, err = parseAt(s)
+	if err != nil {
+		return nil, err
+	}
+	return
+}
+
+// parseAt is called first since '@' operator always occur after '/' (equivalent
+// to a lower priority)
+func parseAt(s string) (
+	pl Platform,
+	n PackageName,
+	v PackageVersion,
+	err error,
+) {
+	split := strings.Split(s, "@")
+
+	pl, n, err = parseSlash(split[0])
+	if err != nil {
+		return "", "", PackageVersion{}, ESyntax
 	}
 
-	switch len(atSplit) {
-	case 1:
-		p.Name = PackageName(atSplit[0])
-		if p.Name == MinecraftAsPackage {
-			p.Platform = Minecraft
+	if len(split) == 1 {
+		v = AllVersion
+	} else if len(split) == 2 {
+		v = PackageVersion{
+			format: tools.Ternary(
+				func() bool { return pl == Minecraft },
+				MinecraftVersion,
+				SemanticVersion,
+			),
+			raw: split[1],
 		}
-		p.Version = AllVersion
-	case 2:
-		p.Name = PackageName(atSplit[0])
-		if p.Name == MinecraftAsPackage {
-			p.Platform = Minecraft
+	} else {
+		return "", "", PackageVersion{}, ESyntax
+	}
+
+	return
+}
+
+func parseSlash(s string) (pl Platform, n PackageName, err error) {
+	split := strings.Split(s, "/")
+
+	if len(split) == 1 {
+		pl = AllPlatform
+		n = PackageName(split[0])
+		for _, platform := range Platforms {
+			if PackageName(platform) == n {
+				pl = platform
+			}
 		}
-		if p.Platform == Minecraft {
-			p.Version = PackageVersion{MinecraftVersion, atSplit[1]}
-		} else {
-			p.Version = PackageVersion{SemanticVersion, atSplit[1]}
-		}
-	default:
-		return lucyerrors.PackageSyntaxError, nil
+	} else if len(split) == 2 {
+		pl = Platform(split[0])
+		n = PackageName(split[1])
+	} else {
+		return "", "", ESyntax
 	}
 
 	return

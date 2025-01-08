@@ -62,7 +62,7 @@ var subcmdSearch = &cli.Command{
 
 func actionSearch(_ context.Context, cmd *cli.Command) error {
 	// TODO: Error handling
-	_, p := syntax.Parse(cmd.Args().First())
+	p, _ := syntax.Parse(cmd.Args().First())
 	// indexBy can be: relevance (default), downloads, follows, newest, updated
 	indexBy := cmd.String("index")
 	showClientPackage := cmd.Bool("client")

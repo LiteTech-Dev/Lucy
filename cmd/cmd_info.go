@@ -37,7 +37,7 @@ var subcmdInfo = &cli.Command{
 
 func actionInfo(ctx context.Context, cmd *cli.Command) error {
 	// TODO: Error handling
-	_, p := syntax.Parse(cmd.Args().First())
+	p, _ := syntax.Parse(cmd.Args().First())
 
 	switch p.Platform {
 	case syntax.AllPlatform:

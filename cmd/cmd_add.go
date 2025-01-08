@@ -39,7 +39,7 @@ func actionAdd(_ context.Context, cmd *cli.Command) error {
 	// TODO: Platform compatibility check
 	// TODO: Error handling
 
-	_, p := syntax.Parse(cmd.Args().First())
+	p, _ := syntax.Parse(cmd.Args().First())
 	serverInfo := probe.GetServerInfo()
 
 	if !serverInfo.HasLucy {
