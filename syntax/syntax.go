@@ -90,6 +90,7 @@ var (
 
 func Parse(s string) (p *Package, err error) {
 	s = sanitize(s)
+	p = &Package{}
 	p.Platform, p.Name, p.Version, err = parseAt(s)
 	if err != nil {
 		return nil, err
