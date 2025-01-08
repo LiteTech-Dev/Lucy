@@ -16,7 +16,6 @@ package syntax
 
 import (
 	"errors"
-	"lucy/tools"
 	"strings"
 )
 
@@ -110,22 +109,15 @@ func parseAt(s string) (
 
 	pl, n, err = parseSlash(split[0])
 	if err != nil {
-		return "", "", PackageVersion{}, ESyntax
+		return "", "", "", ESyntax
 	}
 
 	if len(split) == 1 {
 		v = AllVersion
 	} else if len(split) == 2 {
-		v = PackageVersion{
-			format: tools.Ternary(
-				func() bool { return pl == Minecraft },
-				MinecraftVersion,
-				SemanticVersion,
-			),
-			raw: split[1],
-		}
+		v = PackageVersion(split[1])
 	} else {
-		return "", "", PackageVersion{}, ESyntax
+		return "", "", "", ESyntax
 	}
 
 	return

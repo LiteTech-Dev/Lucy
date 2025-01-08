@@ -10,26 +10,12 @@ import (
 	"net/http"
 )
 
-type VersionFormat string
-
-const (
-	MinecraftVersion VersionFormat = "minecraft"
-	SemanticVersion  VersionFormat = "semver"
-	tAllVersion      VersionFormat = "all"
-)
-
-var AllVersion = PackageVersion{tAllVersion, ""}
-
 // PackageVersion is the version of the package. If not specified, it defaults to
-// "all". Most mods should use semver. An exception is Minecraft versions snapshots.
-// Therefore, the type MinecraftVersion is defined.
-type PackageVersion struct {
-	format VersionFormat
-	raw    string
-}
+// "all". Here we expect mods and plugins to use semver (which they should). A
+// known exception is Minecraft versions snapshots.
+type PackageVersion string
 
-const VersionManifestURL = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json"
-
+var AllVersion PackageVersion = "all"
 var (
 	EInvalidVersionComparison = errors.New("invalid version comparison")
 	EVersionNotFound          = errors.New("version do not exist")
@@ -37,6 +23,8 @@ var (
 
 // TODO: Remove the err return value
 // TODO: Use tools.Memoize to cache the result
+
+const VersionManifestURL = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json"
 
 func GetVersionManifest() (manifest *apitypes.VersionManifest, err error) {
 	manifest = &apitypes.VersionManifest{}
@@ -60,34 +48,33 @@ func GetVersionManifest() (manifest *apitypes.VersionManifest, err error) {
 	return manifest, nil
 }
 
-// CompareMinecraftVersions gives -1 when v1 is older than v2, 0 when they are
+// ComparePackageVersions gives -1 when v1 is older than v2, 0 when they are
 // the same (or an error occurred), and 1 when v1 is newer than v2. 0 is returned
 // when either v1 or v2 is AllVersion
-func CompareMinecraftVersions(v1, v2 PackageVersion) (c int8, err error) {
-	if v1.format == tAllVersion || v2.format == tAllVersion {
+func ComparePackageVersions(p1, p2 *Package) (c int8, err error) {
+	v1, v2 := p1.Version, p2.Version
+
+	if v1 == AllVersion || v2 == AllVersion {
 		return 0, nil
 	}
 
-	if v1.format != v2.format {
+	if p1.Platform != p2.Platform {
 		return 0, fmt.Errorf(
-			"%w between type %s and %s",
+			"%w between package on platform %s and %s",
 			EInvalidVersionComparison,
-			v1.format,
-			v2.format,
+			p1.Platform,
+			p2.Platform,
 		)
 	}
 
-	if v1.raw == v2.raw {
+	if v1 == v2 {
 		return 0, nil
 	}
 
-	if v1.format == MinecraftVersion {
+	if p1.Platform == Minecraft {
 		return compareMinecraftVersions(v1, v2)
-	} else if v1.format == SemanticVersion {
-		return int8(semver.Compare("v"+v1.raw, "v"+v2.raw)), nil
 	}
-
-	return 0, nil // unreachable
+	return int8(semver.Compare("v"+string(v1), "v"+string(v2))), nil
 }
 
 func compareMinecraftVersions(v1, v2 PackageVersion) (c int8, err error) {
@@ -98,10 +85,10 @@ func compareMinecraftVersions(v1, v2 PackageVersion) (c int8, err error) {
 
 	i1, i2 := -1, -1
 	for i, v := range manifest.Versions {
-		if v1.raw == (v.Id) {
+		if v1 == PackageVersion(v.Id) {
 			i1 = i
 		}
-		if v2.raw == (v.Id) {
+		if v2 == PackageVersion(v.Id) {
 			i2 = i
 		}
 	}
