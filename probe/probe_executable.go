@@ -104,7 +104,6 @@ func analyzeExecutable(file *os.File) (exec *lucytypes.ExecutableInfo) {
 					exec = analyzeFabricLauncher(ff)
 				}
 			}
-			return exec
 		case vanillaIdentifierFile:
 			if exec != nil {
 				*exec = unknownExecutable
@@ -170,7 +169,7 @@ func analyzeFabricSingle(installProperties *zip.File) (exec *lucytypes.Executabl
 // Note that line breaks are "\r\n " and the last line ends with "\r\n"
 
 func analyzeFabricLauncher(
-	manifest *zip.File,
+manifest *zip.File,
 ) (exec *lucytypes.ExecutableInfo) {
 	exec = &lucytypes.ExecutableInfo{}
 	exec.Type = syntaxtypes.Fabric
