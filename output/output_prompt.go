@@ -1,28 +1,21 @@
 package output
 
 import (
-	"encoding/json"
 	"github.com/manifoldco/promptui"
 	"lucy/lucytypes"
-	"text/template"
 )
 
 var selectExecutableTemplate = &promptui.SelectTemplates{
-	Active:   `{{ "●" | blue }} {{ .Path | bold }} [2m(Minecraft {{ .GameVersion }}, {{ if eq .ModLoaderType "vanilla" }}Vanilla{{ else }}{{ .ModLoaderType | capitalize }} v{{ .ModLoaderVersion }}{{ end }})[0m`,
-	Inactive: `{{ "○" | blue }} {{ .Path }} [2m(Minecraft {{ .GameVersion }}, {{ if eq .ModLoaderType "vanilla" }}Vanilla{{ else }}{{ .ModLoaderType | capitalize }} v{{ .ModLoaderVersion }}{{ end }})[0m`,
-	Selected: `{{ "✔︎" | green }} {{ .Path | bold }} [2m(Minecraft {{ .GameVersion }}, {{ if eq .ModLoaderType "vanilla" }}Vanilla{{ else }}{{ .ModLoaderType | capitalize }} v{{ .ModLoaderVersion }}{{ end }})[0m`,
-	FuncMap: func() (funcMap template.FuncMap) {
-		funcMap = promptui.FuncMap
-		funcMap["capitalize"] = captalize
-		return
-	}(),
+	Active:   `{{ "●" | blue }} {{ .Path | bold }} [2m(Minecraft {{ .GameVersion }}, {{ if eq .Type "minecraft" }}Vanilla{{ else }}{{ .Type }} {{ .LoaderVersion }}{{ end }})[0m`,
+	Inactive: `{{ "○" | blue }} {{ .Path }} [2m(Minecraft {{ .GameVersion }}, {{ if eq .Type "minecraft" }}Vanilla{{ else }}{{ .Type }} {{ .LoaderVersion }}{{ end }})[0m`,
+	Selected: `{{ "✔︎" | green }} {{ .Path | bold }} [2m(Minecraft {{ .GameVersion }}, {{ if eq .Type "minecraft" }}vsanilla{{ else }}{{ .Type }} {{ .LoaderVersion }}{{ end }})[0m`,
 }
 
 func PromptSelectExecutable(executables []*lucytypes.ExecutableInfo) int {
 	// data, _ := json.MarshalIndent(executables, "", "  ")
 	// println(string(data))
 	selectExecutable := promptui.Select{
-		Label:     "Multiple valid executables detected, select one:",
+		Label:     "Multiple possible executables detected, select one",
 		Items:     executables,
 		Templates: selectExecutableTemplate,
 	}

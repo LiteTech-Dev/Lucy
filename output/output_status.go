@@ -25,7 +25,7 @@ func GenerateStatus(data *lucytypes.ServerInfo) {
 	}
 
 	// Print mod loader types and version
-	printField("Modding", captalize(string(data.Executable.Type)))
+	printField("Modding", capitalize(string(data.Executable.Type)))
 
 	// Print MCDR status
 	if data.Modules.Mcdr != nil {

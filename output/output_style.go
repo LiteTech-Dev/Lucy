@@ -6,7 +6,8 @@ func bold(s string) string {
 	return "\033[1m" + s + "\033[0m"
 }
 
-func captalize(s string) string {
+func capitalize(v interface{}) string {
+	s := v.(string)
 	if len(s) == 0 {
 		return ""
 	}
