@@ -37,7 +37,7 @@ var subcmdInfo = &cli.Command{
 
 func actionInfo(ctx context.Context, cmd *cli.Command) error {
 	// TODO: Error handling
-	p, _ := syntax.Parse(cmd.Args().First())
+	p := syntax.Parse(cmd.Args().First())
 
 	switch p.Platform {
 	case syntax.AllPlatform:
@@ -45,14 +45,20 @@ func actionInfo(ctx context.Context, cmd *cli.Command) error {
 		res, _ := http.Get(modrinth.ConstructProjectUrl(p.Name))
 		modrinthProject := &apitypes.ModrinthProject{}
 		data, _ := io.ReadAll(res.Body)
-		json.Unmarshal(data, modrinthProject)
+		err := json.Unmarshal(data, modrinthProject)
+		if err != nil {
+			return err
+		}
 		output.GenerateInfo(modrinthProject)
 	case syntax.Fabric:
 		// TODO: Fabric specific search
 		res, _ := http.Get(modrinth.ConstructProjectUrl(p.Name))
 		modrinthProject := &apitypes.ModrinthProject{}
 		data, _ := io.ReadAll(res.Body)
-		json.Unmarshal(data, modrinthProject)
+		err := json.Unmarshal(data, modrinthProject)
+		if err != nil {
+			return err
+		}
 		output.GenerateInfo(modrinthProject)
 	case syntax.Forge:
 		// TODO: Forge support

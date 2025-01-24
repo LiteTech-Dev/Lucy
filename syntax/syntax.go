@@ -16,6 +16,7 @@ package syntax
 
 import (
 	"errors"
+	"log"
 	"strings"
 )
 
@@ -88,19 +89,27 @@ var (
 	ESyntax = errors.New("invalid syntax")
 )
 
-func Parse(s string) (p *Package, err error) {
+// Parse is exported to parse a string into a Package struct. This function
+// should only be used on user inputs. Therefore, It does NOT return an
+// error but instead invokes a panic if the syntax is invalid.
+func Parse(s string) (p *Package) {
 	s = sanitize(s)
 	p = &Package{}
-	p.Platform, p.Name, p.Version, err = parseAt(s)
+	var err error
+	p.Platform, p.Name, p.Version, err = parseOperatorAt(s)
 	if err != nil {
-		return nil, err
+		if errors.Is(err, ESyntax) {
+			panic(err)
+		} else {
+			log.Fatal(err)
+		}
 	}
 	return
 }
 
-// parseAt is called first since '@' operator always occur after '/' (equivalent
-// to a lower priority)
-func parseAt(s string) (
+// parseOperatorAt is called first since '@' operator always occur after '/' (equivalent
+// to a lower priority).
+func parseOperatorAt(s string) (
 	pl Platform,
 	n PackageName,
 	v PackageVersion,
@@ -108,7 +117,7 @@ func parseAt(s string) (
 ) {
 	split := strings.Split(s, "@")
 
-	pl, n, err = parseSlash(split[0])
+	pl, n, err = parseOperatorSlash(split[0])
 	if err != nil {
 		return "", "", "", ESyntax
 	}
@@ -124,7 +133,7 @@ func parseAt(s string) (
 	return
 }
 
-func parseSlash(s string) (pl Platform, n PackageName, err error) {
+func parseOperatorSlash(s string) (pl Platform, n PackageName, err error) {
 	split := strings.Split(s, "/")
 
 	if len(split) == 1 {
