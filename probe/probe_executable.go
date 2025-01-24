@@ -18,15 +18,14 @@ import (
 // TODO: Improve probe logic, plain executable unpacking do not work well
 // TODO: Research on forge installation
 
-func getExecutableInfo() lucytypes.ExecutableInfo {
-	var valid []lucytypes.ExecutableInfo
+func getExecutableInfo() *lucytypes.ExecutableInfo {
+	var valid []*lucytypes.ExecutableInfo
 	workPath := getServerWorkPath()
 	jars := findJar(workPath)
 	for _, jar := range jars {
 		exec := analyzeExecutable(jar)
-		if exec != nil {
-			valid = append(valid, *exec)
-		}
+		valid = append(valid, exec)
+
 	}
 
 	switch len(valid) {
@@ -39,7 +38,7 @@ func getExecutableInfo() lucytypes.ExecutableInfo {
 		return valid[index]
 	}
 
-	return lucytypes.ExecutableInfo{}
+	return nil
 }
 
 func findJar(dir string) (jarFiles []*os.File) {
@@ -66,7 +65,7 @@ func findJar(dir string) (jarFiles []*os.File) {
 	return
 }
 
-var unknownExecutable = lucytypes.ExecutableInfo{
+var unknownExecutable = &lucytypes.ExecutableInfo{
 	Path:        "",
 	GameVersion: "unknown",
 	BootCommand: nil,
@@ -88,14 +87,14 @@ func analyzeExecutable(file *os.File) (exec *lucytypes.ExecutableInfo) {
 		switch f.Name {
 		case fabricSingleIdentifierFile:
 			if exec != nil {
-				*exec = unknownExecutable
+				exec = unknownExecutable
 				exec.Path = file.Name()
 				return
 			}
 			exec = analyzeFabricSingle(f)
 		case fabricLauncherIdentifierFile:
 			if exec != nil {
-				*exec = unknownExecutable
+				exec = unknownExecutable
 				exec.Path = file.Name()
 				return
 			}
@@ -106,7 +105,7 @@ func analyzeExecutable(file *os.File) (exec *lucytypes.ExecutableInfo) {
 			}
 		case vanillaIdentifierFile:
 			if exec != nil {
-				*exec = unknownExecutable
+				exec = unknownExecutable
 				exec.Path = file.Name()
 				return
 			}
@@ -115,7 +114,7 @@ func analyzeExecutable(file *os.File) (exec *lucytypes.ExecutableInfo) {
 	}
 
 	if exec == nil {
-		exec = &unknownExecutable
+		exec = unknownExecutable
 		return
 	}
 	// Set the path to the file at the end

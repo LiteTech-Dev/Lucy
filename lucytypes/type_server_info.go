@@ -12,7 +12,7 @@ type ServerInfo struct {
 	SavePath    string
 	ModPath     string
 	HasLucy     bool
-	Executable  ExecutableInfo
+	Executable  *ExecutableInfo
 	BootCommand exec.Cmd
 	Activity    *Activity
 	Modules     *ServerModules

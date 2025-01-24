@@ -18,7 +18,7 @@ var selectExecutableTemplate = &promptui.SelectTemplates{
 	}(),
 }
 
-func PromptSelectExecutable(executables []lucytypes.ExecutableInfo) int {
+func PromptSelectExecutable(executables []*lucytypes.ExecutableInfo) int {
 	data, _ := json.MarshalIndent(executables[0], "", "  ")
 	println(string(data))
 	selectExecutable := promptui.Select{
