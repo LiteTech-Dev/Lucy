@@ -3,6 +3,7 @@ package output
 import (
 	"fmt"
 	"lucy/lucytypes"
+	"lucy/syntaxtypes"
 	"lucy/tools"
 )
 
@@ -25,13 +26,15 @@ func GenerateStatus(data *lucytypes.ServerInfo) {
 	}
 
 	// Print mod loader types and version
-	printField("Modding", tools.Capitalize(string(data.Executable.Type)))
+	if data.Executable.Platform != syntaxtypes.Minecraft {
+		printField("Modding", tools.Capitalize(data.Executable.Platform))
+	}
 
 	// Print MCDR status
-	if data.Modules.Mcdr != nil {
+	if data.Mcdr != nil {
 		printField("MCDR", "Installed")
 		printKey("MCDR Plugins")
-		printLabels(data.Modules.Mcdr.PluginPaths, 1)
+		printLabels(data.Mcdr.PluginPaths, 1)
 	}
 
 	// Print lucy status

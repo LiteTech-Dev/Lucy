@@ -31,7 +31,6 @@ func buildServerInfo() lucytypes.ServerInfo {
 	var wg sync.WaitGroup
 	var mu sync.Mutex
 	var serverInfo lucytypes.ServerInfo
-	serverInfo.Modules = &lucytypes.ServerModules{}
 
 	// MCDR Stage
 	wg.Add(1)
@@ -40,8 +39,7 @@ func buildServerInfo() lucytypes.ServerInfo {
 		mcdrConfig := getMcdrConfig()
 		if mcdrConfig != nil {
 			mu.Lock()
-			serverInfo.Modules.Mcdr = &lucytypes.Mcdr{
-				Name:        syntaxtypes.Mcdr,
+			serverInfo.Mcdr = &lucytypes.Mcdr{
 				PluginPaths: mcdrConfig.PluginDirectories,
 			}
 			mu.Unlock()
@@ -118,7 +116,7 @@ func buildServerInfo() lucytypes.ServerInfo {
 var getServerModPath = tools.Memoize(
 	func() string {
 		exec := getExecutableInfo()
-		if exec.Type == syntaxtypes.Fabric || exec.Type == syntaxtypes.Forge {
+		if exec.Platform == syntaxtypes.Fabric || exec.Platform == syntaxtypes.Forge {
 			return "mods"
 		}
 		return ""

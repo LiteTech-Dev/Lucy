@@ -75,7 +75,7 @@ var unknownExecutable = &lucytypes.ExecutableInfo{
 	Path:        "",
 	GameVersion: "unknown",
 	BootCommand: nil,
-	Type:        "unknown",
+	Platform:    "unknown",
 }
 
 const fabricSingleIdentifierFile = "install.properties"
@@ -125,7 +125,7 @@ func analyzeExecutable(file *os.File) (exec *lucytypes.ExecutableInfo) {
 
 func analyzeVanilla(versionJson *zip.File) (exec *lucytypes.ExecutableInfo) {
 	exec = &lucytypes.ExecutableInfo{}
-	exec.Type = syntaxtypes.Minecraft
+	exec.Platform = syntaxtypes.Minecraft
 	reader, _ := versionJson.Open()
 	data, _ := io.ReadAll(reader)
 	obj := VersionDotJson{}
@@ -140,7 +140,7 @@ func analyzeVanilla(versionJson *zip.File) (exec *lucytypes.ExecutableInfo) {
 
 func analyzeFabricSingle(installProperties *zip.File) (exec *lucytypes.ExecutableInfo) {
 	exec = &lucytypes.ExecutableInfo{}
-	exec.Type = syntaxtypes.Fabric
+	exec.Platform = syntaxtypes.Fabric
 	r, _ := installProperties.Open()
 	data, _ := io.ReadAll(r)
 	s := string(data)
@@ -171,7 +171,7 @@ func analyzeFabricLauncher(
 	manifest *zip.File,
 ) (exec *lucytypes.ExecutableInfo) {
 	exec = &lucytypes.ExecutableInfo{}
-	exec.Type = syntaxtypes.Fabric
+	exec.Platform = syntaxtypes.Fabric
 	r, _ := manifest.Open()
 	data, _ := io.ReadAll(r)
 	s := string(data)
