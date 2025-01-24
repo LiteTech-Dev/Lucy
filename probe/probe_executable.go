@@ -26,6 +26,9 @@ var getExecutableInfo = tools.Memoize(
 		jars := findJar(workPath)
 		for _, jar := range jars {
 			exec := analyzeExecutable(jar)
+			if exec == nil {
+				continue
+			}
 			valid = append(valid, exec)
 
 		}
@@ -80,6 +83,8 @@ const vanillaIdentifierFile = "version.json"
 const fabricLauncherIdentifierFile = "fabric-server-launch.properties"
 const fabricLauncherManifest = "META-INF/MANIFEST.MF"
 
+// analyzeExecutable gives nil if the jar file is invalid. The constant unknownExecutable
+// is not yet used in the codebase, however still reserved for future use.
 func analyzeExecutable(file *os.File) (exec *lucytypes.ExecutableInfo) {
 	// exec is a nil before an analysis function is called
 	// Anything other than exec.Path is set in the analysis function
@@ -90,16 +95,12 @@ func analyzeExecutable(file *os.File) (exec *lucytypes.ExecutableInfo) {
 		switch f.Name {
 		case fabricSingleIdentifierFile:
 			if exec != nil {
-				exec = unknownExecutable
-				exec.Path = file.Name()
-				return
+				return nil
 			}
 			exec = analyzeFabricSingle(f)
 		case fabricLauncherIdentifierFile:
 			if exec != nil {
-				exec = unknownExecutable
-				exec.Path = file.Name()
-				return
+				return nil
 			}
 			for _, ff := range reader.File {
 				if ff.Name == fabricLauncherManifest {
@@ -108,21 +109,17 @@ func analyzeExecutable(file *os.File) (exec *lucytypes.ExecutableInfo) {
 			}
 		case vanillaIdentifierFile:
 			if exec != nil {
-				exec = unknownExecutable
-				exec.Path = file.Name()
-				return
+				return nil
 			}
 			exec = analyzeVanilla(f)
 		}
 	}
 
 	if exec == nil {
-		exec = unknownExecutable
 		return
 	}
 	// Set the path to the file at the end
 	exec.Path = file.Name()
-
 	return
 }
 
