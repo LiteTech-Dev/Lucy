@@ -19,8 +19,8 @@ var selectExecutableTemplate = &promptui.SelectTemplates{
 }
 
 func PromptSelectExecutable(executables []*lucytypes.ExecutableInfo) int {
-	data, _ := json.MarshalIndent(executables[0], "", "  ")
-	println(string(data))
+	// data, _ := json.MarshalIndent(executables, "", "  ")
+	// println(string(data))
 	selectExecutable := promptui.Select{
 		Label:     "Multiple valid executables detected, select one:",
 		Items:     executables,

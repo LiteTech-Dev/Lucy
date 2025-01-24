@@ -10,6 +10,7 @@ import (
 	"lucy/lucytypes"
 	"lucy/output"
 	"lucy/syntaxtypes"
+	"lucy/tools"
 	"os"
 	"path"
 	"strings"
@@ -18,28 +19,30 @@ import (
 // TODO: Improve probe logic, plain executable unpacking do not work well
 // TODO: Research on forge installation
 
-func getExecutableInfo() *lucytypes.ExecutableInfo {
-	var valid []*lucytypes.ExecutableInfo
-	workPath := getServerWorkPath()
-	jars := findJar(workPath)
-	for _, jar := range jars {
-		exec := analyzeExecutable(jar)
-		valid = append(valid, exec)
+var getExecutableInfo = tools.Memoize(
+	func() *lucytypes.ExecutableInfo {
+		var valid []*lucytypes.ExecutableInfo
+		workPath := getServerWorkPath()
+		jars := findJar(workPath)
+		for _, jar := range jars {
+			exec := analyzeExecutable(jar)
+			valid = append(valid, exec)
 
-	}
+		}
 
-	switch len(valid) {
-	case 0:
-		logger.CreateFatal(errors.New("no server executable found"))
-	case 1:
-		return valid[0]
-	default:
-		index := output.PromptSelectExecutable(valid)
-		return valid[index]
-	}
+		switch len(valid) {
+		case 0:
+			logger.CreateFatal(errors.New("no server executable found"))
+		case 1:
+			return valid[0]
+		default:
+			index := output.PromptSelectExecutable(valid)
+			return valid[index]
+		}
 
-	return nil
-}
+		return nil
+	},
+)
 
 func findJar(dir string) (jarFiles []*os.File) {
 	jarFiles = []*os.File{}
