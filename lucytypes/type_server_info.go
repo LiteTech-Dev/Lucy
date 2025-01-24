@@ -1,7 +1,7 @@
 package lucytypes
 
 import (
-	"lucy/syntax"
+	"lucy/syntaxtypes"
 	"os/exec"
 )
 
@@ -21,7 +21,7 @@ type ServerInfo struct {
 type ExecutableInfo struct {
 	Path          string
 	GameVersion   string
-	Type          syntax.Platform
+	Type          syntaxtypes.Platform
 	LoaderVersion string
 	BootCommand   *exec.Cmd
 }
@@ -38,16 +38,16 @@ type ServerModules struct {
 }
 
 type Mcdr struct {
-	Name        syntax.Platform
+	Name        syntaxtypes.Platform
 	PluginPaths []string
 }
 
 type Fabric struct {
-	Name    syntax.Platform
+	Name    syntaxtypes.Platform
 	Version string
 }
 
 type Forge struct {
-	Name    syntax.Platform
+	Name    syntaxtypes.Platform
 	Version string
 }

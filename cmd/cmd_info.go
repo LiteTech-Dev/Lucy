@@ -11,6 +11,7 @@ import (
 	"lucy/modrinth"
 	"lucy/output"
 	"lucy/syntax"
+	"lucy/syntaxtypes"
 	"net/http"
 )
 
@@ -40,7 +41,7 @@ func actionInfo(ctx context.Context, cmd *cli.Command) error {
 	p := syntax.Parse(cmd.Args().First())
 
 	switch p.Platform {
-	case syntax.AllPlatform:
+	case syntaxtypes.AllPlatform:
 		// TODO: Wide range search
 		res, _ := http.Get(modrinth.ConstructProjectUrl(p.Name))
 		modrinthProject := &apitypes.ModrinthProject{}
@@ -50,7 +51,7 @@ func actionInfo(ctx context.Context, cmd *cli.Command) error {
 			return err
 		}
 		output.GenerateInfo(modrinthProject)
-	case syntax.Fabric:
+	case syntaxtypes.Fabric:
 		// TODO: Fabric specific search
 		res, _ := http.Get(modrinth.ConstructProjectUrl(p.Name))
 		modrinthProject := &apitypes.ModrinthProject{}
@@ -60,10 +61,10 @@ func actionInfo(ctx context.Context, cmd *cli.Command) error {
 			return err
 		}
 		output.GenerateInfo(modrinthProject)
-	case syntax.Forge:
+	case syntaxtypes.Forge:
 		// TODO: Forge support
 		println("Not yet implemented")
-	case syntax.Mcdr:
+	case syntaxtypes.Mcdr:
 		mcdrPlugin := mcdr.SearchMcdrPluginCatalogue(p.Name)
 		if mcdrPlugin == nil {
 			_ = fmt.Errorf("plugin not found")

@@ -6,10 +6,11 @@ import (
 	"github.com/google/go-github/v50/github"
 	"lucy/apitypes"
 	"lucy/syntax"
+	"lucy/syntaxtypes"
 	"path"
 )
 
-func SearchMcdrPluginCatalogue(slug syntax.PackageName) (pluginInfo *apitypes.McdrPluginInfo) {
+func SearchMcdrPluginCatalogue(slug syntaxtypes.PackageName) (pluginInfo *apitypes.McdrPluginInfo) {
 	plugins := getMcdrPluginCatalogue()
 
 	for _, plugin := range plugins {

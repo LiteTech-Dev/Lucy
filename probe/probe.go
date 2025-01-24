@@ -5,7 +5,7 @@ import (
 	"gopkg.in/ini.v1"
 	"lucy/logger"
 	"lucy/lucytypes"
-	"lucy/syntax"
+	"lucy/syntaxtypes"
 	"lucy/tools"
 	"os"
 	"path"
@@ -41,7 +41,7 @@ func buildServerInfo() lucytypes.ServerInfo {
 		if mcdrConfig != nil {
 			mu.Lock()
 			serverInfo.Modules.Mcdr = &lucytypes.Mcdr{
-				Name:        syntax.Mcdr,
+				Name:        syntaxtypes.Mcdr,
 				PluginPaths: mcdrConfig.PluginDirectories,
 			}
 			mu.Unlock()
@@ -118,7 +118,7 @@ func buildServerInfo() lucytypes.ServerInfo {
 var getServerModPath = tools.Memoize(
 	func() string {
 		exec := getExecutableInfo()
-		if exec.Type == syntax.Fabric || exec.Type == syntax.Forge {
+		if exec.Type == syntaxtypes.Fabric || exec.Type == syntaxtypes.Forge {
 			return "mods"
 		}
 		return ""

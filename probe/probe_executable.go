@@ -9,7 +9,7 @@ import (
 	"lucy/logger"
 	"lucy/lucytypes"
 	"lucy/output"
-	"lucy/syntax"
+	"lucy/syntaxtypes"
 	"os"
 	"path"
 	"strings"
@@ -127,7 +127,7 @@ func analyzeExecutable(file *os.File) (exec *lucytypes.ExecutableInfo) {
 
 func analyzeVanilla(versionJson *zip.File) (exec *lucytypes.ExecutableInfo) {
 	exec = &lucytypes.ExecutableInfo{}
-	exec.Type = syntax.Minecraft
+	exec.Type = syntaxtypes.Minecraft
 	reader, _ := versionJson.Open()
 	data, _ := io.ReadAll(reader)
 	obj := VersionDotJson{}
@@ -142,7 +142,7 @@ func analyzeVanilla(versionJson *zip.File) (exec *lucytypes.ExecutableInfo) {
 
 func analyzeFabricSingle(installProperties *zip.File) (exec *lucytypes.ExecutableInfo) {
 	exec = &lucytypes.ExecutableInfo{}
-	exec.Type = syntax.Fabric
+	exec.Type = syntaxtypes.Fabric
 	r, _ := installProperties.Open()
 	data, _ := io.ReadAll(r)
 	s := string(data)
@@ -173,7 +173,7 @@ func analyzeFabricLauncher(
 	manifest *zip.File,
 ) (exec *lucytypes.ExecutableInfo) {
 	exec = &lucytypes.ExecutableInfo{}
-	exec.Type = syntax.Fabric
+	exec.Type = syntaxtypes.Fabric
 	r, _ := manifest.Open()
 	data, _ := io.ReadAll(r)
 	s := string(data)
