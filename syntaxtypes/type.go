@@ -1,3 +1,8 @@
+// Package syntaxtypes contains syntax-related constants and types. This package
+// is created to avoid cyclic dependencies by separating syntax-related types and
+// syntax parsing functions. As types are more fundamental, and were used in more
+// packages, they are placed in this independent package. This package should not
+// import any other packages in lucy.
 package syntaxtypes
 
 // Platform is an enum of several string constants. All platform is a package under
