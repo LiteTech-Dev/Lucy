@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"lucy/lucytypes"
+	"lucy/tools"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -21,15 +22,15 @@ func WriteLogItem(message *lucytypes.LogItem) {
 func formatLogItem(message *lucytypes.LogItem) string {
 	switch message.Level {
 	case 0:
-		return cyan("[INFO] ") + message.Content.Error()
+		return tools.Cyan("[INFO] ") + message.Content.Error()
 	case 1:
-		return yellow("[WARNING] ") + message.Content.Error()
+		return tools.Yellow("[WARNING] ") + message.Content.Error()
 	case 2:
-		return red("[ERROR] ") + message.Content.Error()
+		return tools.Red("[ERROR] ") + message.Content.Error()
 	case 3:
-		return red("[FATAL] ") + message.Content.Error()
+		return tools.Red("[FATAL] ") + message.Content.Error()
 	}
-	return faint("[UNKNOWN] ") + message.Content.Error()
+	return tools.Dim("[UNKNOWN] ") + message.Content.Error()
 }
 
 func formatUncolorLogItem(message *lucytypes.LogItem) string {

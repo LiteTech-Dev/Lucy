@@ -2,6 +2,7 @@ package output
 
 import (
 	"fmt"
+	"lucy/tools"
 	"os"
 	"text/tabwriter"
 )
@@ -9,7 +10,7 @@ import (
 var keyValueWriter = tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
 
 func printKey(title string) {
-	fmt.Fprintf(keyValueWriter, "%s\t", bold(mangeta(title)))
+	fmt.Fprintf(keyValueWriter, "%s\t", tools.Bold(tools.Mangeta(title)))
 }
 
 func printValue(value string) {
@@ -17,11 +18,16 @@ func printValue(value string) {
 }
 
 func printValueAnnot(value string, annotation string) {
-	fmt.Fprintf(keyValueWriter, "%s %s\n", value, faint(annotation))
+	fmt.Fprintf(keyValueWriter, "%s %s\n", value, tools.Dim(annotation))
 }
 
 func printField(key string, value string) {
-	fmt.Fprintf(keyValueWriter, "%s\t%s\n", bold(mangeta(key)), value)
+	fmt.Fprintf(
+		keyValueWriter,
+		"%s\t%s\n",
+		tools.Bold(tools.Mangeta(key)),
+		value,
+	)
 }
 
 func printLabels(labels []string, maxWidth int) {
@@ -40,7 +46,7 @@ func printLabels(labels []string, maxWidth int) {
 		}
 		width += len(label) + 2
 		if width > maxWidth {
-			fmt.Fprintf(keyValueWriter, "\n%s\t", bold(mangeta("")))
+			fmt.Fprintf(keyValueWriter, "\n%s\t", tools.Bold(tools.Mangeta("")))
 			width = 0
 		}
 	}
@@ -50,9 +56,9 @@ func printLabels(labels []string, maxWidth int) {
 }
 
 func printVersions(
-	versions []string,
-	maxWidth int,
-	showAll bool,
+versions []string,
+maxWidth int,
+showAll bool,
 ) {
 	// TODO: filter by version type
 	printLabels(versions, maxWidth)

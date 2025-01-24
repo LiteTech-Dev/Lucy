@@ -1,9 +1,9 @@
 package output
 
 import (
+	"fmt"
 	"lucy/lucytypes"
 	"lucy/tools"
-	"strconv"
 )
 
 func GenerateStatus(data *lucytypes.ServerInfo) {
@@ -18,14 +18,14 @@ func GenerateStatus(data *lucytypes.ServerInfo) {
 		printKey("Activity")
 		printValueAnnot(
 			"Currently Running",
-			"pid "+strconv.Itoa(data.Activity.Pid),
+			fmt.Sprintf("PID: %d", data.Activity.Pid),
 		)
 	} else {
 		printField("Activity", "Inactive")
 	}
 
 	// Print mod loader types and version
-	printField("Modding", capitalize(string(data.Executable.Type)))
+	printField("Modding", tools.Capitalize(string(data.Executable.Type)))
 
 	// Print MCDR status
 	if data.Modules.Mcdr != nil {
