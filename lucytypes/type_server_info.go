@@ -8,21 +8,22 @@ import (
 // ServerInfo components that do not exist, use an empty string. Note Executable
 // must exist, otherwise the program will exit; therefore, it is not a pointer.
 type ServerInfo struct {
-	ServerWorkPath string
-	SavePath       string
-	ModPath        string
-	HasLucy        bool
-	Executable     ServerExecutable
-	BootCommand    *exec.Cmd
-	Activity       *Activity
-	Modules        *ServerModules
+	WorkPath    string
+	SavePath    string
+	ModPath     string
+	HasLucy     bool
+	Executable  ExecutableInfo
+	BootCommand exec.Cmd
+	Activity    *Activity
+	Modules     *ServerModules
 }
 
-type ServerExecutable struct {
-	Path        string
-	GameVersion string
-	BootCommand exec.Cmd
-	Type        syntax.Platform
+type ExecutableInfo struct {
+	Path          string
+	GameVersion   string
+	Type          syntax.Platform
+	LoaderVersion string
+	BootCommand   *exec.Cmd
 }
 
 type Activity struct {

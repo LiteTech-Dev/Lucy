@@ -12,12 +12,7 @@ import (
 	"sync"
 )
 
-// IMPORTANT: Inside this package, any call to GetServerInfo() have the risk
-// to cause a stack overflow.
-
 const mcdrConfigFileName = "config.yml"
-const fabricAttributeFileName = "install.properties"
-const vanillaAttributeFileName = "version.json"
 
 // GetServerInfo is the exposed function for external packages to get serverInfo`.
 // As we can assume that the environment do not change while the program is
@@ -34,61 +29,82 @@ var GetServerInfo = tools.Memoize(buildServerInfo)
 //  4. Then search for related dirs (mods/, config/, plugins/, etc.)
 func buildServerInfo() lucytypes.ServerInfo {
 	var wg sync.WaitGroup
+	var mu sync.Mutex
 	var serverInfo lucytypes.ServerInfo
 	serverInfo.Modules = &lucytypes.ServerModules{}
 
 	// MCDR Stage
+	wg.Add(1)
 	go func() {
-		wg.Add(1)
 		defer wg.Done()
 		mcdrConfig := getMcdrConfig()
 		if mcdrConfig != nil {
+			mu.Lock()
 			serverInfo.Modules.Mcdr = &lucytypes.Mcdr{
 				Name:        syntax.Mcdr,
 				PluginPaths: mcdrConfig.PluginDirectories,
 			}
+			mu.Unlock()
 		}
 	}()
 
 	// Server Work Path
+	wg.Add(1)
 	go func() {
-		wg.Add(1)
 		defer wg.Done()
-		serverInfo.ServerWorkPath = getServerWorkPath()
+		workPath := getServerWorkPath()
+		mu.Lock()
+		serverInfo.WorkPath = workPath
+		mu.Unlock()
 	}()
 
 	// Executable Stage
+	wg.Add(1)
 	go func() {
-		wg.Add(1)
 		defer wg.Done()
-		serverInfo.Executable = getServerExecutable()
+		executable := getExecutableInfo()
+		mu.Lock()
+		serverInfo.Executable = executable
+		mu.Unlock()
 	}()
 
 	// Save Path
+	wg.Add(1)
 	go func() {
-		wg.Add(1)
 		defer wg.Done()
-		serverInfo.SavePath = getSavePath()
+		savePath := getSavePath()
+		mu.Lock()
+		serverInfo.SavePath = savePath
+		mu.Unlock()
 	}()
 
 	// Check for Lucy installation
+	wg.Add(1)
 	go func() {
-		wg.Add(1)
 		defer wg.Done()
-		serverInfo.HasLucy = checkHasLucy()
+		hasLucy := checkHasLucy()
+		mu.Lock()
+		serverInfo.HasLucy = hasLucy
+		mu.Unlock()
 	}()
 
 	// Check if the server is running
+	wg.Add(1)
 	go func() {
-		wg.Add(1)
 		defer wg.Done()
-		serverInfo.Activity = checkServerFileLock()
+		activity := checkServerFileLock()
+		mu.Lock()
+		serverInfo.Activity = activity
+		mu.Unlock()
 	}()
 
+	wg.Add(1)
 	go func() {
-		wg.Add(1)
 		defer wg.Done()
-		serverInfo.ModPath = getServerModPath()
+		modPath := getServerModPath()
+		mu.Lock()
+		serverInfo.ModPath = modPath
+		mu.Unlock()
 	}()
 
 	wg.Wait()
@@ -101,7 +117,7 @@ func buildServerInfo() lucytypes.ServerInfo {
 
 var getServerModPath = tools.Memoize(
 	func() string {
-		exec := getServerExecutable()
+		exec := getExecutableInfo()
 		if exec.Type == syntax.Fabric || exec.Type == syntax.Forge {
 			return "mods"
 		}

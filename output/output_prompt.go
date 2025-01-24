@@ -1,9 +1,9 @@
 package output
 
 import (
+	"encoding/json"
 	"github.com/manifoldco/promptui"
 	"lucy/lucytypes"
-	"strings"
 	"text/template"
 )
 
@@ -13,16 +13,16 @@ var selectExecutableTemplate = &promptui.SelectTemplates{
 	Selected: `{{ "✔︎" | green }} {{ .Path | bold }} [2m(Minecraft {{ .GameVersion }}, {{ if eq .ModLoaderType "vanilla" }}Vanilla{{ else }}{{ .ModLoaderType | capitalize }} v{{ .ModLoaderVersion }}{{ end }})[0m`,
 	FuncMap: func() (funcMap template.FuncMap) {
 		funcMap = promptui.FuncMap
-		funcMap["capitalize"] = func(s string) (cap string) {
-			return strings.ToUpper(s[:1]) + s[1:]
-		}
+		funcMap["capitalize"] = captalize
 		return
 	}(),
 }
 
-func PromptSelectExecutable(executables []*lucytypes.ServerExecutable) int {
+func PromptSelectExecutable(executables []lucytypes.ExecutableInfo) int {
+	data, _ := json.MarshalIndent(executables[0], "", "  ")
+	println(string(data))
 	selectExecutable := promptui.Select{
-		Label:     "Multiple executables detected, select one",
+		Label:     "Multiple valid executables detected, select one:",
 		Items:     executables,
 		Templates: selectExecutableTemplate,
 	}
