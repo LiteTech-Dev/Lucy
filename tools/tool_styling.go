@@ -22,15 +22,20 @@ const (
 	StyleWhiteText
 )
 
+const esc = '\u001B'
+
 func styleFactory(i int) func(any) string {
 	return func(v any) string {
 		s := v.(string)
-		return fmt.Sprintf("\u001B[%dm%s\u001B[%dm", i, s, StyleReset)
+		return fmt.Sprintf("%c[%dm%s%c[%dm", esc, i, s, esc, StyleReset)
 	}
 }
 
-func Capitalize(v interface{}) string {
-	s := v.(string)
+func Capitalize(v any) string {
+	s, ok := v.(string)
+	if !ok {
+		s = fmt.Sprintf("%v", v)
+	}
 	if len(s) == 0 {
 		return ""
 	}
