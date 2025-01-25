@@ -55,11 +55,19 @@ func printLabels(labels []string, maxWidth int) {
 	}
 }
 
+// TODO: Implement this
 func printVersions(
-versions []string,
-maxWidth int,
-showAll bool,
+	versions []string,
+	maxWidth int,
+	showAll bool,
 ) {
-	// TODO: filter by version type
 	printLabels(versions, maxWidth)
+}
+
+// TODO: Implement this
+func printPackages(
+	packages []string,
+	maxWidth int,
+	showAll bool,
+) {
 }

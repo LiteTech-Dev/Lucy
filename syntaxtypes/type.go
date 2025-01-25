@@ -9,6 +9,7 @@ package syntaxtypes
 // itself, for example, "fabric/fabric" is a valid package, and is equivalent to
 // "fabric". This literal is typically used when installing/upgrading a platform
 // itself.
+// TODO: Make this a interface with a Output() method so we don't have to call Capitalize() everywhere.
 type Platform string
 
 const (
@@ -49,9 +50,10 @@ func (p Platform) IsValid() bool {
 	return false
 }
 
-// PackageVersion is the version of the package. If not specified, it defaults to
-// "all". Here we expect mods and plugins to use semver (which they should). A
-// known exception is Minecraft versions snapshots.
+// PackageVersion is the version of a package. Here we expect mods and plugins
+// use semver (which they should). A known exception is Minecraft snapshots.
 type PackageVersion string
 
 var AllVersion PackageVersion = "all"
+var NoVersion PackageVersion = "none"
+var LatestVersion PackageVersion = "latest"

@@ -28,7 +28,7 @@ var subcmdAdd = &cli.Command{
 }
 
 // actionAdd
-// Now the strategy is:
+// The strategy is:
 //
 //   - Most up to date
 //   - Compatible with the server version
