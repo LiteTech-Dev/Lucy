@@ -56,12 +56,14 @@ var Platforms = []Platform{
 }
 
 // PackageName is the slug of the package, using hyphens as separators. For example,
-// "fabric-api". It is not case-sensitive, however lowercase is recommended. Underline
-// '_' is equivalent to hyphen. The slug from a source API is preferred, if available.
-// Otherwise, the slug is obtained from the executable file. No exceptions since
-// a package must either exist on a remote API or user's local files. All Minecraft
-// versions are valid package names. This literal is typically used when migrating
-// to another Minecraft version.
+// "fabric-api".
+//
+// It is non-case-sensitive, though lowercase is recommended. Underlines '_' are
+// equivalent to hyphens.
+//
+// A slug from a upstream API is preferred, if possible. Otherwise, the slug is
+// obtained from the executable file. No exceptions since a package must either
+// exist on a remote API or user's local files.
 type PackageName string
 
 type Package struct {

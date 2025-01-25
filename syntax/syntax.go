@@ -68,10 +68,10 @@ func Parse(s string) (p *syntaxtypes.Package) {
 // parseOperatorAt is called first since '@' operator always occur after '/' (equivalent
 // to a lower priority).
 func parseOperatorAt(s string) (
-pl syntaxtypes.Platform,
-n syntaxtypes.PackageName,
-v syntaxtypes.PackageVersion,
-err error,
+	pl syntaxtypes.Platform,
+	n syntaxtypes.PackageName,
+	v syntaxtypes.PackageVersion,
+	err error,
 ) {
 	split := strings.Split(s, "@")
 
@@ -92,9 +92,9 @@ err error,
 }
 
 func parseOperatorSlash(s string) (
-pl syntaxtypes.Platform,
-n syntaxtypes.PackageName,
-err error,
+	pl syntaxtypes.Platform,
+	n syntaxtypes.PackageName,
+	err error,
 ) {
 	split := strings.Split(s, "/")
 
@@ -102,6 +102,9 @@ err error,
 		pl = syntaxtypes.AllPlatform
 		n = syntaxtypes.PackageName(split[0])
 		if syntaxtypes.Platform(n).Valid() {
+			// Remember, all platforms are also valid packages under themselves.
+			// This literal is for users to specify the platform itself. See the
+			// docs for syntaxtypes.Platform for more information.
 			pl = syntaxtypes.Platform(n)
 			n = syntaxtypes.PackageName(pl)
 		}
