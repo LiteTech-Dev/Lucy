@@ -27,7 +27,7 @@ func GenerateStatus(data *lucytypes.ServerInfo) {
 
 	// Print mod loader types and version
 	if data.Executable.Platform != syntaxtypes.Minecraft {
-		printField("Modding", tools.Capitalize(data.Executable.Platform))
+		printField("Modding", data.Executable.Platform.String())
 	}
 
 	// Print MCDR status

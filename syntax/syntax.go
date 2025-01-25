@@ -43,7 +43,8 @@ func sanitize(s string) (clean string) {
 }
 
 var (
-	ESyntax = errors.New("invalid syntax")
+	ESyntax   = errors.New("invalid syntax")
+	EPlatform = errors.New("invalid platform")
 )
 
 // Parse is exported to parse a string into a Package struct. This function
@@ -67,10 +68,10 @@ func Parse(s string) (p *syntaxtypes.Package) {
 // parseOperatorAt is called first since '@' operator always occur after '/' (equivalent
 // to a lower priority).
 func parseOperatorAt(s string) (
-	pl syntaxtypes.Platform,
-	n syntaxtypes.PackageName,
-	v syntaxtypes.PackageVersion,
-	err error,
+pl syntaxtypes.Platform,
+n syntaxtypes.PackageName,
+v syntaxtypes.PackageVersion,
+err error,
 ) {
 	split := strings.Split(s, "@")
 
@@ -91,22 +92,24 @@ func parseOperatorAt(s string) (
 }
 
 func parseOperatorSlash(s string) (
-	pl syntaxtypes.Platform,
-	n syntaxtypes.PackageName,
-	err error,
+pl syntaxtypes.Platform,
+n syntaxtypes.PackageName,
+err error,
 ) {
 	split := strings.Split(s, "/")
 
 	if len(split) == 1 {
 		pl = syntaxtypes.AllPlatform
 		n = syntaxtypes.PackageName(split[0])
-		for _, platform := range syntaxtypes.Platforms {
-			if syntaxtypes.PackageName(platform) == n {
-				pl = platform
-			}
+		if syntaxtypes.Platform(n).Valid() {
+			pl = syntaxtypes.Platform(n)
+			n = syntaxtypes.PackageName(pl)
 		}
 	} else if len(split) == 2 {
 		pl = syntaxtypes.Platform(split[0])
+		if !pl.Valid() {
+			return "", "", EPlatform
+		}
 		n = syntaxtypes.PackageName(split[1])
 	} else {
 		return "", "", ESyntax

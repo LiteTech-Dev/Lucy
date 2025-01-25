@@ -31,7 +31,10 @@ func (p Platform) String() string {
 	if p.IsAll() {
 		return "Any"
 	}
-	return strings.ToUpper(string(p)[0:1]) + string(p)[1:]
+	if p.Valid() {
+		return strings.ToUpper(string(p)[0:1]) + string(p)[1:]
+	}
+	return "Invalid Platform"
 }
 
 func (p Platform) IsAll() bool {
