@@ -5,11 +5,15 @@
 // import any other packages in lucy.
 package syntaxtypes
 
+import (
+	"fmt"
+	"lucy/tools"
+)
+
 // Platform is an enum of several string constants. All platform is a package under
 // itself, for example, "fabric/fabric" is a valid package, and is equivalent to
 // "fabric". This literal is typically used when installing/upgrading a platform
 // itself.
-// TODO: Make this a interface with a Output() method so we don't have to call Capitalize() everywhere.
 type Platform string
 
 const (
@@ -20,6 +24,24 @@ const (
 	Mcdr        Platform = "mcdr"
 	AllPlatform Platform = "all"
 )
+
+func (p Platform) String() string {
+	return tools.Capitalize(p)
+}
+
+func (p Platform) IsAll() bool {
+	return p == AllPlatform
+}
+
+// Valid should be edited if you added a new platform.
+func (p Platform) Valid() bool {
+	for _, valid := range Platforms {
+		if p == valid {
+			return true
+		}
+	}
+	return false
+}
 
 var Platforms = []Platform{
 	Minecraft, Fabric, Forge, Neoforge, Mcdr, AllPlatform,
@@ -40,14 +62,18 @@ type Package struct {
 	Version  PackageVersion
 }
 
-// IsValid should be edited if you added a new platform.
-func (p Platform) IsValid() bool {
-	for _, valid := range Platforms {
-		if p == valid {
-			return true
-		}
-	}
-	return false
+func (p *Package) String() string {
+	return fmt.Sprintln(
+		tools.Ternary(
+			func() bool { return p.Platform == AllPlatform },
+			"", string(p.Platform)+"/",
+		),
+		string(p.Name),
+		tools.Ternary(
+			func() bool { return p.Version == LatestVersion || p.Version == AllVersion || p.Version == NoVersion },
+			"", "@"+string(p.Version),
+		),
+	)
 }
 
 // PackageVersion is the version of a package. Here we expect mods and plugins
