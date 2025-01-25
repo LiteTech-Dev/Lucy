@@ -8,6 +8,7 @@ package syntaxtypes
 import (
 	"fmt"
 	"lucy/tools"
+	"strings"
 )
 
 // Platform is an enum of several string constants. All platform is a package under
@@ -25,8 +26,12 @@ const (
 	AllPlatform Platform = "all"
 )
 
+// String by default returns a capitalized string
 func (p Platform) String() string {
-	return tools.Capitalize(p)
+	if p.IsAll() {
+		return "Any"
+	}
+	return strings.ToUpper(string(p)[0:1]) + string(p)[1:]
 }
 
 func (p Platform) IsAll() bool {
