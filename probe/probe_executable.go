@@ -30,20 +30,15 @@ var getExecutableInfo = tools.Memoize(
 				continue
 			}
 			valid = append(valid, exec)
-
 		}
 
-		switch len(valid) {
-		case 0:
+		if len(valid) == 0 {
 			logger.CreateFatal(errors.New("no server executable found"))
-		case 1:
+		} else if len(valid) == 1 {
 			return valid[0]
-		default:
-			index := output.PromptSelectExecutable(valid)
-			return valid[index]
 		}
-
-		return nil
+		index := output.PromptSelectExecutable(valid)
+		return valid[index]
 	},
 )
 
@@ -88,8 +83,14 @@ const fabricLauncherManifest = "META-INF/MANIFEST.MF"
 func analyzeExecutable(file *os.File) (exec *lucytypes.ExecutableInfo) {
 	// exec is a nil before an analysis function is called
 	// Anything other than exec.Path is set in the analysis function
-	stat, _ := file.Stat()
-	reader, _ := zip.NewReader(file, stat.Size())
+	stat, err := file.Stat()
+	if err != nil {
+		return nil
+	}
+	reader, err := zip.NewReader(file, stat.Size())
+	if err != nil {
+		return nil
+	}
 
 	for _, f := range reader.File {
 		switch f.Name {

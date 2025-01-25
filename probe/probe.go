@@ -1,8 +1,12 @@
 package probe
 
 import (
+	"archive/zip"
+	"encoding/json"
 	"errors"
 	"gopkg.in/ini.v1"
+	"io"
+	"lucy/apitypes"
 	"lucy/logger"
 	"lucy/lucytypes"
 	"lucy/syntaxtypes"
@@ -66,6 +70,26 @@ func buildServerInfo() lucytypes.ServerInfo {
 		mu.Unlock()
 	}()
 
+	// Mod Path
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		modPath := getServerModPath()
+		mu.Lock()
+		serverInfo.ModPath = modPath
+		mu.Unlock()
+	}()
+
+	// Mod List
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		modList := getModList()
+		mu.Lock()
+		serverInfo.Mods = modList
+		mu.Unlock()
+	}()
+
 	// Save Path
 	wg.Add(1)
 	go func() {
@@ -96,6 +120,7 @@ func buildServerInfo() lucytypes.ServerInfo {
 		mu.Unlock()
 	}()
 
+	// Server Mod Path
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
@@ -169,3 +194,60 @@ var checkHasLucy = tools.Memoize(
 		return err == nil
 	},
 )
+
+var getModList = tools.Memoize(
+	func() (mods []*lucytypes.PackageInfo) {
+		path := getServerModPath()
+		jars := findJar(path)
+		for _, jar := range jars {
+			mod := analyzeModJar(jar)
+			if mod != nil {
+				mods = append(mods, mod)
+			}
+		}
+		return mods
+	},
+)
+
+const fabricModIdentifierFile = "fabric.mod.json"
+
+// const forgeModIdentifierFile =
+// TODO: forgeModIdentifierFile
+
+func analyzeModJar(file *os.File) *lucytypes.PackageInfo {
+	stat, err := file.Stat()
+	if err != nil {
+		return nil
+	}
+	r, err := zip.NewReader(file, stat.Size())
+	if err != nil {
+		return nil
+	}
+
+	for _, f := range r.File {
+		if f.Name == fabricModIdentifierFile {
+			rr, err := f.Open()
+			data, err := io.ReadAll(rr)
+			if err != nil {
+				return nil
+			}
+			modInfo := &apitypes.FabricModIdentifier{}
+			err = json.Unmarshal(data, modInfo)
+			if err != nil {
+				return nil
+			}
+			p := &lucytypes.PackageInfo{
+				Base: syntaxtypes.Package{
+					Platform: syntaxtypes.Fabric,
+					Name:     syntaxtypes.PackageName(modInfo.Id),
+					Version:  syntaxtypes.PackageVersion(modInfo.Version),
+				},
+				Path:              file.Name(),
+				SupportedVersions: nil, // TODO: This is not yet implemented, because the deps field is an expression, we need to parse it
+			}
+			return p
+		}
+	}
+
+	return nil
+}

@@ -2,11 +2,10 @@ package cmd
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
 	"github.com/urfave/cli/v3"
 	"lucy/output"
 	"lucy/probe"
+	"lucy/tools"
 )
 
 var subcmdStatus = &cli.Command{
@@ -24,8 +23,7 @@ var subcmdStatus = &cli.Command{
 func actionStatus(_ context.Context, cmd *cli.Command) error {
 	serverInfo := probe.GetServerInfo()
 	if cmd.Bool("debug") {
-		data, _ := json.MarshalIndent(serverInfo, "", "  ")
-		fmt.Println(string(data))
+		tools.PrintAsJson(serverInfo)
 	} else {
 		output.GenerateStatus(&serverInfo)
 	}
