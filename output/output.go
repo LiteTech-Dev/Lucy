@@ -55,7 +55,7 @@ type fieldNil struct{}
 func (f *fieldNil) Output() {}
 
 // FieldLabels is a field that contains a title and a list of labels. If the
-// maxWidth is 0, it defaults to the terminal width.
+// maxWidth is 0, it defaults to max(33% of terminal width, 40)
 type FieldLabels struct {
 	Title    string
 	Labels   []string
@@ -73,11 +73,10 @@ func (f *FieldLabels) Output() {
 		return
 	}
 
-	if f.MaxWidth == 0 {
-		f.MaxWidth = tools.TermWidth()
-	}
-
 	key(f.Title)
+	if f.MaxWidth == 0 {
+		f.MaxWidth = max(33*tools.TermWidth()/100, 40)
+	}
 	width := 0
 	for i, label := range f.Labels {
 		fmt.Fprintf(keyValueWriter, "%s", label)

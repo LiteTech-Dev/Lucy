@@ -111,7 +111,7 @@ func modrinthProjectToInfo(source *apitypes.ModrinthProject) *lucytypes.OutputDa
 			&output.FieldLabels{
 				Title:    "Versions",
 				Labels:   source.GameVersions,
-				MaxWidth: tools.TermWidth(),
+				MaxWidth: 0,
 			},
 		},
 	}
