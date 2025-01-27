@@ -3,7 +3,7 @@ package sources
 import (
 	"fmt"
 	"io"
-	"lucy/syntax"
+	"lucy/syntaxtypes"
 	"net/http"
 	"sync"
 	"time"
@@ -19,10 +19,10 @@ const (
 	None       Source = "none"
 )
 
-var AvailableSources = map[syntax.Platform][]Source{
-	syntax.Fabric: {CurseForge, Modrinth},
-	syntax.Forge:  {CurseForge, Modrinth},
-	syntax.Mcdr:   {Mcdr},
+var AvailableSources = map[syntaxtypes.Platform][]Source{
+	syntaxtypes.Fabric: {CurseForge, Modrinth},
+	syntaxtypes.Forge:  {CurseForge, Modrinth},
+	syntaxtypes.Mcdr:   {Mcdr},
 }
 
 var SpeedTestUrls = map[Source]string{
@@ -42,7 +42,7 @@ const slow float64 = 0x7FF0000000000000 // inf
 //
 // Cons:
 //   - Speed test might not be representative
-func SelectSource(platform syntax.Platform) Source {
+func SelectSource(platform syntaxtypes.Platform) Source {
 	min := slow
 	fastestSource := None
 	wg := sync.WaitGroup{}
