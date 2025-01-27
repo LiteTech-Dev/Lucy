@@ -2,11 +2,10 @@ package cmd
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"github.com/urfave/cli/v3"
-	"io"
 	"lucy/apitypes"
+	"lucy/logger"
 	"lucy/lucytypes"
 	"lucy/mcdr"
 	"lucy/modrinth"
@@ -14,7 +13,6 @@ import (
 	"lucy/syntax"
 	"lucy/syntaxtypes"
 	"lucy/tools"
-	"net/http"
 )
 
 var subcmdInfo = &cli.Command{
@@ -47,38 +45,34 @@ func actionInfo(ctx context.Context, cmd *cli.Command) error {
 	switch p.Platform {
 	case syntaxtypes.AllPlatform:
 		// TODO: Wide range search
-		res, _ := http.Get(modrinth.ConstructProjectUrl(p.Name))
-		modrinthProject := &apitypes.ModrinthProject{}
-		data, _ := io.ReadAll(res.Body)
-		err := json.Unmarshal(data, modrinthProject)
+		proj, err := modrinth.GetProjectByName(p.Name)
 		if err != nil {
-			return err
+			logger.CreateWarning(err)
+			break
 		}
 		multiSourceData = append(
 			multiSourceData,
-			modrinthProjectToInfo(modrinthProject),
+			modrinthProjectToInfo(proj),
 		)
 	case syntaxtypes.Fabric:
 		// TODO: Fabric specific search
-		res, _ := http.Get(modrinth.ConstructProjectUrl(p.Name))
-		modrinthProject := &apitypes.ModrinthProject{}
-		data, _ := io.ReadAll(res.Body)
-		err := json.Unmarshal(data, modrinthProject)
+		proj, err := modrinth.GetProjectByName(p.Name)
 		if err != nil {
-			return err
+			logger.CreateWarning(err)
+			break
 		}
 		multiSourceData = append(
 			multiSourceData,
-			modrinthProjectToInfo(modrinthProject),
+			modrinthProjectToInfo(proj),
 		)
 	case syntaxtypes.Forge:
-		// TODO: Forge support
-		println("Not yet implemented")
+		// TODO: Forge
+		logger.CreateFatal(fmt.Errorf("forge is not yet supported"))
 	case syntaxtypes.Mcdr:
-		mcdrPlugin := mcdr.SearchMcdrPluginCatalogue(p.Name)
-		if mcdrPlugin == nil {
-			_ = fmt.Errorf("plugin not found")
-			return nil
+		mcdrPlugin, err := mcdr.SearchMcdrPluginCatalogue(p.Name)
+		if err != nil {
+			logger.CreateWarning(err)
+			break
 		}
 		multiSourceData = append(
 			multiSourceData,
