@@ -2,9 +2,19 @@ package tools
 
 import "sync"
 
-// Ternary gives a if expr == true, b if expr == false
-func Ternary[T any](expr func() bool, a T, b T) T {
+// TernaryFunc gives a if expr == true, b if expr == false. For a simple
+// bool expression, use Ternary instead.
+func TernaryFunc[T any](expr func() bool, a T, b T) T {
 	if expr() {
+		return a
+	}
+	return b
+}
+
+// Ternary gives a if v == true, b if v == false. For a function parameter, use
+// TernaryFunc instead.
+func Ternary[T any](v bool, a T, b T) T {
+	if v {
 		return a
 	}
 	return b

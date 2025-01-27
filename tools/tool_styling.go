@@ -3,6 +3,7 @@ package tools
 import (
 	"encoding/json"
 	"fmt"
+	"golang.org/x/term"
 	"strings"
 )
 
@@ -63,4 +64,9 @@ func PrintAsJson(v interface{}) {
 		return
 	}
 	fmt.Println(string(data))
+}
+
+func TermWidth() int {
+	width, _, _ := term.GetSize(0)
+	return width
 }
