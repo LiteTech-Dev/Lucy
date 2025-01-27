@@ -17,11 +17,11 @@ func value(value string) {
 	fmt.Fprintf(keyValueWriter, "%s", value)
 }
 
-func annot(annotation string) {
+func inlineAnnot(annotation string) {
 	fmt.Fprintf(keyValueWriter, "\t%s", tools.Dim(annotation))
 }
 
-func dim(value string) {
+func annot(value string) {
 	fmt.Fprintf(keyValueWriter, "%s", tools.Dim(value))
 }
 
@@ -31,4 +31,8 @@ func newLine() {
 
 func tab() {
 	fmt.Fprintf(keyValueWriter, "\t")
+}
+
+func flush() {
+	keyValueWriter.Flush()
 }
