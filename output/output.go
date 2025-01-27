@@ -9,35 +9,47 @@ import (
 
 var keyValueWriter = tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
 
-func printKey(title string) {
+func printTitle(title string) {
 	fmt.Fprintf(keyValueWriter, "%s\t", tools.Bold(tools.Mangeta(title)))
 }
 
-func printValue(value string) {
-	fmt.Fprintf(keyValueWriter, "%s\n", value)
+func printText(value string) {
+	fmt.Fprintf(keyValueWriter, "%s", value)
 }
 
-func printValueAnnot(value string, annotation string) {
-	fmt.Fprintf(keyValueWriter, "%s %s\n", value, tools.Dim(annotation))
+func printNewLine() {
+	fmt.Fprintf(keyValueWriter, "\n")
 }
 
-func printField(key string, value string) {
-	fmt.Fprintf(
-		keyValueWriter,
-		"%s\t%s\n",
-		tools.Bold(tools.Mangeta(key)),
-		value,
-	)
+func printAnnotation(annotation string) {
+	fmt.Fprintf(keyValueWriter, "%s", tools.Dim(annotation))
 }
 
-func printLabels(labels []string, maxWidth int) {
+// ShortTextFieldWithAnnot prints a key-value pair with an annotation
+func ShortTextFieldWithAnnot(key string, text string, annotation string) {
+	ShortTextField(key, text)
+	printAnnotation(annotation)
+	printNewLine()
+}
+
+// ShortTextField prints a key-value pair
+func ShortTextField(key string, text string) {
+	printTitle(key)
+	printText(text)
+	printNewLine()
+}
+
+// LabelsField prints a list of labels
+func LabelsField(title string, labels []string, maxWidth int) {
 	if len(labels) == 0 {
-		fmt.Fprintf(keyValueWriter, "\n")
+		return
 	} else if len(labels) == 1 {
-		printValue(labels[0])
+		printTitle(title)
+		printText(labels[0])
 		return
 	}
 
+	printTitle(title)
 	width := 0
 	for _, label := range labels {
 		fmt.Fprintf(keyValueWriter, "%s", label)
@@ -56,18 +68,16 @@ func printLabels(labels []string, maxWidth int) {
 }
 
 // TODO: Implement this
-func printVersions(
-	versions []string,
-	maxWidth int,
-	showAll bool,
-) {
-	printLabels(versions, maxWidth)
-}
+
+func LongTextField(title string, text string, maxWidth int) {}
 
 // TODO: Implement this
-func printPackages(
-	packages []string,
-	maxWidth int,
-	showAll bool,
+
+func printVersions(
+title string,
+versions []string,
+maxWidth int,
+showAll bool,
 ) {
+	LabelsField(title, versions, maxWidth)
 }

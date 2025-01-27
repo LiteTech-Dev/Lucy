@@ -7,24 +7,22 @@ import (
 
 func GenerateInfo(data interface{}) {
 	defer keyValueWriter.Flush()
-
 	switch v := data.(type) {
 	case *apitypes.ModrinthProject:
-		printField("Name", v.Title)
-		printField("Description", v.Description)
-		printField("Downloads", fmt.Sprintf("%d", v.Downloads))
-		printKey("Game Versions")
-		printLabels(v.GameVersions, 60)
+		ShortTextField("Name", v.Title)
+		ShortTextField("Description", v.Description)
+		ShortTextField("Downloads", fmt.Sprintf("%d", v.Downloads))
+		LabelsField("Game Versions", v.GameVersions, 60)
 	case *apitypes.McdrPluginInfo:
-		printField("Name", v.Id)
-		printKey("Authors")
+		ShortTextField("Name", v.Id)
 		for i, author := range v.Authors {
-			if i != 0 {
-				printKey("")
+			if i == 0 {
+				ShortTextFieldWithAnnot("Author", author.Name, author.Link)
+			} else {
+				ShortTextFieldWithAnnot("", author.Name, author.Link)
 			}
-			printValueAnnot(author.Name, author.Link)
 		}
-		printField("Source", v.Repository)
+		ShortTextField("Source", v.Repository)
 	default:
 		panic("Invalid type")
 	}
