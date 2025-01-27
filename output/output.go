@@ -112,6 +112,7 @@ func (f *FieldPeople) Output() {
 		key(f.Title)
 		value(f.People[0].Name)
 		inlineAnnot(tools.Underline(f.People[0].Link))
+		newLine()
 		return
 	}
 
