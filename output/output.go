@@ -49,6 +49,11 @@ func LabelsField(title string, labels []string, maxWidth int) {
 	}
 }
 
+func SourceInfo(source string) {
+	dim("(Source: " + tools.Underline(source) + ")")
+	newLine()
+}
+
 // TODO: Implement this
 
 func LongTextField(title string, text string, maxWidth int) {}
