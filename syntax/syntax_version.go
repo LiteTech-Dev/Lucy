@@ -7,15 +7,10 @@ import (
 	"golang.org/x/mod/semver"
 	"io"
 	"lucy/apitypes"
+	"lucy/syntaxtypes"
 	"net/http"
 )
 
-// PackageVersion is the version of the package. If not specified, it defaults to
-// "all". Here we expect mods and plugins to use semver (which they should). A
-// known exception is Minecraft versions snapshots.
-type PackageVersion string
-
-var AllVersion PackageVersion = "all"
 var (
 	EInvalidVersionComparison = errors.New("invalid version comparison")
 	EVersionNotFound          = errors.New("version do not exist")
@@ -51,10 +46,10 @@ func GetVersionManifest() (manifest *apitypes.VersionManifest, err error) {
 // ComparePackageVersions gives -1 when v1 is older than v2, 0 when they are
 // the same (or an error occurred), and 1 when v1 is newer than v2. 0 is returned
 // when either v1 or v2 is AllVersion
-func ComparePackageVersions(p1, p2 *Package) (c int8, err error) {
+func ComparePackageVersions(p1, p2 *syntaxtypes.Package) (c int8, err error) {
 	v1, v2 := p1.Version, p2.Version
 
-	if v1 == AllVersion || v2 == AllVersion {
+	if v1 == syntaxtypes.AllVersion || v2 == syntaxtypes.AllVersion {
 		return 0, nil
 	}
 
@@ -71,13 +66,16 @@ func ComparePackageVersions(p1, p2 *Package) (c int8, err error) {
 		return 0, nil
 	}
 
-	if p1.Platform == Minecraft {
+	if p1.Platform == syntaxtypes.Minecraft {
 		return compareMinecraftVersions(v1, v2)
 	}
 	return int8(semver.Compare("v"+string(v1), "v"+string(v2))), nil
 }
 
-func compareMinecraftVersions(v1, v2 PackageVersion) (c int8, err error) {
+func compareMinecraftVersions(v1, v2 syntaxtypes.PackageVersion) (
+	c int8,
+	err error,
+) {
 	manifest, err := GetVersionManifest()
 	if err != nil {
 		return 0, err
@@ -85,10 +83,10 @@ func compareMinecraftVersions(v1, v2 PackageVersion) (c int8, err error) {
 
 	i1, i2 := -1, -1
 	for i, v := range manifest.Versions {
-		if v1 == PackageVersion(v.Id) {
+		if v1 == syntaxtypes.PackageVersion(v.Id) {
 			i1 = i
 		}
-		if v2 == PackageVersion(v.Id) {
+		if v2 == syntaxtypes.PackageVersion(v.Id) {
 			i2 = i
 		}
 	}

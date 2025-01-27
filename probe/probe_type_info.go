@@ -7,10 +7,10 @@ import "time"
 // calling any newly added property.
 type MinecraftServerDotProperties map[string]string
 
-// JarVersionDotJson (version.json) do not exist across all game versions.
+// VersionDotJson (version.json) do not exist across all game versions.
 // TODO: Backtrack the last version with this file
 // TODO: Implement an alternative version check method (checksum)
-type JarVersionDotJson struct {
+type VersionDotJson struct {
 	Id              string `json:"id"`
 	Name            string `json:"name"`
 	WorldVersion    int    `json:"world_version"`

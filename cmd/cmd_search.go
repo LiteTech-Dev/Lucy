@@ -8,6 +8,7 @@ import (
 	"golang.org/x/term"
 	"lucy/sources/modrinth"
 	"lucy/syntax"
+	"lucy/syntaxtypes"
 	"os"
 	"text/tabwriter"
 )
@@ -62,7 +63,7 @@ var subcmdSearch = &cli.Command{
 
 func actionSearch(_ context.Context, cmd *cli.Command) error {
 	// TODO: Error handling
-	p, _ := syntax.Parse(cmd.Args().First())
+	p := syntax.Parse(cmd.Args().First())
 	// indexBy can be: relevance (default), downloads, follows, newest, updated
 	indexBy := cmd.String("index")
 	showClientPackage := cmd.Bool("client")
@@ -80,16 +81,16 @@ func actionSearch(_ context.Context, cmd *cli.Command) error {
 		return nil
 	}
 
-	var slugs []syntax.PackageName
+	var slugs []syntaxtypes.PackageName
 	for _, hit := range res.Hits {
-		slugs = append(slugs, syntax.PackageName(hit.Slug))
+		slugs = append(slugs, syntaxtypes.PackageName(hit.Slug))
 	}
 	generateSearchOutput(slugs)
 
 	return nil
 }
 
-func generateSearchOutput(slugs []syntax.PackageName) {
+func generateSearchOutput(slugs []syntaxtypes.PackageName) {
 	termWidth, _, _ := term.GetSize(int(os.Stdout.Fd()))
 	maxSlugLen := 0
 	for i := 0; i < len(slugs); i += 1 {

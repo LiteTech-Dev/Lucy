@@ -6,7 +6,7 @@ import (
 	"io"
 	"lucy/apitypes"
 	"lucy/probe"
-	"lucy/syntax"
+	"lucy/syntaxtypes"
 	"net/http"
 	url2 "net/url"
 	"strings"
@@ -15,7 +15,7 @@ import (
 // For Modrinth search API, see:
 // https://docs.modrinth.com/api/operations/searchprojects/
 
-func GetNewestProjectVersion(slug syntax.PackageName) (newestVersion *apitypes.ModrinthProjectVersion) {
+func GetNewestProjectVersion(slug syntaxtypes.PackageName) (newestVersion *apitypes.ModrinthProjectVersion) {
 	newestVersion = nil
 	versions := getProjectVersions(slug)
 	serverInfo := probe.GetServerInfo()
@@ -36,14 +36,14 @@ func GetNewestProjectVersion(slug syntax.PackageName) (newestVersion *apitypes.M
 	return
 }
 
-func getProjectVersions(slug syntax.PackageName) (versions []*apitypes.ModrinthProjectVersion) {
+func getProjectVersions(slug syntaxtypes.PackageName) (versions []*apitypes.ModrinthProjectVersion) {
 	res, _ := http.Get(constructProjectVersionsUrl(slug))
 	data, _ := io.ReadAll(res.Body)
 	json.Unmarshal(data, &versions)
 	return
 }
 
-func GetProjectId(slug syntax.PackageName) (id string) {
+func GetProjectId(slug syntaxtypes.PackageName) (id string) {
 	res, _ := http.Get(ConstructProjectUrl(slug))
 	modrinthProject := apitypes.ModrinthProject{}
 	data, _ := io.ReadAll(res.Body)
@@ -55,8 +55,8 @@ func GetProjectId(slug syntax.PackageName) (id string) {
 // TODO: Search() is way too long, refactor
 
 func Search(
-	platform syntax.Platform,
-	packageName syntax.PackageName,
+	platform syntaxtypes.Platform,
+	packageName syntaxtypes.PackageName,
 	showClientPackage bool,
 	indexBy string,
 ) (result *apitypes.ModrinthSearchResults) {
@@ -72,11 +72,11 @@ func Search(
 	)
 	var facetsArray []string
 	switch platform {
-	case syntax.AllPlatform:
+	case syntaxtypes.AllPlatform:
 		facetsArray = append(facetsArray, facetsCategoryAll)
-	case syntax.Forge:
+	case syntaxtypes.Forge:
 		facetsArray = append(facetsArray, facetsCategoryForge)
-	case syntax.Fabric:
+	case syntaxtypes.Fabric:
 		facetsArray = append(facetsArray, facetsCategoryFabric)
 	}
 	if !showClientPackage {

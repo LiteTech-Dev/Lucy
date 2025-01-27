@@ -1,28 +1,30 @@
 package lucytypes
 
 import (
-	"lucy/syntax"
+	"lucy/syntaxtypes"
 	"os/exec"
 )
 
 // ServerInfo components that do not exist, use an empty string. Note Executable
 // must exist, otherwise the program will exit; therefore, it is not a pointer.
 type ServerInfo struct {
-	ServerWorkPath string
-	SavePath       string
-	ModPath        string
-	HasLucy        bool
-	Executable     ServerExecutable
-	BootCommand    *exec.Cmd
-	Activity       *Activity
-	Modules        *ServerModules
+	WorkPath    string
+	SavePath    string
+	ModPath     string
+	Mods        []*PackageInfo
+	HasLucy     bool
+	Mcdr        *Mcdr
+	Executable  *ExecutableInfo
+	BootCommand *exec.Cmd
+	Activity    *Activity
 }
 
-type ServerExecutable struct {
-	Path        string
-	GameVersion string
-	BootCommand exec.Cmd
-	Type        syntax.Platform
+type ExecutableInfo struct {
+	Path          string
+	GameVersion   string
+	Platform      syntaxtypes.Platform
+	LoaderVersion string
+	BootCommand   *exec.Cmd
 }
 
 type Activity struct {
@@ -30,23 +32,6 @@ type Activity struct {
 	Pid    int
 }
 
-type ServerModules struct {
-	Mcdr   *Mcdr
-	Fabric *Fabric
-	Forge  *Forge
-}
-
 type Mcdr struct {
-	Name        syntax.Platform
 	PluginPaths []string
-}
-
-type Fabric struct {
-	Name    syntax.Platform
-	Version string
-}
-
-type Forge struct {
-	Name    syntax.Platform
-	Version string
 }

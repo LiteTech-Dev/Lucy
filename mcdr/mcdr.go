@@ -3,23 +3,28 @@ package mcdr
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/google/go-github/v50/github"
 	"lucy/apitypes"
 	"lucy/syntax"
+	"lucy/syntaxtypes"
 	"path"
 )
 
-func SearchMcdrPluginCatalogue(slug syntax.PackageName) (pluginInfo *apitypes.McdrPluginInfo) {
+func SearchMcdrPluginCatalogue(search syntaxtypes.PackageName) (
+	pluginInfo *apitypes.McdrPluginInfo,
+	err error,
+) {
 	plugins := getMcdrPluginCatalogue()
 
 	for _, plugin := range plugins {
-		p, _ := syntax.Parse(*plugin.Name)
-		if p.Name == slug {
-			return getMcdrPluginInfo(*plugin.Path)
+		p := syntax.Parse(*plugin.Name)
+		if p.Name == search {
+			return getMcdrPluginInfo(*plugin.Path), nil
 		}
 	}
 
-	return nil
+	return nil, fmt.Errorf("plugin not found")
 }
 
 func getMcdrPluginCatalogue() []*github.RepositoryContent {

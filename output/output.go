@@ -2,58 +2,139 @@ package output
 
 import (
 	"fmt"
-	"os"
-	"text/tabwriter"
+	"golang.org/x/term"
+	"lucy/lucytypes"
+	"lucy/tools"
 )
 
-var keyValueWriter = tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
-
-func printKey(title string) {
-	fmt.Fprintf(keyValueWriter, "%s\t", bold(mangeta(title)))
+func SourceInfo(source string) {
+	annot("(Source: " + tools.Underline(source) + ")")
+	newLine()
 }
 
-func printValue(value string) {
-	fmt.Fprintf(keyValueWriter, "%s\n", value)
+// Separator prints a separator line. A length of 0 will print a line of current
+// terminal width
+func Separator(length int) {
+	if length == 0 {
+		length, _, _ = term.GetSize(0)
+	}
+	for i := 0; i < length; i++ {
+		fmt.Fprintf(keyValueWriter, "-")
+	}
+	newLine()
 }
 
-func printValueAnnot(value string, annotation string) {
-	fmt.Fprintf(keyValueWriter, "%s %s\n", value, faint(annotation))
+type FieldShortText struct {
+	Title string
+	Text  string
 }
 
-func printField(key string, value string) {
-	fmt.Fprintf(keyValueWriter, "%s\t%s\n", bold(mangeta(key)), value)
+func (f *FieldShortText) Output() {
+	key(f.Title)
+	value(f.Text)
+	newLine()
 }
 
-func printLabels(labels []string, maxWidth int) {
-	if len(labels) == 0 {
-		fmt.Fprintf(keyValueWriter, "\n")
-	} else if len(labels) == 1 {
-		printValue(labels[0])
+type FieldAnnotatedShortText struct {
+	Title      string
+	Text       string
+	Annotation string
+}
+
+func (f *FieldAnnotatedShortText) Output() {
+	key(f.Title)
+	value(f.Text)
+	inlineAnnot(f.Annotation)
+	newLine()
+}
+
+var FieldNil = &fieldNil{}
+
+type fieldNil struct{}
+
+func (f *fieldNil) Output() {}
+
+// FieldLabels is a field that contains a title and a list of labels. If the
+// maxWidth is 0, it defaults to max(33% of terminal width, 40)
+type FieldLabels struct {
+	Title    string
+	Labels   []string
+	MaxWidth int
+}
+
+func (f *FieldLabels) Output() {
+	if len(f.Labels) == 0 {
+		return
+	}
+	if len(f.Labels) == 1 {
+		key(f.Title)
+		value(f.Labels[0])
+		newLine()
 		return
 	}
 
+	key(f.Title)
+	if f.MaxWidth == 0 {
+		f.MaxWidth = max(33*tools.TermWidth()/100, 40)
+	}
 	width := 0
-	for _, label := range labels {
+	for i, label := range f.Labels {
 		fmt.Fprintf(keyValueWriter, "%s", label)
-		if label != labels[len(labels)-1] {
+		if i != len(f.Labels)-1 {
 			fmt.Fprintf(keyValueWriter, ", ")
 		}
 		width += len(label) + 2
-		if width > maxWidth {
-			fmt.Fprintf(keyValueWriter, "\n%s\t", bold(mangeta("")))
+		if width >= f.MaxWidth && i != len(f.Labels)-1 {
+			newLine()
+			tab()
 			width = 0
 		}
 	}
-	if width > 0 {
-		fmt.Fprintf(keyValueWriter, "\n")
+
+	if width != 0 {
+		newLine()
 	}
 }
 
-func printVersions(
-	versions []string,
-	maxWidth int,
-	showAll bool,
-) {
-	// TODO: filter by version type
-	printLabels(versions, maxWidth)
+type FieldPeople struct {
+	Title  string
+	People []struct {
+		Name string
+		Link string
+	}
+}
+
+func (f *FieldPeople) Output() {
+	if len(f.People) == 0 {
+		return
+	}
+	if len(f.People) == 1 {
+		key(f.Title)
+		value(f.People[0].Name)
+		inlineAnnot(tools.Underline(f.People[0].Link))
+		newLine()
+		return
+	}
+
+	for i, person := range f.People {
+		if i == 0 {
+			key(f.Title)
+			value(person.Name)
+			inlineAnnot(tools.Underline(f.People[i].Link))
+		} else {
+			tab()
+			value(person.Name)
+			inlineAnnot(tools.Underline(f.People[i].Link))
+		}
+		if i != len(f.People)-1 {
+			newLine()
+		}
+	}
+}
+
+func GenerateOutput(data *lucytypes.OutputData) {
+	for _, field := range data.Fields {
+		field.Output()
+	}
+	flush()
 }

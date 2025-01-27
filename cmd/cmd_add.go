@@ -9,6 +9,7 @@ import (
 	"lucy/probe"
 	"lucy/sources/modrinth"
 	"lucy/syntax"
+	"lucy/syntaxtypes"
 	"lucy/util"
 )
 
@@ -27,7 +28,7 @@ var subcmdAdd = &cli.Command{
 }
 
 // actionAdd
-// Now the strategy is:
+// The strategy is:
 //
 //   - Most up to date
 //   - Compatible with the server version
@@ -39,18 +40,18 @@ func actionAdd(_ context.Context, cmd *cli.Command) error {
 	// TODO: Platform compatibility check
 	// TODO: Error handling
 
-	p, _ := syntax.Parse(cmd.Args().First())
+	p := syntax.Parse(cmd.Args().First())
 	serverInfo := probe.GetServerInfo()
 
 	if !serverInfo.HasLucy {
 		return errors.New("lucy is not installed, run `lucy init` before downloading mods")
 	}
 
-	if p.Platform == syntax.Mcdr && serverInfo.Modules.Mcdr == nil {
+	if p.Platform == syntaxtypes.Mcdr && serverInfo.Mcdr == nil {
 		// TODO: Deal with this
 		println("MCDR is not installed, cannot download MCDR plugins")
 		return errors.New("no mcdr")
-	} else if p.Platform != syntax.AllPlatform && p.Platform != serverInfo.Executable.Type {
+	} else if p.Platform != syntaxtypes.AllPlatform && p.Platform != serverInfo.Executable.Platform {
 		// TODO: Deal with this
 		return errors.New("platform mismatch")
 	}

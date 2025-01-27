@@ -1,23 +1,22 @@
 package probe
 
 import (
+	"archive/zip"
+	"encoding/json"
 	"errors"
 	"gopkg.in/ini.v1"
+	"io"
+	"lucy/apitypes"
 	"lucy/logger"
 	"lucy/lucytypes"
-	"lucy/syntax"
+	"lucy/syntaxtypes"
 	"lucy/tools"
 	"os"
 	"path"
 	"sync"
 )
 
-// IMPORTANT: Inside this package, any call to GetServerInfo() have the risk
-// to cause a stack overflow.
-
 const mcdrConfigFileName = "config.yml"
-const fabricAttributeFileName = "install.properties"
-const vanillaAttributeFileName = "version.json"
 
 // GetServerInfo is the exposed function for external packages to get serverInfo`.
 // As we can assume that the environment do not change while the program is
@@ -34,56 +33,101 @@ var GetServerInfo = tools.Memoize(buildServerInfo)
 //  4. Then search for related dirs (mods/, config/, plugins/, etc.)
 func buildServerInfo() lucytypes.ServerInfo {
 	var wg sync.WaitGroup
+	var mu sync.Mutex
 	var serverInfo lucytypes.ServerInfo
-	serverInfo.Modules = &lucytypes.ServerModules{}
-
-	wg.Add(6)
 
 	// MCDR Stage
+	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		mcdrConfig := getMcdrConfig()
 		if mcdrConfig != nil {
-			serverInfo.Modules.Mcdr = &lucytypes.Mcdr{
-				Name:        syntax.Mcdr,
+			mu.Lock()
+			serverInfo.Mcdr = &lucytypes.Mcdr{
 				PluginPaths: mcdrConfig.PluginDirectories,
 			}
+			mu.Unlock()
 		}
 	}()
 
 	// Server Work Path
+	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		serverInfo.ServerWorkPath = getServerWorkPath()
+		workPath := getServerWorkPath()
+		mu.Lock()
+		serverInfo.WorkPath = workPath
+		mu.Unlock()
 	}()
 
 	// Executable Stage
+	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		serverInfo.Executable = getServerExecutable()
+		executable := getExecutableInfo()
+		mu.Lock()
+		serverInfo.Executable = executable
+		mu.Unlock()
+	}()
+
+	// Mod Path
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		modPath := getServerModPath()
+		mu.Lock()
+		serverInfo.ModPath = modPath
+		mu.Unlock()
+	}()
+
+	// Mod List
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		modList := getModList()
+		mu.Lock()
+		serverInfo.Mods = modList
+		mu.Unlock()
 	}()
 
 	// Save Path
+	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		serverInfo.SavePath = getSavePath()
+		savePath := getSavePath()
+		mu.Lock()
+		serverInfo.SavePath = savePath
+		mu.Unlock()
 	}()
 
 	// Check for Lucy installation
+	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		serverInfo.HasLucy = checkHasLucy()
+		hasLucy := checkHasLucy()
+		mu.Lock()
+		serverInfo.HasLucy = hasLucy
+		mu.Unlock()
 	}()
 
 	// Check if the server is running
+	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		serverInfo.Activity = checkServerFileLock()
+		activity := checkServerFileLock()
+		mu.Lock()
+		serverInfo.Activity = activity
+		mu.Unlock()
 	}()
 
+	// Server Mod Path
+	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		serverInfo.ModPath = getServerModPath()
+		modPath := getServerModPath()
+		mu.Lock()
+		serverInfo.ModPath = modPath
+		mu.Unlock()
 	}()
 
 	wg.Wait()
@@ -96,8 +140,8 @@ func buildServerInfo() lucytypes.ServerInfo {
 
 var getServerModPath = tools.Memoize(
 	func() string {
-		exec := getServerExecutable()
-		if exec.Type == syntax.Fabric || exec.Type == syntax.Forge {
+		exec := getExecutableInfo()
+		if exec.Platform == syntaxtypes.Fabric || exec.Platform == syntaxtypes.Forge {
 			return "mods"
 		}
 		return ""
@@ -150,3 +194,60 @@ var checkHasLucy = tools.Memoize(
 		return err == nil
 	},
 )
+
+var getModList = tools.Memoize(
+	func() (mods []*lucytypes.PackageInfo) {
+		path := getServerModPath()
+		jars := findJar(path)
+		for _, jar := range jars {
+			mod := analyzeModJar(jar)
+			if mod != nil {
+				mods = append(mods, mod)
+			}
+		}
+		return mods
+	},
+)
+
+const fabricModIdentifierFile = "fabric.mod.json"
+
+// const forgeModIdentifierFile =
+// TODO: forgeModIdentifierFile
+
+func analyzeModJar(file *os.File) *lucytypes.PackageInfo {
+	stat, err := file.Stat()
+	if err != nil {
+		return nil
+	}
+	r, err := zip.NewReader(file, stat.Size())
+	if err != nil {
+		return nil
+	}
+
+	for _, f := range r.File {
+		if f.Name == fabricModIdentifierFile {
+			rr, err := f.Open()
+			data, err := io.ReadAll(rr)
+			if err != nil {
+				return nil
+			}
+			modInfo := &apitypes.FabricModIdentifier{}
+			err = json.Unmarshal(data, modInfo)
+			if err != nil {
+				return nil
+			}
+			p := &lucytypes.PackageInfo{
+				Base: syntaxtypes.Package{
+					Platform: syntaxtypes.Fabric,
+					Name:     syntaxtypes.PackageName(modInfo.Id),
+					Version:  syntaxtypes.PackageVersion(modInfo.Version),
+				},
+				Path:              file.Name(),
+				SupportedVersions: nil, // TODO: This is not yet implemented, because the deps field is an expression, we need to parse it
+			}
+			return p
+		}
+	}
+
+	return nil
+}

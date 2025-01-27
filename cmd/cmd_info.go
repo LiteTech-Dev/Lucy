@@ -2,16 +2,17 @@ package cmd
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"github.com/urfave/cli/v3"
-	"io"
 	"lucy/apitypes"
+	"lucy/logger"
+	"lucy/lucytypes"
 	"lucy/mcdr"
 	"lucy/output"
 	"lucy/sources/modrinth"
 	"lucy/syntax"
-	"net/http"
+	"lucy/syntaxtypes"
+	"lucy/tools"
 )
 
 var subcmdInfo = &cli.Command{
@@ -37,34 +38,101 @@ var subcmdInfo = &cli.Command{
 
 func actionInfo(ctx context.Context, cmd *cli.Command) error {
 	// TODO: Error handling
-	p, _ := syntax.Parse(cmd.Args().First())
+	p := syntax.Parse(cmd.Args().First())
+
+	var multiSourceData []*lucytypes.OutputData
 
 	switch p.Platform {
-	case syntax.AllPlatform:
+	case syntaxtypes.AllPlatform:
 		// TODO: Wide range search
-		res, _ := http.Get(modrinth.ConstructProjectUrl(p.Name))
-		modrinthProject := &apitypes.ModrinthProject{}
-		data, _ := io.ReadAll(res.Body)
-		json.Unmarshal(data, modrinthProject)
-		output.GenerateInfo(modrinthProject)
-	case syntax.Fabric:
-		// TODO: Fabric specific search
-		res, _ := http.Get(modrinth.ConstructProjectUrl(p.Name))
-		modrinthProject := &apitypes.ModrinthProject{}
-		data, _ := io.ReadAll(res.Body)
-		json.Unmarshal(data, modrinthProject)
-		output.GenerateInfo(modrinthProject)
-	case syntax.Forge:
-		// TODO: Forge support
-		println("Not yet implemented")
-	case syntax.Mcdr:
-		mcdrPlugin := mcdr.SearchMcdrPluginCatalogue(p.Name)
-		if mcdrPlugin == nil {
-			_ = fmt.Errorf("plugin not found")
-			return nil
+		proj, err := modrinth.GetProjectByName(p.Name)
+		if err != nil {
+			logger.CreateWarning(err)
+			break
 		}
-		output.GenerateInfo(mcdrPlugin)
+		multiSourceData = append(
+			multiSourceData,
+			modrinthProjectToInfo(proj),
+		)
+	case syntaxtypes.Fabric:
+		// TODO: Fabric specific search
+		proj, err := modrinth.GetProjectByName(p.Name)
+		if err != nil {
+			logger.CreateWarning(err)
+			break
+		}
+		multiSourceData = append(
+			multiSourceData,
+			modrinthProjectToInfo(proj),
+		)
+	case syntaxtypes.Forge:
+		// TODO: Forge
+		logger.CreateFatal(fmt.Errorf("forge is not yet supported"))
+	case syntaxtypes.Mcdr:
+		mcdrPlugin, err := mcdr.SearchMcdrPluginCatalogue(p.Name)
+		if err != nil {
+			logger.CreateWarning(err)
+			break
+		}
+		multiSourceData = append(
+			multiSourceData,
+			mcdrPluginInfoToInfo(mcdrPlugin),
+		)
+	}
+
+	for _, data := range multiSourceData {
+		output.GenerateOutput(data)
 	}
 
 	return nil
+}
+
+func modrinthProjectToInfo(source *apitypes.ModrinthProject) *lucytypes.OutputData {
+	return &lucytypes.OutputData{
+		Fields: []lucytypes.Field{
+			&output.FieldShortText{
+				Title: "Name",
+				Text:  source.Title,
+			},
+			&output.FieldShortText{
+				Title: "Description",
+				Text:  source.Description,
+			},
+			&output.FieldShortText{
+				Title: "Downloads",
+				Text:  fmt.Sprintf("%d", source.Downloads),
+			},
+			&output.FieldLabels{
+				Title:    "Versions",
+				Labels:   source.GameVersions,
+				MaxWidth: 0,
+			},
+		},
+	}
+}
+
+func mcdrPluginInfoToInfo(source *apitypes.McdrPluginInfo) *lucytypes.OutputData {
+	return &lucytypes.OutputData{
+		Fields: []lucytypes.Field{
+			&output.FieldShortText{
+				Title: "Name",
+				Text:  source.Id,
+			},
+			&output.FieldShortText{
+				Title: "Introduction",
+				Text:  source.Introduction.EnUs,
+			},
+			&output.FieldPeople{
+				Title: "Authors",
+				People: []struct {
+					Name string
+					Link string
+				}(source.Authors),
+			},
+			&output.FieldShortText{
+				Title: "Source Code",
+				Text:  tools.Underline(source.Repository),
+			},
+		},
+	}
 }
