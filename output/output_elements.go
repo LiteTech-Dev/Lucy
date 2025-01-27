@@ -30,7 +30,7 @@ func newLine() {
 }
 
 func tab() {
-	fmt.Fprintf(keyValueWriter, "\t")
+	fmt.Fprintf(keyValueWriter, "%s\t", tools.Bold(tools.Mangeta("")))
 }
 
 func flush() {
