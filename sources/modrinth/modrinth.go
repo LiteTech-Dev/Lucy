@@ -22,8 +22,8 @@ func GetNewestProjectVersion(slug syntaxtypes.PackageName) (newestVersion *apity
 	for _, version := range versions {
 		for _, gameVersion := range version.GameVersions {
 			if gameVersion == serverInfo.Executable.GameVersion &&
-				version.VersionType == "release" &&
-				(newestVersion == nil || version.DatePublished.After(newestVersion.DatePublished)) {
+			version.VersionType == "release" &&
+			(newestVersion == nil || version.DatePublished.After(newestVersion.DatePublished)) {
 				newestVersion = version
 			}
 		}
@@ -55,10 +55,10 @@ func GetProjectId(slug syntaxtypes.PackageName) (id string) {
 // TODO: Search() is way too long, refactor
 
 func Search(
-	platform syntaxtypes.Platform,
-	packageName syntaxtypes.PackageName,
-	showClientPackage bool,
-	indexBy string,
+platform syntaxtypes.Platform,
+packageName syntaxtypes.PackageName,
+showClientPackage bool,
+indexBy string,
 ) (result *apitypes.ModrinthSearchResults) {
 	// Construct the search url
 	const (

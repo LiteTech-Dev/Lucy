@@ -2,14 +2,17 @@ package cmd
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"github.com/urfave/cli/v3"
-	"golang.org/x/term"
+	"lucy/apitypes"
+	"lucy/lucytypes"
+	"lucy/output"
 	"lucy/sources/modrinth"
 	"lucy/syntax"
 	"lucy/syntaxtypes"
+	"lucy/tools"
 	"os"
+	"strconv"
 	"text/tabwriter"
 )
 
@@ -76,29 +79,40 @@ func actionSearch(_ context.Context, cmd *cli.Command) error {
 	)
 
 	if cmd.Bool("debug") {
-		jsonOutput, _ := json.MarshalIndent(res, "", "  ")
-		fmt.Println(string(jsonOutput))
+		tools.PrintAsJson(res)
 		return nil
 	}
-
-	var slugs []syntaxtypes.PackageName
-	for _, hit := range res.Hits {
-		slugs = append(slugs, syntaxtypes.PackageName(hit.Slug))
-	}
-	generateSearchOutput(slugs)
-
+	output.GenerateOutput(modrinthResToSearch(res))
 	return nil
 }
 
+func modrinthResToSearch(res *apitypes.ModrinthSearchResults) *lucytypes.OutputData {
+	hits := make([]string, len(res.Hits))
+	for i, hit := range res.Hits {
+		hits[i] = hit.Slug
+	}
+	return &lucytypes.OutputData{
+		Fields: []lucytypes.Field{
+			&output.FieldShortText{
+				Title: "#  ",
+				Text:  strconv.Itoa(res.TotalHits),
+			},
+			&output.FieldDynamicColumnLabels{
+				Title:  ">>>",
+				Labels: hits,
+			},
+		},
+	}
+}
+
 func generateSearchOutput(slugs []syntaxtypes.PackageName) {
-	termWidth, _, _ := term.GetSize(int(os.Stdout.Fd()))
 	maxSlugLen := 0
 	for i := 0; i < len(slugs); i += 1 {
 		if len(slugs[i]) > maxSlugLen {
 			maxSlugLen = len(slugs[i])
 		}
 	}
-	columns := termWidth / (maxSlugLen + 2)
+	columns := tools.TermWidth() / (maxSlugLen + 2)
 
 	writer := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
 	fmt.Printf("Found %d results from Modrinth\n", len(slugs))

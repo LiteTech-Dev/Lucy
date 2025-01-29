@@ -45,25 +45,25 @@ func actionInfo(ctx context.Context, cmd *cli.Command) error {
 	switch p.Platform {
 	case syntaxtypes.AllPlatform:
 		// TODO: Wide range search
-		proj, err := modrinth.GetProjectByName(p.Name)
+		modrinthProject, err := modrinth.GetProjectByName(p.Name)
 		if err != nil {
 			logger.CreateWarning(err)
 			break
 		}
 		multiSourceData = append(
 			multiSourceData,
-			modrinthProjectToInfo(proj),
+			modrinthProjectToInfo(modrinthProject),
 		)
 	case syntaxtypes.Fabric:
 		// TODO: Fabric specific search
-		proj, err := modrinth.GetProjectByName(p.Name)
+		modrinthProject, err := modrinth.GetProjectByName(p.Name)
 		if err != nil {
 			logger.CreateWarning(err)
 			break
 		}
 		multiSourceData = append(
 			multiSourceData,
-			modrinthProjectToInfo(proj),
+			modrinthProjectToInfo(modrinthProject),
 		)
 	case syntaxtypes.Forge:
 		// TODO: Forge

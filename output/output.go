@@ -79,9 +79,9 @@ func (f *FieldLabels) Output() {
 	}
 	width := 0
 	for i, label := range f.Labels {
-		fmt.Fprintf(keyValueWriter, "%s", label)
+		value(label)
 		if i != len(f.Labels)-1 {
-			fmt.Fprintf(keyValueWriter, ", ")
+			value(", ")
 		}
 		width += len(label) + 2
 		if width >= f.MaxWidth && i != len(f.Labels)-1 {
@@ -94,6 +94,40 @@ func (f *FieldLabels) Output() {
 	if width != 0 {
 		newLine()
 	}
+}
+
+type FieldDynamicColumnLabels struct {
+	Title  string
+	Labels []string
+}
+
+func (f *FieldDynamicColumnLabels) Output() {
+	flush()
+	key(f.Title)
+
+	maxLabelLen := 0
+	for _, label := range f.Labels {
+		if len(label) > maxLabelLen {
+			maxLabelLen = len(label)
+		}
+	}
+
+	columns := (tools.TermWidth() - 4) / (maxLabelLen + 2)
+	if columns == 0 {
+		columns = 1
+	}
+
+	for i, label := range f.Labels {
+		value(label)
+		if (i+1)%columns == 0 || i == len(f.Labels)-1 {
+			newLine()
+			tab()
+		} else {
+			tab()
+		}
+	}
+
+	flush()
 }
 
 // TODO: Refactor to FieldMultiShortTextWithAnnot
