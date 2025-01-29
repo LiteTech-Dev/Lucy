@@ -44,7 +44,7 @@ func getProjectVersions(slug syntaxtypes.PackageName) (versions []*apitypes.Modr
 }
 
 func GetProjectId(slug syntaxtypes.PackageName) (id string) {
-	res, _ := http.Get(ConstructProjectUrl(slug))
+	res, _ := http.Get(constructProjectUrl(slug))
 	modrinthProject := apitypes.ModrinthProject{}
 	data, _ := io.ReadAll(res.Body)
 	json.Unmarshal(data, &modrinthProject)
