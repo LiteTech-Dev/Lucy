@@ -130,44 +130,41 @@ func (f *FieldDynamicColumnLabels) Output() {
 	flush()
 }
 
-// TODO: Refactor to FieldMultiShortTextWithAnnot
-type FieldPeople struct {
+// FieldMultiShortTextWithAnnot accepts 2 arrays, Texts and Annots. len(Texts) determines
+// the length of the output. Any content in Annots after len(Texts) will be omitted.
+type FieldMultiShortTextWithAnnot struct {
 	Title  string
-	People []struct {
-		Name string
-		Link string
-	}
+	Texts  []string
+	Annots []string
 }
 
-func (f *FieldPeople) Output() {
-	if len(f.People) == 0 {
+func (f *FieldMultiShortTextWithAnnot) Output() {
+	if len(f.Texts) == 0 {
 		return
 	}
-	if len(f.People) == 1 {
+	if len(f.Texts) == 1 {
 		key(f.Title)
-		value(f.People[0].Name)
-		inlineAnnot(tools.Underline(f.People[0].Link))
+		value(f.Texts[0])
+		inlineAnnot(f.Annots[0])
 		newLine()
 		return
 	}
 
-	for i, person := range f.People {
+	for i, t := range f.Texts {
 		if i == 0 {
 			key(f.Title)
-			value(person.Name)
-			inlineAnnot(tools.Underline(f.People[i].Link))
+			value(t)
+			inlineAnnot(f.Annots[i])
 		} else {
 			tab()
-			value(person.Name)
-			inlineAnnot(tools.Underline(f.People[i].Link))
+			value(t)
+			inlineAnnot(f.Annots[i])
 		}
-		if i != len(f.People)-1 {
-			newLine()
-		}
+		newLine()
 	}
 }
 
-func GenerateOutput(data *lucytypes.OutputData) {
+func Flush(data *lucytypes.OutputData) {
 	for _, field := range data.Fields {
 		field.Output()
 	}

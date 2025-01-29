@@ -28,7 +28,7 @@ func actionStatus(_ context.Context, cmd *cli.Command) error {
 	if cmd.Bool("debug") {
 		tools.PrintAsJson(serverInfo)
 	} else {
-		output.GenerateOutput(serverInfoToStatus(&serverInfo))
+		output.Flush(serverInfoToStatus(&serverInfo))
 	}
 	return nil
 }

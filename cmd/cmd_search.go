@@ -82,7 +82,7 @@ func actionSearch(_ context.Context, cmd *cli.Command) error {
 		tools.PrintAsJson(res)
 		return nil
 	}
-	output.GenerateOutput(modrinthResToSearch(res))
+	output.Flush(modrinthResToSearch(res))
 	return nil
 }
 

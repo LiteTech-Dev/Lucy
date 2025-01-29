@@ -81,7 +81,7 @@ func actionInfo(ctx context.Context, cmd *cli.Command) error {
 	}
 
 	for _, data := range multiSourceData {
-		output.GenerateOutput(data)
+		output.Flush(data)
 	}
 
 	return nil
@@ -119,7 +119,13 @@ func modrinthProjectToInfo(source *apitypes.ModrinthProject) *lucytypes.OutputDa
 // TODO: Generate `lucy install` command
 
 func mcdrPluginInfoToInfo(source *apitypes.McdrPluginInfo) *lucytypes.OutputData {
-	return &lucytypes.OutputData{
+
+	// []struct {
+	// 	Texts  string
+	// 	Annots string
+	// }(source.Authors)
+
+	info := &lucytypes.OutputData{
 		Fields: []lucytypes.Field{
 			&output.FieldShortText{
 				Title: "Name",
@@ -129,12 +135,10 @@ func mcdrPluginInfoToInfo(source *apitypes.McdrPluginInfo) *lucytypes.OutputData
 				Title: "Introduction",
 				Text:  source.Introduction.EnUs,
 			},
-			&output.FieldPeople{
-				Title: "Authors",
-				People: []struct {
-					Name string
-					Link string
-				}(source.Authors),
+			&output.FieldMultiShortTextWithAnnot{
+				Title:  "Authors",
+				Texts:  []string{},
+				Annots: []string{},
 			},
 			&output.FieldShortText{
 				Title: "Source Code",
@@ -142,4 +146,15 @@ func mcdrPluginInfoToInfo(source *apitypes.McdrPluginInfo) *lucytypes.OutputData
 			},
 		},
 	}
+
+	// This is temporary TODO: Use iota for fields instead
+	const authorsField = 2
+	a := info.Fields[authorsField].(*output.FieldMultiShortTextWithAnnot)
+
+	for _, p := range source.Authors {
+		a.Texts = append(a.Texts, p.Name)
+		a.Annots = append(a.Annots, tools.Underline(p.Link))
+	}
+
+	return info
 }
