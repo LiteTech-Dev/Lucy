@@ -164,6 +164,28 @@ func (f *FieldMultiShortTextWithAnnot) Output() {
 	}
 }
 
+type FieldMultiShortText struct {
+	Title string
+	Texts []string
+}
+
+func (f *FieldMultiShortText) Output() {
+	if len(f.Texts) == 0 {
+		return
+	}
+
+	for i, t := range f.Texts {
+		if i == 0 {
+			key(f.Title)
+			value(t)
+		} else {
+			tab()
+			value(t)
+		}
+		newLine()
+	}
+}
+
 func Flush(data *lucytypes.OutputData) {
 	for _, field := range data.Fields {
 		field.Output()
