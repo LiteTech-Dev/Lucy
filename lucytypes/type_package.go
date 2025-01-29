@@ -2,11 +2,32 @@ package lucytypes
 
 import "lucy/syntaxtypes"
 
-// PackageInfo and syntaxtypes.Package's difference is that PackageInfo
-// only exists for packages already installed, while Package is an identifier
-// for all packages. Therefore, here we define it as a super set of Package.
+type SourceUrlType uint8
+
+const (
+	File SourceUrlType = iota
+	Homepage
+	SourceCode
+	Wiki
+)
+
+type PackageUrl struct {
+	Name string
+	Type SourceUrlType
+	Url  string
+}
+
+// PackageInfo is a package with all of its related information.
+//
+// All fields other than Id are optional.
+//
+// Most of the fields other than PackageInfo.Id should be obtained from an
+// external source. This includes a web API or the user's local filesystem.
 type PackageInfo struct {
-	Base              syntaxtypes.Package
+	Id                syntaxtypes.Package // Base package identifier
 	Path              string
+	Urls              []PackageUrl
+	Name              string
+	Description       string
 	SupportedVersions []syntaxtypes.PackageVersion
 }

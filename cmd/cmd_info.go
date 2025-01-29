@@ -119,12 +119,6 @@ func modrinthProjectToInfo(source *apitypes.ModrinthProject) *lucytypes.OutputDa
 // TODO: Generate `lucy install` command
 
 func mcdrPluginInfoToInfo(source *apitypes.McdrPluginInfo) *lucytypes.OutputData {
-
-	// []struct {
-	// 	Texts  string
-	// 	Annots string
-	// }(source.Authors)
-
 	info := &lucytypes.OutputData{
 		Fields: []lucytypes.Field{
 			&output.FieldShortText{

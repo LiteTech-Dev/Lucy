@@ -237,7 +237,7 @@ func analyzeModJar(file *os.File) *lucytypes.PackageInfo {
 				return nil
 			}
 			p := &lucytypes.PackageInfo{
-				Base: syntaxtypes.Package{
+				Id: syntaxtypes.Package{
 					Platform: syntaxtypes.Fabric,
 					Name:     syntaxtypes.PackageName(modInfo.Id),
 					Version:  syntaxtypes.PackageVersion(modInfo.Version),
