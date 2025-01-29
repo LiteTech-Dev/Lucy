@@ -13,6 +13,7 @@ import (
 	"lucy/syntax"
 	"lucy/syntaxtypes"
 	"lucy/tools"
+	"strconv"
 )
 
 var subcmdInfo = &cli.Command{
@@ -104,7 +105,7 @@ func modrinthProjectToInfo(source *apitypes.ModrinthProject) *lucytypes.OutputDa
 			},
 			&output.FieldShortText{
 				Title: "Downloads",
-				Text:  fmt.Sprintf("%d", source.Downloads),
+				Text:  strconv.Itoa(source.Downloads),
 			},
 			&output.FieldLabels{
 				Title:    "Versions",
@@ -126,7 +127,7 @@ func mcdrPluginInfoToInfo(source *apitypes.McdrPluginInfo) *lucytypes.OutputData
 				Text:  source.Id,
 			},
 			&output.FieldShortText{
-				Title: "Introduction",
+				Title: "Description",
 				Text:  source.Introduction.EnUs,
 			},
 			&output.FieldMultiShortTextWithAnnot{

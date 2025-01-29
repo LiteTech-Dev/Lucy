@@ -61,7 +61,7 @@ func serverInfoToStatus(data *lucytypes.ServerInfo) *lucytypes.OutputData {
 	}
 
 	status.Fields[statusFieldExecutablePath] = &output.FieldShortText{
-		Title: "Executable Path",
+		Title: "Executable",
 		Text:  data.Executable.Path,
 	}
 
@@ -80,28 +80,36 @@ func serverInfoToStatus(data *lucytypes.ServerInfo) *lucytypes.OutputData {
 			),
 		}
 	} else {
-		status.Fields[statusFieldActivity] = output.FieldNil
+		status.Fields[statusFieldActivity] = &output.FieldShortText{
+			Title: "Activity",
+			Text:  tools.Dim("Unknown"),
+		}
 	}
 
+	// Modding related fields only shown when modding platform detected
 	if data.Executable.Platform != syntaxtypes.Minecraft {
 		mods := make([]string, 0, len(data.Mods))
+		modPaths := make([]string, 0, len(mods))
 		if len(data.Mods) == 0 {
-			mods = append(mods, "None")
+			mods = append(mods, tools.Dim("(None)"))
 		}
 		for _, mod := range data.Mods {
-			mods = append(mods, string(mod.Base.Name))
+			mods = append(mods, string(mod.Id.Name))
+			modPaths = append(modPaths, mod.Path)
 		}
 
 		status.Fields[statusFieldModdingPlatform] = &output.FieldShortText{
-			Title: "Modding Platform",
+			Title: "Platform",
 			Text:  data.Executable.Platform.String(),
 		}
-		status.Fields[statusFieldMods] = &output.FieldLabels{
-			Title:  "Mods",
-			Labels: mods,
+		status.Fields[statusFieldMods] = &output.FieldMultiShortTextWithAnnot{
+			Title:  "Mod List",
+			Texts:  mods,
+			Annots: modPaths,
 		}
 	} else {
 		status.Fields[statusFieldModdingPlatform] = output.FieldNil
+		status.Fields[statusFieldMods] = output.FieldNil
 	}
 
 	return status
