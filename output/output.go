@@ -192,6 +192,32 @@ func (f *FieldMultiShortText) Output() {
 	}
 }
 
+// FieldCheckBox defaults to a red cross and green check when TrueText and
+// FalseText is not specified.
+type FieldCheckBox struct {
+	Title     string
+	Boolean   bool
+	TrueText  string
+	FalseText string
+}
+
+func (f *FieldCheckBox) Output() {
+	key(f.Title)
+
+	if f.TrueText == "" {
+		f.TrueText = tools.Green("\u2713") // Check
+	}
+	if f.FalseText == "" {
+		f.FalseText = tools.Red("\u2717") // X
+	}
+
+	if f.Boolean {
+		value(f.TrueText)
+	} else {
+		value(f.FalseText)
+	}
+}
+
 func Flush(data *lucytypes.OutputData) {
 	for _, field := range data.Fields {
 		field.Output()
