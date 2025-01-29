@@ -96,6 +96,7 @@ func (f *FieldLabels) Output() {
 	}
 }
 
+// TODO: Refactor to FieldMultiShortTextWithAnnot
 type FieldPeople struct {
 	Title  string
 	People []struct {

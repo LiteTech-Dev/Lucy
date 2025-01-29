@@ -87,6 +87,10 @@ func actionInfo(ctx context.Context, cmd *cli.Command) error {
 	return nil
 }
 
+// TODO: Link to newest version
+// TODO: Link to latest compatible version
+// TODO: Generate `lucy install` command
+
 func modrinthProjectToInfo(source *apitypes.ModrinthProject) *lucytypes.OutputData {
 	return &lucytypes.OutputData{
 		Fields: []lucytypes.Field{
@@ -110,6 +114,9 @@ func modrinthProjectToInfo(source *apitypes.ModrinthProject) *lucytypes.OutputDa
 		},
 	}
 }
+
+// TODO: Link to newest version
+// TODO: Generate `lucy install` command
 
 func mcdrPluginInfoToInfo(source *apitypes.McdrPluginInfo) *lucytypes.OutputData {
 	return &lucytypes.OutputData{
