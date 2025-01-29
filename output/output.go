@@ -1,10 +1,13 @@
+// Package output is a key-value based commandline output framework. It uses multiple
+// different types of field to generate output.
+//
+// Note the field will not show if its content is empty
 package output
 
 import (
-	"fmt"
-	"golang.org/x/term"
 	"lucy/lucytypes"
 	"lucy/tools"
+	"strings"
 )
 
 func SourceInfo(source string) {
@@ -12,14 +15,24 @@ func SourceInfo(source string) {
 	newLine()
 }
 
-// Separator prints a separator line. A length of 0 will print a line of current
-// terminal width
-func Separator(length int) {
-	if length == 0 {
-		length, _, _ = term.GetSize(0)
+// Separator prints a separator line. A length of 0 will print a line of 66%
+// terminal width.
+//
+// Separator also adjusts itself so it does not exceed the terminal width.
+//
+// Use dim to control whether the separator is dimmed.
+func Separator(len int, dim bool) {
+	if len == 0 {
+		len = tools.TermWidth() * 2 / 3
+	} else if len > tools.TermWidth() {
+		len = tools.TermWidth()
 	}
-	for i := 0; i < length; i++ {
-		fmt.Fprintf(keyValueWriter, "-")
+
+	sep := strings.Repeat("-", len)
+	if dim {
+		annot(sep)
+	} else {
+		value(sep)
 	}
 	newLine()
 }
@@ -66,12 +79,6 @@ func (f *FieldLabels) Output() {
 	if len(f.Labels) == 0 {
 		return
 	}
-	if len(f.Labels) == 1 {
-		key(f.Title)
-		value(f.Labels[0])
-		newLine()
-		return
-	}
 
 	key(f.Title)
 	if f.MaxWidth == 0 {
@@ -102,6 +109,12 @@ type FieldDynamicColumnLabels struct {
 }
 
 func (f *FieldDynamicColumnLabels) Output() {
+	if len(f.Labels) == 0 {
+		return
+	}
+
+	// This field should have a unique indent size so it's predictable. Therefore
+	// we call flush() before output.
 	flush()
 	key(f.Title)
 
@@ -121,13 +134,14 @@ func (f *FieldDynamicColumnLabels) Output() {
 		value(label)
 		if (i+1)%columns == 0 || i == len(f.Labels)-1 {
 			newLine()
-			tab()
-		} else {
-			tab()
 		}
+		tab()
 	}
 
+	// As we mentioned, we refresh the indent while finished to quarantine the
+	// indent space.
 	flush()
+	// Maybe using an unique tab writer is better? TODO: Investigate this method
 }
 
 // FieldMultiShortTextWithAnnot accepts 2 arrays, Texts and Annots. len(Texts) determines
@@ -142,22 +156,15 @@ func (f *FieldMultiShortTextWithAnnot) Output() {
 	if len(f.Texts) == 0 {
 		return
 	}
-	if len(f.Texts) == 1 {
-		key(f.Title)
-		value(f.Texts[0])
-		inlineAnnot(f.Annots[0])
-		newLine()
-		return
-	}
 
 	for i, t := range f.Texts {
 		if i == 0 {
 			key(f.Title)
-			value(t)
-			inlineAnnot(f.Annots[i])
 		} else {
 			tab()
-			value(t)
+		}
+		value(t)
+		if i < len(f.Annots) {
 			inlineAnnot(f.Annots[i])
 		}
 		newLine()
@@ -177,11 +184,10 @@ func (f *FieldMultiShortText) Output() {
 	for i, t := range f.Texts {
 		if i == 0 {
 			key(f.Title)
-			value(t)
 		} else {
 			tab()
-			value(t)
 		}
+		value(t)
 		newLine()
 	}
 }

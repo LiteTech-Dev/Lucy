@@ -7,7 +7,16 @@ import (
 	"text/tabwriter"
 )
 
-var keyValueWriter = tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
+const debugOutput = false
+
+var keyValueWriter = tabwriter.NewWriter(
+	os.Stdout,
+	0,
+	0,
+	2,
+	' ',
+	tools.Ternary(debugOutput, tabwriter.Debug, 0),
+)
 
 func key(title string) {
 	fmt.Fprintf(keyValueWriter, "%s\t", tools.Bold(tools.Mangeta(title)))
