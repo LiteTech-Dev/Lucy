@@ -13,6 +13,7 @@ import (
 	"lucy/tools"
 	"os"
 	"path"
+	"sort"
 	"sync"
 )
 
@@ -205,6 +206,10 @@ var getModList = tools.Memoize(
 				mods = append(mods, mod)
 			}
 		}
+		sort.Slice(
+			mods,
+			func(i, j int) bool { return mods[i].Id.Name < mods[j].Id.Name },
+		)
 		return mods
 	},
 )
