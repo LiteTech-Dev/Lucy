@@ -74,13 +74,13 @@ type Package struct {
 
 func (p *Package) String() string {
 	return fmt.Sprintln(
-		tools.TernaryFunc(
-			func() bool { return p.Platform == AllPlatform },
+		tools.Ternary(
+			p.Platform == AllPlatform,
 			"", string(p.Platform)+"/",
 		),
 		string(p.Name),
-		tools.TernaryFunc(
-			func() bool { return p.Version == LatestVersion || p.Version == AllVersion || p.Version == NoVersion },
+		tools.Ternary(
+			p.Version == LatestVersion || p.Version == AllVersion || p.Version == NoVersion,
 			"", "@"+string(p.Version),
 		),
 	)
