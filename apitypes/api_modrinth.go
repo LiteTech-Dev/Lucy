@@ -4,6 +4,14 @@ package apitypes
 
 import "time"
 
+// ModrinthProject is a struct that represents a Modrinth project, the basic
+// form of any item on Modrinth.
+//
+// API Example:
+//   - https://api.modrinth.com/v2/project/P7dR8mSH
+//     (Fabric API)
+//   - https://api.modrinth.com/v2/project/1IjD5062
+//     (Continuity)
 type ModrinthProject struct {
 	ClientSide       string      `json:"client_side"`
 	ServerSide       string      `json:"server_side"`
@@ -22,7 +30,7 @@ type ModrinthProject struct {
 	Approved         time.Time   `json:"approved"`
 	Queued           interface{} `json:"queued"`
 	Status           string      `json:"status"`
-	RequestedStatus  string      `json:"requested_status"`
+	RequestedStatus  interface{} `json:"requested_status"`
 	ModeratorMessage interface{} `json:"moderator_message"`
 	License          struct {
 		Id   string      `json:"id"`
@@ -40,11 +48,15 @@ type ModrinthProject struct {
 	SourceUrl            string        `json:"source_url"`
 	WikiUrl              string        `json:"wiki_url"`
 	DiscordUrl           string        `json:"discord_url"`
-	DonationUrls         []interface{} `json:"donation_urls"`
-	Gallery              []interface{} `json:"gallery"`
-	Color                int           `json:"color"`
-	ThreadId             string        `json:"thread_id"`
-	MonetizationStatus   string        `json:"monetization_status"`
+	DonationUrls         []struct {
+		Id       string `json:"id"`
+		Platform string `json:"platform"`
+		Url      string `json:"url"`
+	} `json:"donation_urls"`
+	Gallery            []interface{} `json:"gallery"`
+	Color              int           `json:"color"`
+	ThreadId           string        `json:"thread_id"`
+	MonetizationStatus string        `json:"monetization_status"`
 }
 
 type ModrinthSearchResults struct {

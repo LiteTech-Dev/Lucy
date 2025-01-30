@@ -7,6 +7,8 @@ package syntaxtypes
 
 import (
 	"fmt"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 	"lucy/tools"
 	"strings"
 )
@@ -66,6 +68,20 @@ var Platforms = []Platform{
 // exist on a remote API or user's local files.
 type PackageName string
 
+// Replace underlines or hyphens with spaces, then capitalize the first letter of
+// each word.
+func (p PackageName) String() string {
+	return cases.Title(language.English).String(
+		strings.ReplaceAll(
+			strings.ReplaceAll(
+				string(p),
+				"-",
+				" ",
+			), "_", " ",
+		),
+	)
+}
+
 type Package struct {
 	Platform Platform
 	Name     PackageName
@@ -89,6 +105,19 @@ func (p *Package) String() string {
 // PackageVersion is the version of a package. Here we expect mods and plugins
 // use semver (which they should). A known exception is Minecraft snapshots.
 type PackageVersion string
+
+func (p PackageVersion) String() string {
+	if p == AllVersion {
+		return "Any"
+	}
+	if p == NoVersion {
+		return "None"
+	}
+	if p == LatestVersion {
+		return "Latest"
+	}
+	return string(p)
+}
 
 var AllVersion PackageVersion = "all"
 var NoVersion PackageVersion = "none"

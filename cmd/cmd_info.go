@@ -13,6 +13,7 @@ import (
 	"lucy/syntax"
 	"lucy/syntaxtypes"
 	"lucy/tools"
+	"slices"
 	"strconv"
 )
 
@@ -152,4 +153,48 @@ func mcdrPluginInfoToInfo(source *apitypes.McdrPluginInfo) *lucytypes.OutputData
 	}
 
 	return info
+}
+
+func packageInfoToInfoOutput(info lucytypes.PackageInfo) *lucytypes.OutputData {
+	o := &lucytypes.OutputData{
+		Fields: []lucytypes.Field{
+			&output.FieldShortText{
+				Title: "Name",
+				Text:  info.Name,
+			},
+			&output.FieldShortText{
+				Title: "Description",
+				Text:  info.Description,
+			},
+			// 	TODO: Authors
+			// TODO: Downloads
+
+		},
+	}
+
+	for _, url := range info.Urls {
+		o.Fields = append(
+			o.Fields, &output.FieldShortText{
+				Title: url.Name,
+				Text:  tools.Underline(url.Url),
+			},
+		)
+	}
+
+	if !slices.Contains(
+		info.SupportedPlatforms,
+		syntaxtypes.Mcdr,
+	) && (info.SupportedVersions != nil || len(info.SupportedVersions) != 0) {
+		f := &output.FieldLabels{
+			Title:    "Game Versions",
+			Labels:   []string{},
+			MaxWidth: 0,
+		}
+		for _, version := range info.SupportedVersions {
+			f.Labels = append(f.Labels, version.String())
+		}
+		o.Fields = append(o.Fields, f)
+	}
+
+	return o
 }

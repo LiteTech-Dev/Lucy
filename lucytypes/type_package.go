@@ -2,18 +2,34 @@ package lucytypes
 
 import "lucy/syntaxtypes"
 
-type SourceUrlType uint8
+type PackageUrlType uint8
 
 const (
-	File SourceUrlType = iota
-	Homepage
-	SourceCode
-	Wiki
+	FileUrl PackageUrlType = iota
+	HomepageUrl
+	SourceUrl
+	WikiUrl
+	OthersUrl
 )
+
+func (p PackageUrlType) String() string {
+	switch p {
+	case FileUrl:
+		return "File"
+	case HomepageUrl:
+		return "Homepage"
+	case SourceUrl:
+		return "Source"
+	case WikiUrl:
+		return "Wiki"
+	default:
+		return "Unknown"
+	}
+}
 
 type PackageUrl struct {
 	Name string
-	Type SourceUrlType
+	Type PackageUrlType
 	Url  string
 }
 

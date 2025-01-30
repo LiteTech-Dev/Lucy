@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"io"
 	"lucy/apitypes"
+	"lucy/lucytypes"
 	"lucy/probe"
 	"lucy/syntaxtypes"
 	"net/http"
@@ -22,8 +23,8 @@ func GetNewestProjectVersion(slug syntaxtypes.PackageName) (newestVersion *apity
 	for _, version := range versions {
 		for _, gameVersion := range version.GameVersions {
 			if gameVersion == serverInfo.Executable.GameVersion &&
-			version.VersionType == "release" &&
-			(newestVersion == nil || version.DatePublished.After(newestVersion.DatePublished)) {
+				version.VersionType == "release" &&
+				(newestVersion == nil || version.DatePublished.After(newestVersion.DatePublished)) {
 				newestVersion = version
 			}
 		}
@@ -55,10 +56,10 @@ func GetProjectId(slug syntaxtypes.PackageName) (id string) {
 // TODO: Search() is way too long, refactor
 
 func Search(
-platform syntaxtypes.Platform,
-packageName syntaxtypes.PackageName,
-showClientPackage bool,
-indexBy string,
+	platform syntaxtypes.Platform,
+	packageName syntaxtypes.PackageName,
+	showClientPackage bool,
+	indexBy string,
 ) (result *apitypes.ModrinthSearchResults) {
 	// Construct the search url
 	const (
@@ -110,4 +111,82 @@ indexBy string,
 	resp.Body.Close()
 
 	return
+}
+
+func modrinthProjectToPackageInfo(s *apitypes.ModrinthProject) *lucytypes.PackageInfo {
+	name := syntaxtypes.PackageName(s.Slug)
+	serverInfo := probe.GetServerInfo()
+
+	info := &lucytypes.PackageInfo{
+		Id: syntaxtypes.Package{
+			// Edit in later code
+			Platform: "",
+			Name:     name,
+			Version:  "",
+		},
+		Installed:          false,                    // Edit in later code
+		Path:               "",                       // Edit in later code
+		Urls:               []lucytypes.PackageUrl{}, // Edit in later code
+		Name:               s.Title,
+		Description:        s.Description,
+		SupportedVersions:  []syntaxtypes.PackageVersion{}, // Edit in later code
+		SupportedPlatforms: []syntaxtypes.Platform{},       // Edit in later code
+	}
+
+	// See if the mod is installed locally
+	for _, mod := range serverInfo.Mods {
+		if mod.Id.Name == name {
+			info.Path = mod.Path
+			info.Installed = true
+			info.Id = mod.Id
+		}
+	}
+
+	// Fill in supported versions and platforms
+	for _, version := range s.GameVersions {
+		info.SupportedVersions = append(
+			info.SupportedVersions,
+			syntaxtypes.PackageVersion(version),
+		)
+	}
+
+	for _, platform := range s.Loaders {
+		if syntaxtypes.Platform(platform).Valid() {
+			info.SupportedPlatforms = append(
+				info.SupportedPlatforms,
+				syntaxtypes.Platform(platform),
+			)
+		}
+	}
+
+	// Fill in URLs
+	if s.WikiUrl != "" {
+		info.Urls = append(
+			info.Urls, lucytypes.PackageUrl{
+				Name: lucytypes.WikiUrl.String(),
+				Type: lucytypes.WikiUrl,
+				Url:  s.WikiUrl,
+			},
+		)
+	}
+	if s.SourceUrl != "" {
+		info.Urls = append(
+			info.Urls, lucytypes.PackageUrl{
+				Name: lucytypes.HomepageUrl.String(),
+				Type: lucytypes.SourceUrl,
+				Url:  s.SourceUrl,
+			},
+		)
+	}
+	for _, url := range s.DonationUrls {
+		info.Urls = append(
+			info.Urls, lucytypes.PackageUrl{
+				Name: "Donation",
+				Type: lucytypes.OthersUrl,
+				Url:  url.Url,
+			},
+		)
+	}
+
+	return info
 }
