@@ -142,7 +142,7 @@ var getServerModPath = tools.Memoize(
 	func() string {
 		exec := getExecutableInfo()
 		if exec.Platform == syntaxtypes.Fabric || exec.Platform == syntaxtypes.Forge {
-			return "mods"
+			return path.Join(getServerWorkPath(), "mods")
 		}
 		return ""
 	},
