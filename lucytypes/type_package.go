@@ -24,10 +24,16 @@ type PackageUrl struct {
 // Most of the fields other than PackageInfo.Id should be obtained from an
 // external source. This includes a web API or the user's local filesystem.
 type PackageInfo struct {
-	Id                syntaxtypes.Package // Base package identifier
-	Path              string
-	Urls              []PackageUrl
-	Name              string
-	Description       string
-	SupportedVersions []syntaxtypes.PackageVersion
+	Id                 syntaxtypes.Package // Base package identifier
+	Path               string
+	Installed          bool
+	Urls               []PackageUrl
+	Name               string
+	Description        string
+	SupportedVersions  []syntaxtypes.PackageVersion
+	SupportedPlatforms []syntaxtypes.Platform
+}
+
+func (p *PackageInfo) String() string {
+	return p.Name
 }
