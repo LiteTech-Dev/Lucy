@@ -1,3 +1,10 @@
+// Package apitypes stores types of APIs and files.
+//
+// This package should not exist and should be deprecated in the future. We should
+// use the unified data structures if possible (rather than raw api/file read data
+// structure).
+//
+// I am planning to move all the declarations to either package sources or probe.
 package apitypes
 
 // TODO: Rename this package to 'datatypes'

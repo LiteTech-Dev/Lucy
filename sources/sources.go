@@ -90,3 +90,13 @@ func testDownloadSpeed(url string) (elapsedTime float64) {
 	elapsedTime = time.Since(startTime).Seconds()
 	return elapsedTime
 }
+
+// TODO: More param should be added here to implement search options However,
+//  we don't have a unified search option data structure yet. It should be designed
+//  first.
+
+// Maybe conversion functions are not a bad idea. Maybe I will refactor them into
+// methods when structs from apitypes are moved to their local packages.
+// Maybe conversion functions are not a bad idea (and its widely applied over
+// the project). Maybe I will refactor them into methods when structs from
+// apitypes are moved to their local packages.
