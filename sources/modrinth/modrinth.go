@@ -5,11 +5,12 @@ import (
 	"html/template"
 	"io"
 	"lucy/apitypes"
+	"lucy/logger"
 	"lucy/lucytypes"
 	"lucy/probe"
 	"lucy/syntaxtypes"
 	"net/http"
-	url2 "net/url"
+	"net/url"
 	"strings"
 )
 
@@ -23,8 +24,8 @@ func GetNewestProjectVersion(slug syntaxtypes.PackageName) (newestVersion *apity
 	for _, version := range versions {
 		for _, gameVersion := range version.GameVersions {
 			if gameVersion == serverInfo.Executable.GameVersion &&
-				version.VersionType == "release" &&
-				(newestVersion == nil || version.DatePublished.After(newestVersion.DatePublished)) {
+			version.VersionType == "release" &&
+			(newestVersion == nil || version.DatePublished.After(newestVersion.DatePublished)) {
 				newestVersion = version
 			}
 		}
@@ -55,60 +56,55 @@ func GetProjectId(slug syntaxtypes.PackageName) (id string) {
 
 // TODO: Search() is way too long, refactor
 
+const searchUrlTemplate = `https://api.modrinth.com/v2/search?query={{.packageName}}&limit=100&index={{.indexBy}}&facets={{.facets}}`
+
 func Search(
-	platform syntaxtypes.Platform,
-	packageName syntaxtypes.PackageName,
-	showClientPackage bool,
-	indexBy string,
+platform syntaxtypes.Platform,
+packageName syntaxtypes.PackageName,
+showClientPackage bool,
+indexBy string, // indexBy can be: relevance (default), downloads, follows, newest, updated
 ) (result *apitypes.ModrinthSearchResults) {
 	// Construct the search url
-	const (
-		facetsCategoryAll    = `["categories:'forge'","categories:'fabric'","categories:'quilt'","categories:'liteloader'","categories:'modloader'","categories:'rift'","categories:'neoforge'"]`
-		facetsCategoryForge  = `["categories:'forge'"]`
-		facetsCategoryFabric = `["categories:'fabric'"]`
-		facetsServerOnly     = `["server_side:optional","server_side:required"],["client_side:optional","client_side:required","client_side:unsupported"]`
-		facetsShowClient     = `["server_side:optional","server_side:required","server_side:unsupported"],["client_side:optional","client_side:required","client_side:unsupported"]`
-		facetsTypeMod        = `["project_type:'mod'"]`
-		urlTemplate          = `https://api.modrinth.com/v2/search?query={{.packageName}}&limit=100&index={{.indexBy}}&facets={{.facetsEncoded}}`
-	)
-	var facetsArray []string
+	var facets []*facet
 	switch platform {
-	case syntaxtypes.AllPlatform:
-		facetsArray = append(facetsArray, facetsCategoryAll)
 	case syntaxtypes.Forge:
-		facetsArray = append(facetsArray, facetsCategoryForge)
+		facets = append(facets, facetForge)
 	case syntaxtypes.Fabric:
-		facetsArray = append(facetsArray, facetsCategoryFabric)
+		facets = append(facets, facetFabric)
 	}
-	if !showClientPackage {
-		facetsArray = append(facetsArray, facetsServerOnly)
-	} else {
-		facetsArray = append(facetsArray, facetsShowClient)
-	}
-	facetsArray = append(facetsArray, facetsTypeMod)
-	facetsEncoded := url2.QueryEscape(
-		"[" + strings.Join(
-			facetsArray,
-			",",
-		) + "]",
-	)
 
-	templateUrl, _ := template.New("template_url").Parse(urlTemplate)
+	if showClientPackage {
+		facets = append(facets, facetBothSupported)
+	} else {
+		facets = append(facets, facetServerSupported)
+	}
+
+	templateUrl, _ := template.New("template_url").Parse(searchUrlTemplate)
 	urlBuilder := strings.Builder{}
 	_ = templateUrl.Execute(
 		&urlBuilder,
-		map[string]string{
-			"packageName":   string(packageName),
-			"indexBy":       indexBy,
-			"facetsEncoded": facetsEncoded,
+		map[string]any{
+			"packageName": string(packageName),
+			"indexBy":     indexBy,
+			"facets":      url.QueryEscape(StringifyFacets(facets...)),
 		},
 	)
+	searchUrl := urlBuilder.String()
 
 	// Make the call to Modrinth API
-	resp, _ := http.Get(urlBuilder.String())
-	body, _ := io.ReadAll(resp.Body)
-	json.Unmarshal(body, &result)
-	resp.Body.Close()
+	println("calling", searchUrl)
+	res, err := http.Get(searchUrl)
+	if err != nil {
+		logger.CreateFatal(err)
+	}
+	data, err := io.ReadAll(res.Body)
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			logger.CreateWarning(err)
+		}
+	}(res.Body)
+	err = json.Unmarshal(data, &result)
 
 	return
 }
@@ -178,12 +174,12 @@ func modrinthProjectToPackageInfo(s *apitypes.ModrinthProject) *lucytypes.Packag
 			},
 		)
 	}
-	for _, url := range s.DonationUrls {
+	for _, donationUrl := range s.DonationUrls {
 		info.Urls = append(
 			info.Urls, lucytypes.PackageUrl{
 				Name: "Donation",
 				Type: lucytypes.OthersUrl,
-				Url:  url.Url,
+				Url:  donationUrl.Url,
 			},
 		)
 	}
