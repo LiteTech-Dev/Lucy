@@ -47,12 +47,12 @@ var (
 	EPlatform = errors.New("invalid platform")
 )
 
-// Parse is exported to parse a string into a Package struct. This function
+// Parse is exported to parse a string into a PackageId struct. This function
 // should only be used on user inputs. Therefore, It does NOT return an
 // error but instead invokes a panic if the syntax is invalid.
-func Parse(s string) (p *syntaxtypes.Package) {
+func Parse(s string) (p *syntaxtypes.PackageId) {
 	s = sanitize(s)
-	p = &syntaxtypes.Package{}
+	p = &syntaxtypes.PackageId{}
 	var err error
 	p.Platform, p.Name, p.Version, err = parseOperatorAt(s)
 	if err != nil {

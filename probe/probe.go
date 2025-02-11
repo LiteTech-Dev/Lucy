@@ -197,7 +197,7 @@ var checkHasLucy = tools.Memoize(
 )
 
 var getModList = tools.Memoize(
-	func() (mods []*lucytypes.PackageInfo) {
+	func() (mods []*lucytypes.Package) {
 		path := getServerModPath()
 		jars := findJar(path)
 		for _, jar := range jars {
@@ -219,7 +219,7 @@ const fabricModIdentifierFile = "fabric.mod.json"
 // const forgeModIdentifierFile =
 // TODO: forgeModIdentifierFile
 
-func analyzeModJar(file *os.File) *lucytypes.PackageInfo {
+func analyzeModJar(file *os.File) *lucytypes.Package {
 	stat, err := file.Stat()
 	if err != nil {
 		return nil
@@ -241,14 +241,16 @@ func analyzeModJar(file *os.File) *lucytypes.PackageInfo {
 			if err != nil {
 				return nil
 			}
-			p := &lucytypes.PackageInfo{
-				Id: syntaxtypes.Package{
+			p := &lucytypes.Package{
+				Id: syntaxtypes.PackageId{
 					Platform: syntaxtypes.Fabric,
 					Name:     syntaxtypes.PackageName(modInfo.Id),
 					Version:  syntaxtypes.PackageVersion(modInfo.Version),
 				},
-				Path:              file.Name(),
-				SupportedVersions: nil, // TODO: This is not yet implemented, because the deps field is an expression, we need to parse it
+				Path:      file.Name(),
+				Installed: true,
+				Info:      nil, // Don't need this for now
+				Deps:      nil, // TODO: This is not yet implemented, because the deps field is an expression, we need to parse it
 			}
 			return p
 		}

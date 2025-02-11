@@ -11,7 +11,7 @@ type ServerInfo struct {
 	WorkPath    string
 	SavePath    string
 	ModPath     string
-	Mods        []*PackageInfo
+	Mods        []*Package
 	HasLucy     bool
 	Mcdr        *Mcdr
 	Executable  *ExecutableInfo
@@ -34,5 +34,5 @@ type Activity struct {
 
 type Mcdr struct {
 	PluginPaths []string
-	PluginList  []*PackageInfo // TODO: Implement probe func
+	PluginList  []*Package // TODO: Implement probe func
 }

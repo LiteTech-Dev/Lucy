@@ -24,8 +24,8 @@ func GetNewestProjectVersion(slug syntaxtypes.PackageName) (newestVersion *apity
 	for _, version := range versions {
 		for _, gameVersion := range version.GameVersions {
 			if gameVersion == serverInfo.Executable.GameVersion &&
-				version.VersionType == "release" &&
-				(newestVersion == nil || version.DatePublished.After(newestVersion.DatePublished)) {
+			version.VersionType == "release" &&
+			(newestVersion == nil || version.DatePublished.After(newestVersion.DatePublished)) {
 				newestVersion = version
 			}
 		}
@@ -59,10 +59,10 @@ func GetProjectId(slug syntaxtypes.PackageName) (id string) {
 const searchUrlTemplate = `https://api.modrinth.com/v2/search?query={{.packageName}}&limit=100&index={{.indexBy}}&facets={{.facets}}`
 
 func Search(
-	platform syntaxtypes.Platform,
-	packageName syntaxtypes.PackageName,
-	showClientPackage bool,
-	indexBy string, // indexBy can be: relevance (default), downloads, follows, newest, updated
+platform syntaxtypes.Platform,
+packageName syntaxtypes.PackageName,
+showClientPackage bool,
+indexBy string, // indexBy can be: relevance (default), downloads, follows, newest, updated
 ) (result *apitypes.ModrinthSearchResults) {
 	// Construct the search url
 	var facets []*facet
@@ -109,74 +109,64 @@ func Search(
 	return
 }
 
-func modrinthProjectToPackageInfo(s *apitypes.ModrinthProject) *lucytypes.PackageInfo {
+func PackageFromModrinth(s *apitypes.ModrinthProject) *lucytypes.Package {
 	name := syntaxtypes.PackageName(s.Slug)
 	serverInfo := probe.GetServerInfo()
 
-	info := &lucytypes.PackageInfo{
-		Id: syntaxtypes.Package{
-			// Edit in later code
-			Platform: "",
-			Name:     name,
-			Version:  "",
-		},
-		Installed:          false,                    // Edit in later code
-		Path:               "",                       // Edit in later code
-		Urls:               []lucytypes.PackageUrl{}, // Edit in later code
-		Name:               s.Title,
-		Description:        s.Description,
-		SupportedVersions:  []syntaxtypes.PackageVersion{}, // Edit in later code
-		SupportedPlatforms: []syntaxtypes.Platform{},       // Edit in later code
-	}
+	p := &lucytypes.Package{}
 
 	// See if the mod is installed locally
 	for _, mod := range serverInfo.Mods {
 		if mod.Id.Name == name {
-			info.Path = mod.Path
-			info.Installed = true
-			info.Id = mod.Id
+			p.Path = mod.Path
+			p.Installed = true
+			p.Id = mod.Id
 		}
 	}
 
+	p.Deps = &lucytypes.PackageDependencies{}
+
 	// Fill in supported versions and platforms
 	for _, version := range s.GameVersions {
-		info.SupportedVersions = append(
-			info.SupportedVersions,
+		p.Deps.SupportedVersions = append(
+			p.Deps.SupportedVersions,
 			syntaxtypes.PackageVersion(version),
 		)
 	}
 
 	for _, platform := range s.Loaders {
-		if syntaxtypes.Platform(platform).Valid() {
-			info.SupportedPlatforms = append(
-				info.SupportedPlatforms,
-				syntaxtypes.Platform(platform),
-			)
+		pf := syntaxtypes.Platform(platform)
+		if pf.Valid() {
+			p.Deps.SupportedPlatforms = append(p.Deps.SupportedPlatforms, pf)
 		}
 	}
 
+	p.Info = &lucytypes.PackageInformation{}
+
 	// Fill in URLs
 	if s.WikiUrl != "" {
-		info.Urls = append(
-			info.Urls, lucytypes.PackageUrl{
+		p.Info.Urls = append(
+			p.Info.Urls, lucytypes.PackageUrl{
 				Name: lucytypes.WikiUrl.String(),
 				Type: lucytypes.WikiUrl,
 				Url:  s.WikiUrl,
 			},
 		)
 	}
+
 	if s.SourceUrl != "" {
-		info.Urls = append(
-			info.Urls, lucytypes.PackageUrl{
+		p.Info.Urls = append(
+			p.Info.Urls, lucytypes.PackageUrl{
 				Name: lucytypes.HomepageUrl.String(),
 				Type: lucytypes.SourceUrl,
 				Url:  s.SourceUrl,
 			},
 		)
 	}
+
 	for _, donationUrl := range s.DonationUrls {
-		info.Urls = append(
-			info.Urls, lucytypes.PackageUrl{
+		p.Info.Urls = append(
+			p.Info.Urls, lucytypes.PackageUrl{
 				Name: "Donation",
 				Type: lucytypes.OthersUrl,
 				Url:  donationUrl.Url,
@@ -184,5 +174,11 @@ func modrinthProjectToPackageInfo(s *apitypes.ModrinthProject) *lucytypes.Packag
 		)
 	}
 
-	return info
+	// Fill in the rest of the info
+	p.Info.Brief = s.Description
+	p.Info.Description = s.Body // s.Body is markdown, so it needs further processing
+	p.Info.License = s.License.Name
+	// p.Info.Author TODO: Author info
+
+	return p
 }

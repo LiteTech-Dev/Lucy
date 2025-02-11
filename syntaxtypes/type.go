@@ -3,6 +3,8 @@
 // syntax parsing functions. As types are more fundamental, and were used in more
 // packages, they are placed in this independent package. This package should not
 // import any other packages in lucy.
+//
+// THIS PACKAGE SHOULD NOT EXIST TODO: refactor to combine with lucytypes
 package syntaxtypes
 
 import (
@@ -82,13 +84,13 @@ func (p PackageName) String() string {
 	)
 }
 
-type Package struct {
+type PackageId struct {
 	Platform Platform
 	Name     PackageName
 	Version  PackageVersion
 }
 
-func (p *Package) String() string {
+func (p *PackageId) String() string {
 	return fmt.Sprintln(
 		tools.Ternary(
 			p.Platform == AllPlatform,

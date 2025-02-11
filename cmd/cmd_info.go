@@ -155,16 +155,16 @@ func mcdrPluginInfoToInfo(source *apitypes.McdrPluginInfo) *lucytypes.OutputData
 	return info
 }
 
-func packageInfoToInfoOutput(info lucytypes.PackageInfo) *lucytypes.OutputData {
+func cInfoOutput(p lucytypes.Package) *lucytypes.OutputData {
 	o := &lucytypes.OutputData{
 		Fields: []lucytypes.Field{
 			&output.FieldShortText{
 				Title: "Name",
-				Text:  info.Name,
+				Text:  p.Info.Name,
 			},
 			&output.FieldShortText{
 				Title: "Description",
-				Text:  info.Description,
+				Text:  p.Info.Description,
 			},
 			// 	TODO: Authors
 			// TODO: Downloads
@@ -172,7 +172,7 @@ func packageInfoToInfoOutput(info lucytypes.PackageInfo) *lucytypes.OutputData {
 		},
 	}
 
-	for _, url := range info.Urls {
+	for _, url := range p.Info.Urls {
 		o.Fields = append(
 			o.Fields, &output.FieldShortText{
 				Title: url.Name,
@@ -182,15 +182,15 @@ func packageInfoToInfoOutput(info lucytypes.PackageInfo) *lucytypes.OutputData {
 	}
 
 	if !slices.Contains(
-		info.SupportedPlatforms,
+		p.Deps.SupportedPlatforms,
 		syntaxtypes.Mcdr,
-	) && (info.SupportedVersions != nil || len(info.SupportedVersions) != 0) {
+	) && (p.Deps.SupportedPlatforms != nil || len(p.Deps.SupportedPlatforms) != 0) {
 		f := &output.FieldLabels{
 			Title:    "Game Versions",
 			Labels:   []string{},
 			MaxWidth: 0,
 		}
-		for _, version := range info.SupportedVersions {
+		for _, version := range p.Deps.SupportedPlatforms {
 			f.Labels = append(f.Labels, version.String())
 		}
 		o.Fields = append(o.Fields, f)

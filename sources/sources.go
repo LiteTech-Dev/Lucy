@@ -99,11 +99,11 @@ func testDownloadSpeed(url string) (elapsedTime float64) {
 // the project). I may refactor them into methods when structs from apitypes are
 // moved to their local packages.
 
-func modrinthSearchToPackageInfo(res *apitypes.ModrinthSearchResults) []lucytypes.PackageInfo {
-	packages := make([]lucytypes.PackageInfo, len(res.Hits))
+func CInfoFromModrinth(res *apitypes.ModrinthSearchResults) []lucytypes.Package {
+	packages := make([]lucytypes.Package, len(res.Hits))
 	for _, hit := range res.Hits {
-		info := lucytypes.PackageInfo{
-			Id: syntaxtypes.Package{
+		info := lucytypes.Package{
+			Id: syntaxtypes.PackageId{
 				Platform: syntaxtypes.AllPlatform, // Add some algorithm to determine the platform
 				Name:     syntaxtypes.PackageName(hit.Slug),
 				Version:  "",
@@ -128,7 +128,7 @@ func modrinthSearchToPackageInfo(res *apitypes.ModrinthSearchResults) []lucytype
 func Search(
 source Source,
 keyword syntaxtypes.PackageName,
-) []lucytypes.PackageInfo {
+) []lucytypes.Package {
 	switch source {
 	case Modrinth:
 		res := modrinth.Search(
@@ -137,7 +137,7 @@ keyword syntaxtypes.PackageName,
 			false,
 			"relevance",
 		)
-		return modrinthSearchToPackageInfo(res)
+		return CInfoFromModrinth(res)
 	case CurseForge:
 		// TODO: curseforge search
 		logger.CreateError(fmt.Errorf("curseforge not yet supported"))

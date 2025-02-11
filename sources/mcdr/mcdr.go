@@ -6,11 +6,11 @@ import (
 	"lucy/syntaxtypes"
 )
 
-func mcdrPluginInfoToPackageInfo(s *apitypes.McdrPluginInfo) *lucytypes.PackageInfo {
+func mcdrPluginInfoToPackageInfo(s *apitypes.McdrPluginInfo) *lucytypes.Package {
 	name := syntaxtypes.PackageName(s.Id)
 
-	info := &lucytypes.PackageInfo{
-		Id: syntaxtypes.Package{
+	info := &lucytypes.Package{
+		Id: syntaxtypes.PackageId{
 			Platform: syntaxtypes.Mcdr,
 			Name:     name,
 			Version:  syntaxtypes.LatestVersion,

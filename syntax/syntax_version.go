@@ -46,7 +46,7 @@ func GetVersionManifest() (manifest *apitypes.VersionManifest, err error) {
 // ComparePackageVersions gives -1 when v1 is older than v2, 0 when they are
 // the same (or an error occurred), and 1 when v1 is newer than v2. 0 is returned
 // when either v1 or v2 is AllVersion
-func ComparePackageVersions(p1, p2 *syntaxtypes.Package) (c int8, err error) {
+func ComparePackageVersions(p1, p2 *syntaxtypes.PackageId) (c int8, err error) {
 	v1, v2 := p1.Version, p2.Version
 
 	if v1 == syntaxtypes.AllVersion || v2 == syntaxtypes.AllVersion {
