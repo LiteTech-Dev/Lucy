@@ -26,6 +26,12 @@ var getMcdrConfig = tools.Memoize(
 		}
 
 		configData, err := io.ReadAll(configFile)
+		defer func(configFile io.ReadCloser) {
+			err := configFile.Close()
+			if err != nil {
+				logger.CreateWarning(err)
+			}
+		}(configFile)
 		if err != nil {
 			logger.CreateWarning(err)
 		}

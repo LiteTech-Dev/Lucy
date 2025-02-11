@@ -24,8 +24,8 @@ func GetNewestProjectVersion(slug syntaxtypes.PackageName) (newestVersion *apity
 	for _, version := range versions {
 		for _, gameVersion := range version.GameVersions {
 			if gameVersion == serverInfo.Executable.GameVersion &&
-			version.VersionType == "release" &&
-			(newestVersion == nil || version.DatePublished.After(newestVersion.DatePublished)) {
+				version.VersionType == "release" &&
+				(newestVersion == nil || version.DatePublished.After(newestVersion.DatePublished)) {
 				newestVersion = version
 			}
 		}
@@ -59,10 +59,10 @@ func GetProjectId(slug syntaxtypes.PackageName) (id string) {
 const searchUrlTemplate = `https://api.modrinth.com/v2/search?query={{.packageName}}&limit=100&index={{.indexBy}}&facets={{.facets}}`
 
 func Search(
-platform syntaxtypes.Platform,
-packageName syntaxtypes.PackageName,
-showClientPackage bool,
-indexBy string, // indexBy can be: relevance (default), downloads, follows, newest, updated
+	platform syntaxtypes.Platform,
+	packageName syntaxtypes.PackageName,
+	showClientPackage bool,
+	indexBy string, // indexBy can be: relevance (default), downloads, follows, newest, updated
 ) (result *apitypes.ModrinthSearchResults) {
 	// Construct the search url
 	var facets []*facet

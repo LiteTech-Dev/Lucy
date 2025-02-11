@@ -1,6 +1,9 @@
 package tools
 
-import "sync"
+import (
+	"io"
+	"sync"
+)
 
 // TernaryFunc gives a if expr == true, b if expr == false. For a simple
 // bool expression, use Ternary instead.
@@ -42,4 +45,13 @@ func Insert[T any](slice []T, pos int, value ...T) []T {
 		return slice
 	}
 	return append(slice[:pos], append(value, slice[pos:]...)...)
+}
+
+// CloseReader closes a reader and warns if an error occurs. Call this with a
+// defer statement.
+func CloseReader(reader io.ReadCloser, failAction func(error)) {
+	err := reader.Close()
+	if err != nil {
+		failAction(err)
+	}
 }

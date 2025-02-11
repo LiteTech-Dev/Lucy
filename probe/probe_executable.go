@@ -128,6 +128,7 @@ func analyzeVanilla(versionJson *zip.File) (exec *lucytypes.ExecutableInfo) {
 	exec = &lucytypes.ExecutableInfo{}
 	exec.Platform = syntaxtypes.Minecraft
 	reader, _ := versionJson.Open()
+	defer tools.CloseReader(reader, logger.CreateWarning)
 	data, _ := io.ReadAll(reader)
 	obj := VersionDotJson{}
 	_ = json.Unmarshal(data, &obj)
@@ -143,6 +144,7 @@ func analyzeFabricSingle(installProperties *zip.File) (exec *lucytypes.Executabl
 	exec = &lucytypes.ExecutableInfo{}
 	exec.Platform = syntaxtypes.Fabric
 	r, _ := installProperties.Open()
+	defer tools.CloseReader(r, logger.CreateWarning)
 	data, _ := io.ReadAll(r)
 	s := string(data)
 
@@ -169,11 +171,12 @@ func analyzeFabricSingle(installProperties *zip.File) (exec *lucytypes.Executabl
 // Note that line breaks are "\r\n " and the last line ends with "\r\n"
 
 func analyzeFabricLauncher(
-	manifest *zip.File,
+manifest *zip.File,
 ) (exec *lucytypes.ExecutableInfo) {
 	exec = &lucytypes.ExecutableInfo{}
 	exec.Platform = syntaxtypes.Fabric
 	r, _ := manifest.Open()
+	defer tools.CloseReader(r, logger.CreateWarning)
 	data, _ := io.ReadAll(r)
 	s := string(data)
 	s = strings.Split(s, "Class-Path: ")[1] // Start reading from Class-Path
