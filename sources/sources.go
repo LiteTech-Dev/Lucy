@@ -3,6 +3,10 @@ package sources
 import (
 	"fmt"
 	"io"
+	"lucy/apitypes"
+	"lucy/logger"
+	"lucy/lucytypes"
+	"lucy/sources/modrinth"
 	"lucy/syntaxtypes"
 	"net/http"
 	"sync"
@@ -43,7 +47,7 @@ const slow float64 = 0x7FF0000000000000 // inf
 // Cons:
 //   - Speed test might not be representative
 func SelectSource(platform syntaxtypes.Platform) Source {
-	min := slow
+	slowest := slow
 	fastestSource := None
 	wg := sync.WaitGroup{}
 	for _, source := range AvailableSources[platform] {
@@ -51,7 +55,7 @@ func SelectSource(platform syntaxtypes.Platform) Source {
 		go func() {
 			defer wg.Done()
 			speed := testDownloadSpeed(SpeedTestUrls[source])
-			if speed < min {
+			if speed < slowest {
 				fastestSource = source
 			}
 			fmt.Printf("Speed for %s: %f\n", source, speed)
@@ -91,12 +95,54 @@ func testDownloadSpeed(url string) (elapsedTime float64) {
 	return elapsedTime
 }
 
+// Maybe conversion functions are not a bad idea (and they are widely applied over
+// the project). I may refactor them into methods when structs from apitypes are
+// moved to their local packages.
+
+func modrinthSearchToPackageInfo(res *apitypes.ModrinthSearchResults) []lucytypes.PackageInfo {
+	packages := make([]lucytypes.PackageInfo, len(res.Hits))
+	for _, hit := range res.Hits {
+		info := lucytypes.PackageInfo{
+			Id: syntaxtypes.Package{
+				Platform: syntaxtypes.AllPlatform, // Add some algorithm to determine the platform
+				Name:     syntaxtypes.PackageName(hit.Slug),
+				Version:  "",
+			},
+			Path:               "",    // don't need
+			Installed:          false, // don't need
+			Urls:               nil,   // don't need
+			Name:               "",    // don't need
+			Description:        "",    // don't need
+			SupportedVersions:  nil,
+			SupportedPlatforms: nil,
+		}
+		packages = append(packages, info)
+	}
+	return packages
+}
+
 // TODO: More param should be added here to implement search options However,
 //  we don't have a unified search option data structure yet. It should be designed
 //  first.
 
-// Maybe conversion functions are not a bad idea. Maybe I will refactor them into
-// methods when structs from apitypes are moved to their local packages.
-// Maybe conversion functions are not a bad idea (and its widely applied over
-// the project). Maybe I will refactor them into methods when structs from
-// apitypes are moved to their local packages.
+func Search(
+source Source,
+keyword syntaxtypes.PackageName,
+) []lucytypes.PackageInfo {
+	switch source {
+	case Modrinth:
+		res := modrinth.Search(
+			syntaxtypes.AllPlatform,
+			keyword,
+			false,
+			"relevance",
+		)
+		return modrinthSearchToPackageInfo(res)
+	case CurseForge:
+		// TODO: curseforge search
+		logger.CreateError(fmt.Errorf("curseforge not yet supported"))
+	case GitHub:
+		logger.CreateError(fmt.Errorf("github search not yet supported"))
+	}
+	return nil
+}
