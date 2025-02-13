@@ -159,11 +159,11 @@ func cInfoOutput(p lucytypes.Package) *lucytypes.OutputData {
 		Fields: []lucytypes.Field{
 			&output.FieldShortText{
 				Title: "Name",
-				Text:  p.Info.Name,
+				Text:  p.Information.Name,
 			},
 			&output.FieldShortText{
 				Title: "Description",
-				Text:  p.Info.Description,
+				Text:  p.Information.Description,
 			},
 			// 	TODO: Authors
 			// TODO: Downloads
@@ -171,7 +171,7 @@ func cInfoOutput(p lucytypes.Package) *lucytypes.OutputData {
 		},
 	}
 
-	for _, url := range p.Info.Urls {
+	for _, url := range p.Information.Urls {
 		o.Fields = append(
 			o.Fields, &output.FieldShortText{
 				Title: url.Name,
@@ -180,14 +180,14 @@ func cInfoOutput(p lucytypes.Package) *lucytypes.OutputData {
 		)
 	}
 
-	if !slices.Contains(p.Deps.SupportedPlatforms, lucytypes.Mcdr) &&
-	(p.Deps.SupportedPlatforms != nil || len(p.Deps.SupportedPlatforms) != 0) {
+	if !slices.Contains(p.Dependencies.SupportedPlatforms, lucytypes.Mcdr) &&
+	(p.Dependencies.SupportedPlatforms != nil || len(p.Dependencies.SupportedPlatforms) != 0) {
 		f := &output.FieldLabels{
 			Title:    "Game Versions",
 			Labels:   []string{},
 			MaxWidth: 0,
 		}
-		for _, version := range p.Deps.SupportedPlatforms {
+		for _, version := range p.Dependencies.SupportedPlatforms {
 			f.Labels = append(f.Labels, version.String())
 		}
 		o.Fields = append(o.Fields, f)

@@ -109,26 +109,13 @@ func Search(
 }
 
 func PackageFromModrinth(s *apitypes.ModrinthProject) *lucytypes.Package {
-	name := lucytypes.PackageName(s.Slug)
-	serverInfo := probe.GetServerInfo()
-
 	p := &lucytypes.Package{}
-
-	// See if the mod is installed locally
-	for _, mod := range serverInfo.Mods {
-		if mod.Id.Name == name {
-			p.Path = mod.Path
-			p.Installed = true
-			p.Id = mod.Id
-		}
-	}
-
-	p.Deps = &lucytypes.PackageDependencies{}
+	p.Dependencies = &lucytypes.PackageDependencies{}
 
 	// Fill in supported versions and platforms
 	for _, version := range s.GameVersions {
-		p.Deps.SupportedVersions = append(
-			p.Deps.SupportedVersions,
+		p.Dependencies.SupportedVersions = append(
+			p.Dependencies.SupportedVersions,
 			lucytypes.PackageVersion(version),
 		)
 	}
@@ -136,19 +123,19 @@ func PackageFromModrinth(s *apitypes.ModrinthProject) *lucytypes.Package {
 	for _, platform := range s.Loaders {
 		pf := lucytypes.Platform(platform)
 		if pf.Valid() {
-			p.Deps.SupportedPlatforms = append(
-				p.Deps.SupportedPlatforms,
+			p.Dependencies.SupportedPlatforms = append(
+				p.Dependencies.SupportedPlatforms,
 				pf,
 			)
 		}
 	}
 
-	p.Info = &lucytypes.PackageInformation{}
+	p.Information = &lucytypes.PackageInformation{}
 
 	// Fill in URLs
 	if s.WikiUrl != "" {
-		p.Info.Urls = append(
-			p.Info.Urls, lucytypes.PackageUrl{
+		p.Information.Urls = append(
+			p.Information.Urls, lucytypes.PackageUrl{
 				Name: lucytypes.WikiUrl.String(),
 				Type: lucytypes.WikiUrl,
 				Url:  s.WikiUrl,
@@ -157,8 +144,8 @@ func PackageFromModrinth(s *apitypes.ModrinthProject) *lucytypes.Package {
 	}
 
 	if s.SourceUrl != "" {
-		p.Info.Urls = append(
-			p.Info.Urls, lucytypes.PackageUrl{
+		p.Information.Urls = append(
+			p.Information.Urls, lucytypes.PackageUrl{
 				Name: lucytypes.HomepageUrl.String(),
 				Type: lucytypes.SourceUrl,
 				Url:  s.SourceUrl,
@@ -167,8 +154,8 @@ func PackageFromModrinth(s *apitypes.ModrinthProject) *lucytypes.Package {
 	}
 
 	for _, donationUrl := range s.DonationUrls {
-		p.Info.Urls = append(
-			p.Info.Urls, lucytypes.PackageUrl{
+		p.Information.Urls = append(
+			p.Information.Urls, lucytypes.PackageUrl{
 				Name: "Donation",
 				Type: lucytypes.OthersUrl,
 				Url:  donationUrl.Url,
@@ -177,10 +164,10 @@ func PackageFromModrinth(s *apitypes.ModrinthProject) *lucytypes.Package {
 	}
 
 	// Fill in the rest of the info
-	p.Info.Brief = s.Description
-	p.Info.Description = s.Body // s.Body is markdown, so it needs further processing
-	p.Info.License = s.License.Name
-	// p.Info.Author TODO: Author info
+	p.Information.Brief = s.Description
+	p.Information.Description = s.Body // s.Body is markdown, so it needs further processing
+	p.Information.License = s.License.Name
+	// p.Information.Author TODO: Author info
 
 	return p
 }

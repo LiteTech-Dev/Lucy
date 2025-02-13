@@ -35,22 +35,17 @@ type PackageUrl struct {
 
 // Package is a package with all of its related information.
 //
-// Most of the fields other than Package.Id should be obtained from an
-// external source. This includes a web API or the user's local filesystem.
-//
-// Here we use a combination design to extend information about a package. This is
-// done by adding optional attributions to the struct.
-//
-// In principle, any exported function that provides a Package as return value
-// should give the caller an option, or implicit option (such as the function
-// naming), to specify which extra attributions are provided
+// Sources (web APIs and the user's local filesystem) gives different
+// information, and
 type Package struct {
-	Id        PackageId // Base package identifier
-	Path      string
-	Installed bool
+	// Id is the basic package identifier
+	Id PackageId
 
-	Info *PackageInformation  // Optional
-	Deps *PackageDependencies // Optional
+	// Optional attributions
+	Information  *PackageInformation
+	Dependencies *PackageDependencies
+	Local        *PackageInstallation
+	Remote       *PackageRemote
 }
 
 // PackageDependencies is one of the optional attributions that can be added to
@@ -65,16 +60,29 @@ type PackageDependencies struct {
 // PackageInformation is a struct that contains informational data about the
 // package. It is typically used in `lucy info`.
 type PackageInformation struct {
-	Urls   []PackageUrl
-	Author []struct {
+	Name        string
+	Brief       string
+	Description string
+	Author      []struct {
 		Name  string
 		Url   string
 		Email string
 	}
+	Urls    []PackageUrl
 	License string
+}
 
-	// The difference between Name and PackageId.Name is that Name is
-	Name        string
-	Brief       string
-	Description string
+// PackageInstallation is an optional attribution to lucytypes.Package. It is
+// used for packages that are known to be installed in the local filesystem.
+type PackageInstallation struct {
+	Path string
+}
+
+// PackageRemote is an optional attribution to lucytypes.Package. It is used for
+// packages that are known to be bound with a remote source.
+type PackageRemote struct {
+	Source           Source
+	RemoteId         string
+	FileUrl          string
+	LatestVersionUrl string
 }

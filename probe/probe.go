@@ -246,10 +246,10 @@ func analyzeModJar(file *os.File) *lucytypes.Package {
 					Name:     lucytypes.PackageName(modInfo.Id),
 					Version:  lucytypes.PackageVersion(modInfo.Version),
 				},
-				Path:      file.Name(),
-				Installed: true,
-				Info:      nil, // Don't need this for now
-				Deps:      nil, // TODO: This is not yet implemented, because the deps field is an expression, we need to parse it
+				Local: &lucytypes.PackageInstallation{
+					Path: file.Name(),
+				}, Information: nil, // Don't need this for now
+				Dependencies: nil, // TODO: This is not yet implemented, because the deps field is an expression, we need to parse it
 			}
 			return p
 		}

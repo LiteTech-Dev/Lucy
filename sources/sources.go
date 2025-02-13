@@ -3,10 +3,7 @@ package sources
 import (
 	"fmt"
 	"io"
-	"lucy/apitypes"
-	"lucy/logger"
 	"lucy/lucytypes"
-	"lucy/sources/modrinth"
 	"net/http"
 	"sync"
 	"time"
@@ -15,9 +12,9 @@ import (
 type Source string
 
 var AvailableSources = map[lucytypes.Platform][]lucytypes.Source{
-	lucytypes.Fabric:           {lucytypes.CurseForge, lucytypes.Modrinth},
-	lucytypes.Forge:            {lucytypes.CurseForge, lucytypes.Modrinth},
-	lucytypes.McdrInstallation: {lucytypes.McdrSite},
+	lucytypes.Fabric: {lucytypes.CurseForge, lucytypes.Modrinth},
+	lucytypes.Forge:  {lucytypes.CurseForge, lucytypes.Modrinth},
+	lucytypes.Mcdr:   {lucytypes.McdrSite},
 }
 
 var SpeedTestUrls = map[lucytypes.Source]string{
@@ -49,7 +46,7 @@ func SelectSource(platform lucytypes.Platform) lucytypes.Source {
 			if speed < slowest {
 				fastestSource = source
 			}
-			fmt.Printf("Speed for %s: %f\n", source.String(), speed)
+			fmt.Printf("Speed for %s: %f\n", source, speed)
 		}()
 	}
 
@@ -84,56 +81,4 @@ func testDownloadSpeed(url string) (elapsedTime float64) {
 
 	elapsedTime = time.Since(startTime).Seconds()
 	return elapsedTime
-}
-
-// Maybe conversion functions are not a bad idea (and they are widely applied over
-// the project). I may refactor them into methods when structs from apitypes are
-// moved to their local packages.
-
-func CInfoFromModrinth(res *apitypes.ModrinthSearchResults) []lucytypes.Package {
-	packages := make([]lucytypes.Package, len(res.Hits))
-	for _, hit := range res.Hits {
-		info := lucytypes.Package{
-			Id: syntaxtypes.PackageId{
-				Platform: syntaxtypes.AllPlatform, // Add some algorithm to determine the platform
-				Name:     syntaxtypes.PackageName(hit.Slug),
-				Version:  "",
-			},
-			Path:               "",    // don't need
-			Installed:          false, // don't need
-			Urls:               nil,   // don't need
-			Name:               "",    // don't need
-			Description:        "",    // don't need
-			SupportedVersions:  nil,
-			SupportedPlatforms: nil,
-		}
-		packages = append(packages, info)
-	}
-	return packages
-}
-
-// TODO: More param should be added here to implement search options However,
-//  we don't have a unified search option data structure yet. It should be designed
-//  first.
-
-func Search(
-	source Source,
-	keyword syntaxtypes.PackageName,
-) []lucytypes.Package {
-	switch source {
-	case Modrinth:
-		res := modrinth.Search(
-			syntaxtypes.AllPlatform,
-			keyword,
-			false,
-			"relevance",
-		)
-		return CInfoFromModrinth(res)
-	case CurseForge:
-		// TODO: curseforge search
-		logger.CreateError(fmt.Errorf("curseforge not yet supported"))
-	case GitHub:
-		logger.CreateError(fmt.Errorf("github search not yet supported"))
-	}
-	return nil
 }
