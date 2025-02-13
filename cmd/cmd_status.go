@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/urfave/cli/v3"
+	"lucy/local"
 	"lucy/lucytypes"
 	"lucy/output"
-	"lucy/probe"
 	"lucy/tools"
 )
 
@@ -23,7 +23,7 @@ var subcmdStatus = &cli.Command{
 }
 
 func actionStatus(_ context.Context, cmd *cli.Command) error {
-	serverInfo := probe.GetServerInfo()
+	serverInfo := local.GetServerInfo()
 	if cmd.Bool("debug") {
 		tools.PrintAsJson(serverInfo)
 	} else {

@@ -1,6 +1,6 @@
 //go:build !windows && !unix && !linux && !darwin
 
-package probe
+package local
 
 import "lucy/lucytypes"
 

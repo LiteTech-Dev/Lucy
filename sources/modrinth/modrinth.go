@@ -5,9 +5,9 @@ import (
 	"html/template"
 	"io"
 	"lucy/apitypes"
+	"lucy/local"
 	"lucy/logger"
 	"lucy/lucytypes"
-	"lucy/probe"
 	"net/http"
 	"net/url"
 	"strings"
@@ -19,7 +19,7 @@ import (
 func GetNewestProjectVersion(slug lucytypes.PackageName) (newestVersion *apitypes.ModrinthProjectVersion) {
 	newestVersion = nil
 	versions := getProjectVersions(slug)
-	serverInfo := probe.GetServerInfo()
+	serverInfo := local.GetServerInfo()
 	for _, version := range versions {
 		for _, gameVersion := range version.GameVersions {
 			if gameVersion == serverInfo.Executable.GameVersion &&

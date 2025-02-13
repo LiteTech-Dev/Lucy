@@ -4,10 +4,10 @@ import (
 	"context"
 	"errors"
 	"github.com/urfave/cli/v3"
+	"lucy/local"
 	"lucy/logger"
 	"lucy/lucyerrors"
 	"lucy/lucytypes"
-	"lucy/probe"
 	"lucy/sources/modrinth"
 	"lucy/syntax"
 	"lucy/util"
@@ -41,7 +41,7 @@ func actionAdd(_ context.Context, cmd *cli.Command) error {
 	// TODO: Error handling
 
 	p := syntax.Parse(cmd.Args().First())
-	serverInfo := probe.GetServerInfo()
+	serverInfo := local.GetServerInfo()
 
 	if !serverInfo.HasLucy {
 		return errors.New("lucy is not installed, run `lucy init` before downloading mods")

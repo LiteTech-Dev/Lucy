@@ -1,4 +1,4 @@
-package probe
+package local
 
 import "time"
 

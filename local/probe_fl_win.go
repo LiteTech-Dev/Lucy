@@ -1,7 +1,7 @@
 //go:build windows
 // +build windows
 
-package probe
+package local
 
 import (
 	"golang.org/x/sys/windows"

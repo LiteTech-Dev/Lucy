@@ -181,7 +181,7 @@ func cInfoOutput(p lucytypes.Package) *lucytypes.OutputData {
 	}
 
 	if !slices.Contains(p.Dependencies.SupportedPlatforms, lucytypes.Mcdr) &&
-	(p.Dependencies.SupportedPlatforms != nil || len(p.Dependencies.SupportedPlatforms) != 0) {
+		(p.Dependencies.SupportedPlatforms != nil || len(p.Dependencies.SupportedPlatforms) != 0) {
 		f := &output.FieldLabels{
 			Title:    "Game Versions",
 			Labels:   []string{},
