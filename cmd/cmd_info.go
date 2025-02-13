@@ -7,9 +7,9 @@ import (
 	"lucy/apitypes"
 	"lucy/logger"
 	"lucy/lucytypes"
-	"lucy/mcdr"
 	"lucy/output"
-	"lucy/sources/modrinth"
+	"lucy/remote/mcdr"
+	"lucy/remote/modrinth"
 	"lucy/syntax"
 	"lucy/tools"
 	"slices"
@@ -181,7 +181,7 @@ func cInfoOutput(p lucytypes.Package) *lucytypes.OutputData {
 	}
 
 	if !slices.Contains(p.Dependencies.SupportedPlatforms, lucytypes.Mcdr) &&
-		(p.Dependencies.SupportedPlatforms != nil || len(p.Dependencies.SupportedPlatforms) != 0) {
+	(p.Dependencies.SupportedPlatforms != nil || len(p.Dependencies.SupportedPlatforms) != 0) {
 		f := &output.FieldLabels{
 			Title:    "Game Versions",
 			Labels:   []string{},

@@ -1,8 +1,14 @@
 package mcdr
 
 import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"github.com/google/go-github/v50/github"
 	"lucy/apitypes"
 	"lucy/lucytypes"
+	"lucy/syntax"
+	"path"
 )
 
 func mcdrPluginInfoToPackageInfo(s *apitypes.McdrPluginInfo) *lucytypes.Package {
@@ -10,18 +16,60 @@ func mcdrPluginInfoToPackageInfo(s *apitypes.McdrPluginInfo) *lucytypes.Package 
 
 	info := &lucytypes.Package{
 		Id: lucytypes.PackageId{
-			Platform: lucytypes.McdrInstallation,
+			Platform: lucytypes.Mcdr,
 			Name:     name,
 			Version:  lucytypes.LatestVersion,
 		},
-		Path:               "",    // Wait for plugin list detection
-		Installed:          false, // Wait for plugin list detection
-		Urls:               []lucytypes.PackageUrl{},
-		Name:               name.String(),
-		Description:        s.Introduction.EnUs,
-		SupportedVersions:  []lucytypes.PackageVersion{lucytypes.AllVersion},
-		SupportedPlatforms: []lucytypes.Platform{lucytypes.McdrInstallation},
 	}
 
 	return info
+}
+
+func SearchMcdrPluginCatalogue(search lucytypes.PackageName) (
+	pluginInfo *apitypes.McdrPluginInfo,
+	err error,
+) {
+	plugins := getMcdrPluginCatalogue()
+
+	for _, plugin := range plugins {
+		p := syntax.Parse(*plugin.Name)
+		if p.Name == search {
+			return getMcdrPluginInfo(*plugin.Path), nil
+		}
+	}
+
+	return nil, fmt.Errorf("plugin not found")
+}
+
+func getMcdrPluginCatalogue() []*github.RepositoryContent {
+	ctx := context.Background()
+	client := github.NewClient(nil)
+
+	_, directoryContent, _, _ := client.Repositories.GetContents(
+		ctx,
+		"MCDReforged",
+		"PluginCatalogue",
+		"plugins",
+		nil,
+	)
+
+	return directoryContent
+}
+
+func getMcdrPluginInfo(pluginPath string) (pluginInfo *apitypes.McdrPluginInfo) {
+	ctx := context.Background()
+	client := github.NewClient(nil)
+
+	fileContent, _, _, _ := client.Repositories.GetContents(
+		ctx,
+		"MCDReforged",
+		"PluginCatalogue",
+		path.Join(pluginPath, "plugin_info.json"),
+		nil,
+	)
+	pluginInfo = &apitypes.McdrPluginInfo{}
+	content, _ := fileContent.GetContent()
+	_ = json.Unmarshal([]byte(content), pluginInfo)
+
+	return
 }
