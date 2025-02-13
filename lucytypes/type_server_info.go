@@ -1,7 +1,6 @@
 package lucytypes
 
 import (
-	"lucy/syntaxtypes"
 	"os/exec"
 )
 
@@ -13,7 +12,7 @@ type ServerInfo struct {
 	ModPath     string
 	Mods        []*Package
 	HasLucy     bool
-	Mcdr        *Mcdr
+	Mcdr        *McdrInstallation
 	Executable  *ExecutableInfo
 	BootCommand *exec.Cmd
 	Activity    *Activity
@@ -22,7 +21,7 @@ type ServerInfo struct {
 type ExecutableInfo struct {
 	Path          string
 	GameVersion   string
-	Platform      syntaxtypes.Platform
+	Platform      Platform
 	LoaderVersion string
 	BootCommand   *exec.Cmd
 }
@@ -32,7 +31,7 @@ type Activity struct {
 	Pid    int
 }
 
-type Mcdr struct {
+type McdrInstallation struct {
 	PluginPaths []string
 	PluginList  []*Package // TODO: Implement probe func
 }

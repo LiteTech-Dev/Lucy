@@ -6,12 +6,12 @@ import (
 	"fmt"
 	"github.com/google/go-github/v50/github"
 	"lucy/apitypes"
+	"lucy/lucytypes"
 	"lucy/syntax"
-	"lucy/syntaxtypes"
 	"path"
 )
 
-func SearchMcdrPluginCatalogue(search syntaxtypes.PackageName) (
+func SearchMcdrPluginCatalogue(search lucytypes.PackageName) (
 	pluginInfo *apitypes.McdrPluginInfo,
 	err error,
 ) {

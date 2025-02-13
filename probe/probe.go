@@ -9,7 +9,6 @@ import (
 	"lucy/apitypes"
 	"lucy/logger"
 	"lucy/lucytypes"
-	"lucy/syntaxtypes"
 	"lucy/tools"
 	"os"
 	"path"
@@ -44,7 +43,7 @@ func buildServerInfo() lucytypes.ServerInfo {
 		mcdrConfig := getMcdrConfig()
 		if mcdrConfig != nil {
 			mu.Lock()
-			serverInfo.Mcdr = &lucytypes.Mcdr{
+			serverInfo.Mcdr = &lucytypes.McdrInstallation{
 				PluginPaths: mcdrConfig.PluginDirectories,
 			}
 			mu.Unlock()
@@ -142,7 +141,7 @@ func buildServerInfo() lucytypes.ServerInfo {
 var getServerModPath = tools.Memoize(
 	func() string {
 		exec := getExecutableInfo()
-		if exec.Platform == syntaxtypes.Fabric || exec.Platform == syntaxtypes.Forge {
+		if exec.Platform == lucytypes.Fabric || exec.Platform == lucytypes.Forge {
 			return path.Join(getServerWorkPath(), "mods")
 		}
 		return ""
@@ -242,10 +241,10 @@ func analyzeModJar(file *os.File) *lucytypes.Package {
 				return nil
 			}
 			p := &lucytypes.Package{
-				Id: syntaxtypes.PackageId{
-					Platform: syntaxtypes.Fabric,
-					Name:     syntaxtypes.PackageName(modInfo.Id),
-					Version:  syntaxtypes.PackageVersion(modInfo.Version),
+				Id: lucytypes.PackageId{
+					Platform: lucytypes.Fabric,
+					Name:     lucytypes.PackageName(modInfo.Id),
+					Version:  lucytypes.PackageVersion(modInfo.Version),
 				},
 				Path:      file.Name(),
 				Installed: true,

@@ -9,7 +9,6 @@ import (
 	"lucy/output"
 	"lucy/sources/modrinth"
 	"lucy/syntax"
-	"lucy/syntaxtypes"
 	"lucy/tools"
 	"os"
 	"strconv"
@@ -105,7 +104,7 @@ func modrinthResToSearch(res *apitypes.ModrinthSearchResults) *lucytypes.OutputD
 	}
 }
 
-func generateSearchOutput(slugs []syntaxtypes.PackageName) {
+func generateSearchOutput(slugs []lucytypes.PackageName) {
 	maxSlugLen := 0
 	for i := 0; i < len(slugs); i += 1 {
 		if len(slugs[i]) > maxSlugLen {

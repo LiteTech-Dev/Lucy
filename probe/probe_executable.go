@@ -9,7 +9,6 @@ import (
 	"lucy/logger"
 	"lucy/lucytypes"
 	"lucy/output"
-	"lucy/syntaxtypes"
 	"lucy/tools"
 	"os"
 	"path"
@@ -126,7 +125,7 @@ func analyzeExecutable(file *os.File) (exec *lucytypes.ExecutableInfo) {
 
 func analyzeVanilla(versionJson *zip.File) (exec *lucytypes.ExecutableInfo) {
 	exec = &lucytypes.ExecutableInfo{}
-	exec.Platform = syntaxtypes.Minecraft
+	exec.Platform = lucytypes.Minecraft
 	reader, _ := versionJson.Open()
 	defer tools.CloseReader(reader, logger.CreateWarning)
 	data, _ := io.ReadAll(reader)
@@ -142,7 +141,7 @@ func analyzeVanilla(versionJson *zip.File) (exec *lucytypes.ExecutableInfo) {
 
 func analyzeFabricSingle(installProperties *zip.File) (exec *lucytypes.ExecutableInfo) {
 	exec = &lucytypes.ExecutableInfo{}
-	exec.Platform = syntaxtypes.Fabric
+	exec.Platform = lucytypes.Fabric
 	r, _ := installProperties.Open()
 	defer tools.CloseReader(r, logger.CreateWarning)
 	data, _ := io.ReadAll(r)
@@ -171,10 +170,10 @@ func analyzeFabricSingle(installProperties *zip.File) (exec *lucytypes.Executabl
 // Note that line breaks are "\r\n " and the last line ends with "\r\n"
 
 func analyzeFabricLauncher(
-manifest *zip.File,
+	manifest *zip.File,
 ) (exec *lucytypes.ExecutableInfo) {
 	exec = &lucytypes.ExecutableInfo{}
-	exec.Platform = syntaxtypes.Fabric
+	exec.Platform = lucytypes.Fabric
 	r, _ := manifest.Open()
 	defer tools.CloseReader(r, logger.CreateWarning)
 	data, _ := io.ReadAll(r)

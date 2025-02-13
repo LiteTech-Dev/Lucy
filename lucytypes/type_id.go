@@ -1,11 +1,4 @@
-// Package syntaxtypes contains syntax-related constants and types. This package
-// is created to avoid cyclic dependencies by separating syntax-related types and
-// syntax parsing functions. As types are more fundamental, and were used in more
-// packages, they are placed in this independent package. This package should not
-// import any other packages in lucy.
-//
-// THIS PACKAGE SHOULD NOT EXIST TODO: refactor to combine with lucytypes
-package syntaxtypes
+package lucytypes
 
 import (
 	"fmt"
@@ -88,6 +81,16 @@ type PackageId struct {
 	Platform Platform
 	Name     PackageName
 	Version  PackageVersion
+}
+
+func (p *PackageId) NewPackage() *Package {
+	return &Package{
+		Id: PackageId{
+			Platform: p.Platform,
+			Name:     p.Name,
+			Version:  p.Version,
+		},
+	}
 }
 
 func (p *PackageId) String() string {

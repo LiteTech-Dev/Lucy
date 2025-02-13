@@ -11,7 +11,6 @@ import (
 	"lucy/output"
 	"lucy/sources/modrinth"
 	"lucy/syntax"
-	"lucy/syntaxtypes"
 	"lucy/tools"
 	"slices"
 	"strconv"
@@ -45,7 +44,7 @@ func actionInfo(ctx context.Context, cmd *cli.Command) error {
 	var multiSourceData []*lucytypes.OutputData
 
 	switch p.Platform {
-	case syntaxtypes.AllPlatform:
+	case lucytypes.AllPlatform:
 		// TODO: Wide range search
 		modrinthProject, err := modrinth.GetProjectByName(p.Name)
 		if err != nil {
@@ -56,7 +55,7 @@ func actionInfo(ctx context.Context, cmd *cli.Command) error {
 			multiSourceData,
 			modrinthProjectToInfo(modrinthProject),
 		)
-	case syntaxtypes.Fabric:
+	case lucytypes.Fabric:
 		// TODO: Fabric specific search
 		modrinthProject, err := modrinth.GetProjectByName(p.Name)
 		if err != nil {
@@ -67,10 +66,10 @@ func actionInfo(ctx context.Context, cmd *cli.Command) error {
 			multiSourceData,
 			modrinthProjectToInfo(modrinthProject),
 		)
-	case syntaxtypes.Forge:
+	case lucytypes.Forge:
 		// TODO: Forge
 		logger.CreateFatal(fmt.Errorf("forge is not yet supported"))
-	case syntaxtypes.Mcdr:
+	case lucytypes.Mcdr:
 		mcdrPlugin, err := mcdr.SearchMcdrPluginCatalogue(p.Name)
 		if err != nil {
 			logger.CreateWarning(err)
@@ -181,10 +180,8 @@ func cInfoOutput(p lucytypes.Package) *lucytypes.OutputData {
 		)
 	}
 
-	if !slices.Contains(
-		p.Deps.SupportedPlatforms,
-		syntaxtypes.Mcdr,
-	) && (p.Deps.SupportedPlatforms != nil || len(p.Deps.SupportedPlatforms) != 0) {
+	if !slices.Contains(p.Deps.SupportedPlatforms, lucytypes.Mcdr) &&
+	(p.Deps.SupportedPlatforms != nil || len(p.Deps.SupportedPlatforms) != 0) {
 		f := &output.FieldLabels{
 			Title:    "Game Versions",
 			Labels:   []string{},

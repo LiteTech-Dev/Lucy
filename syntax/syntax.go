@@ -17,7 +17,7 @@ package syntax
 import (
 	"errors"
 	"log"
-	"lucy/syntaxtypes"
+	"lucy/lucytypes"
 	"strings"
 )
 
@@ -50,9 +50,9 @@ var (
 // Parse is exported to parse a string into a PackageId struct. This function
 // should only be used on user inputs. Therefore, It does NOT return an
 // error but instead invokes a panic if the syntax is invalid.
-func Parse(s string) (p *syntaxtypes.PackageId) {
+func Parse(s string) (p *lucytypes.PackageId) {
 	s = sanitize(s)
-	p = &syntaxtypes.PackageId{}
+	p = &lucytypes.PackageId{}
 	var err error
 	p.Platform, p.Name, p.Version, err = parseOperatorAt(s)
 	if err != nil {
@@ -68,9 +68,9 @@ func Parse(s string) (p *syntaxtypes.PackageId) {
 // parseOperatorAt is called first since '@' operator always occur after '/' (equivalent
 // to a lower priority).
 func parseOperatorAt(s string) (
-	pl syntaxtypes.Platform,
-	n syntaxtypes.PackageName,
-	v syntaxtypes.PackageVersion,
+	pl lucytypes.Platform,
+	n lucytypes.PackageName,
+	v lucytypes.PackageVersion,
 	err error,
 ) {
 	split := strings.Split(s, "@")
@@ -81,9 +81,9 @@ func parseOperatorAt(s string) (
 	}
 
 	if len(split) == 1 {
-		v = syntaxtypes.AllVersion
+		v = lucytypes.AllVersion
 	} else if len(split) == 2 {
-		v = syntaxtypes.PackageVersion(split[1])
+		v = lucytypes.PackageVersion(split[1])
 	} else {
 		return "", "", "", ESyntax
 	}
@@ -92,28 +92,28 @@ func parseOperatorAt(s string) (
 }
 
 func parseOperatorSlash(s string) (
-	pl syntaxtypes.Platform,
-	n syntaxtypes.PackageName,
+	pl lucytypes.Platform,
+	n lucytypes.PackageName,
 	err error,
 ) {
 	split := strings.Split(s, "/")
 
 	if len(split) == 1 {
-		pl = syntaxtypes.AllPlatform
-		n = syntaxtypes.PackageName(split[0])
-		if syntaxtypes.Platform(n).Valid() {
+		pl = lucytypes.AllPlatform
+		n = lucytypes.PackageName(split[0])
+		if lucytypes.Platform(n).Valid() {
 			// Remember, all platforms are also valid packages under themselves.
 			// This literal is for users to specify the platform itself. See the
 			// docs for syntaxtypes.Platform for more information.
-			pl = syntaxtypes.Platform(n)
-			n = syntaxtypes.PackageName(pl)
+			pl = lucytypes.Platform(n)
+			n = lucytypes.PackageName(pl)
 		}
 	} else if len(split) == 2 {
-		pl = syntaxtypes.Platform(split[0])
+		pl = lucytypes.Platform(split[0])
 		if !pl.Valid() {
 			return "", "", EPlatform
 		}
-		n = syntaxtypes.PackageName(split[1])
+		n = lucytypes.PackageName(split[1])
 	} else {
 		return "", "", ESyntax
 	}

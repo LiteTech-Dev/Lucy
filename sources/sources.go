@@ -7,7 +7,6 @@ import (
 	"lucy/logger"
 	"lucy/lucytypes"
 	"lucy/sources/modrinth"
-	"lucy/syntaxtypes"
 	"net/http"
 	"sync"
 	"time"
@@ -15,23 +14,15 @@ import (
 
 type Source string
 
-const (
-	CurseForge Source = "curseforge"
-	Modrinth   Source = "modrinth"
-	GitHub     Source = "github"
-	Mcdr       Source = "mcdr"
-	None       Source = "none"
-)
-
-var AvailableSources = map[syntaxtypes.Platform][]Source{
-	syntaxtypes.Fabric: {CurseForge, Modrinth},
-	syntaxtypes.Forge:  {CurseForge, Modrinth},
-	syntaxtypes.Mcdr:   {Mcdr},
+var AvailableSources = map[lucytypes.Platform][]lucytypes.Source{
+	lucytypes.Fabric:           {lucytypes.CurseForge, lucytypes.Modrinth},
+	lucytypes.Forge:            {lucytypes.CurseForge, lucytypes.Modrinth},
+	lucytypes.McdrInstallation: {lucytypes.McdrSite},
 }
 
-var SpeedTestUrls = map[Source]string{
-	CurseForge: "https://mediafilez.forgecdn.net/files/4834/896/fabric-api-0.87.2%2B1.19.4.jar",
-	Modrinth:   "https://cdn.modrinth.com/data/P7dR8mSH/versions/nyAmoHlr/fabric-api-0.87.2%2B1.19.4.jar",
+var SpeedTestUrls = map[lucytypes.Source]string{
+	lucytypes.CurseForge: "https://mediafilez.forgecdn.net/files/4834/896/fabric-api-0.87.2%2B1.19.4.jar",
+	lucytypes.Modrinth:   "https://cdn.modrinth.com/data/P7dR8mSH/versions/nyAmoHlr/fabric-api-0.87.2%2B1.19.4.jar",
 }
 
 const slow float64 = 0x7FF0000000000000 // inf
@@ -46,9 +37,9 @@ const slow float64 = 0x7FF0000000000000 // inf
 //
 // Cons:
 //   - Speed test might not be representative
-func SelectSource(platform syntaxtypes.Platform) Source {
+func SelectSource(platform lucytypes.Platform) lucytypes.Source {
 	slowest := slow
-	fastestSource := None
+	fastestSource := lucytypes.UnknownSource
 	wg := sync.WaitGroup{}
 	for _, source := range AvailableSources[platform] {
 		wg.Add(1)
@@ -58,12 +49,12 @@ func SelectSource(platform syntaxtypes.Platform) Source {
 			if speed < slowest {
 				fastestSource = source
 			}
-			fmt.Printf("Speed for %s: %f\n", source, speed)
+			fmt.Printf("Speed for %s: %f\n", source.String(), speed)
 		}()
 	}
 
 	wg.Wait()
-	if fastestSource == None {
+	if fastestSource == lucytypes.UnknownSource {
 		panic("No available source")
 	}
 
@@ -126,8 +117,8 @@ func CInfoFromModrinth(res *apitypes.ModrinthSearchResults) []lucytypes.Package 
 //  first.
 
 func Search(
-source Source,
-keyword syntaxtypes.PackageName,
+	source Source,
+	keyword syntaxtypes.PackageName,
 ) []lucytypes.Package {
 	switch source {
 	case Modrinth:

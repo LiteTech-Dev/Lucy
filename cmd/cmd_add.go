@@ -6,10 +6,10 @@ import (
 	"github.com/urfave/cli/v3"
 	"lucy/logger"
 	"lucy/lucyerrors"
+	"lucy/lucytypes"
 	"lucy/probe"
 	"lucy/sources/modrinth"
 	"lucy/syntax"
-	"lucy/syntaxtypes"
 	"lucy/util"
 )
 
@@ -47,11 +47,11 @@ func actionAdd(_ context.Context, cmd *cli.Command) error {
 		return errors.New("lucy is not installed, run `lucy init` before downloading mods")
 	}
 
-	if p.Platform == syntaxtypes.Mcdr && serverInfo.Mcdr == nil {
+	if p.Platform == lucytypes.Mcdr && serverInfo.Mcdr == nil {
 		// TODO: Deal with this
 		println("MCDR is not installed, cannot download MCDR plugins")
 		return errors.New("no mcdr")
-	} else if p.Platform != syntaxtypes.AllPlatform && p.Platform != serverInfo.Executable.Platform {
+	} else if p.Platform != lucytypes.AllPlatform && p.Platform != serverInfo.Executable.Platform {
 		// TODO: Deal with this
 		return errors.New("platform mismatch")
 	}

@@ -8,7 +8,6 @@ import (
 	"lucy/logger"
 	"lucy/lucytypes"
 	"lucy/probe"
-	"lucy/syntaxtypes"
 	"net/http"
 	"net/url"
 	"strings"
@@ -17,15 +16,15 @@ import (
 // For Modrinth search API, see:
 // https://docs.modrinth.com/api/operations/searchprojects/
 
-func GetNewestProjectVersion(slug syntaxtypes.PackageName) (newestVersion *apitypes.ModrinthProjectVersion) {
+func GetNewestProjectVersion(slug lucytypes.PackageName) (newestVersion *apitypes.ModrinthProjectVersion) {
 	newestVersion = nil
 	versions := getProjectVersions(slug)
 	serverInfo := probe.GetServerInfo()
 	for _, version := range versions {
 		for _, gameVersion := range version.GameVersions {
 			if gameVersion == serverInfo.Executable.GameVersion &&
-			version.VersionType == "release" &&
-			(newestVersion == nil || version.DatePublished.After(newestVersion.DatePublished)) {
+				version.VersionType == "release" &&
+				(newestVersion == nil || version.DatePublished.After(newestVersion.DatePublished)) {
 				newestVersion = version
 			}
 		}
@@ -38,14 +37,14 @@ func GetNewestProjectVersion(slug syntaxtypes.PackageName) (newestVersion *apity
 	return
 }
 
-func getProjectVersions(slug syntaxtypes.PackageName) (versions []*apitypes.ModrinthProjectVersion) {
+func getProjectVersions(slug lucytypes.PackageName) (versions []*apitypes.ModrinthProjectVersion) {
 	res, _ := http.Get(constructProjectVersionsUrl(slug))
 	data, _ := io.ReadAll(res.Body)
 	json.Unmarshal(data, &versions)
 	return
 }
 
-func GetProjectId(slug syntaxtypes.PackageName) (id string) {
+func GetProjectId(slug lucytypes.PackageName) (id string) {
 	res, _ := http.Get(constructProjectUrl(slug))
 	modrinthProject := apitypes.ModrinthProject{}
 	data, _ := io.ReadAll(res.Body)
@@ -59,17 +58,17 @@ func GetProjectId(slug syntaxtypes.PackageName) (id string) {
 const searchUrlTemplate = `https://api.modrinth.com/v2/search?query={{.packageName}}&limit=100&index={{.indexBy}}&facets={{.facets}}`
 
 func Search(
-platform syntaxtypes.Platform,
-packageName syntaxtypes.PackageName,
-showClientPackage bool,
-indexBy string, // indexBy can be: relevance (default), downloads, follows, newest, updated
+	platform lucytypes.Platform,
+	packageName lucytypes.PackageName,
+	showClientPackage bool,
+	indexBy string, // indexBy can be: relevance (default), downloads, follows, newest, updated
 ) (result *apitypes.ModrinthSearchResults) {
 	// Construct the search url
 	var facets []*facet
 	switch platform {
-	case syntaxtypes.Forge:
+	case lucytypes.Forge:
 		facets = append(facets, facetForge)
-	case syntaxtypes.Fabric:
+	case lucytypes.Fabric:
 		facets = append(facets, facetFabric)
 	}
 
@@ -110,7 +109,7 @@ indexBy string, // indexBy can be: relevance (default), downloads, follows, newe
 }
 
 func PackageFromModrinth(s *apitypes.ModrinthProject) *lucytypes.Package {
-	name := syntaxtypes.PackageName(s.Slug)
+	name := lucytypes.PackageName(s.Slug)
 	serverInfo := probe.GetServerInfo()
 
 	p := &lucytypes.Package{}
@@ -130,14 +129,17 @@ func PackageFromModrinth(s *apitypes.ModrinthProject) *lucytypes.Package {
 	for _, version := range s.GameVersions {
 		p.Deps.SupportedVersions = append(
 			p.Deps.SupportedVersions,
-			syntaxtypes.PackageVersion(version),
+			lucytypes.PackageVersion(version),
 		)
 	}
 
 	for _, platform := range s.Loaders {
-		pf := syntaxtypes.Platform(platform)
+		pf := lucytypes.Platform(platform)
 		if pf.Valid() {
-			p.Deps.SupportedPlatforms = append(p.Deps.SupportedPlatforms, pf)
+			p.Deps.SupportedPlatforms = append(
+				p.Deps.SupportedPlatforms,
+				pf,
+			)
 		}
 	}
 

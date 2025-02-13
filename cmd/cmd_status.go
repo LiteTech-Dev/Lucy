@@ -7,7 +7,6 @@ import (
 	"lucy/lucytypes"
 	"lucy/output"
 	"lucy/probe"
-	"lucy/syntaxtypes"
 	"lucy/tools"
 )
 
@@ -87,7 +86,7 @@ func serverInfoToStatus(data *lucytypes.ServerInfo) *lucytypes.OutputData {
 	}
 
 	// Modding related fields only shown when modding platform detected
-	if data.Executable.Platform != syntaxtypes.Minecraft {
+	if data.Executable.Platform != lucytypes.Minecraft {
 		mods := make([]string, 0, len(data.Mods))
 		modPaths := make([]string, 0, len(mods))
 		if len(data.Mods) == 0 {

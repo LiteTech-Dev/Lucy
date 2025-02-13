@@ -4,12 +4,12 @@ import (
 	"encoding/json"
 	"io"
 	"lucy/apitypes"
-	"lucy/syntaxtypes"
+	"lucy/lucytypes"
 	"net/http"
 	"net/url"
 )
 
-func constructProjectVersionsUrl(slug syntaxtypes.PackageName) (urlString string) {
+func constructProjectVersionsUrl(slug lucytypes.PackageName) (urlString string) {
 	urlString, _ = url.JoinPath(
 		"https://api.modrinth.com/v2/project",
 		string(slug),
@@ -18,11 +18,11 @@ func constructProjectVersionsUrl(slug syntaxtypes.PackageName) (urlString string
 	return
 }
 
-func constructProjectUrl(packageName syntaxtypes.PackageName) (url string) {
+func constructProjectUrl(packageName lucytypes.PackageName) (url string) {
 	return "https://api.modrinth.com/v2/project/" + string(packageName)
 }
 
-func GetProjectByName(packageName syntaxtypes.PackageName) (
+func GetProjectByName(packageName lucytypes.PackageName) (
 	project *apitypes.ModrinthProject,
 	err error,
 ) {

@@ -1,7 +1,5 @@
 package lucytypes
 
-import "lucy/syntaxtypes"
-
 type PackageUrlType uint8
 
 const (
@@ -22,6 +20,8 @@ func (p PackageUrlType) String() string {
 		return "Source"
 	case WikiUrl:
 		return "Wiki"
+	case OthersUrl:
+		return "URL"
 	default:
 		return "Unknown"
 	}
@@ -45,7 +45,7 @@ type PackageUrl struct {
 // should give the caller an option, or implicit option (such as the function
 // naming), to specify which extra attributions are provided
 type Package struct {
-	Id        syntaxtypes.PackageId // Base package identifier
+	Id        PackageId // Base package identifier
 	Path      string
 	Installed bool
 
@@ -57,13 +57,13 @@ type Package struct {
 // a Package struct. It is usually used in any command that requires operating
 // local packages, such as `lucy install` or `lucy remove`.
 type PackageDependencies struct {
-	SupportedVersions   []syntaxtypes.PackageVersion
-	SupportedPlatforms  []syntaxtypes.Platform
-	PackageDependencies []syntaxtypes.PackageId
+	SupportedVersions   []PackageVersion
+	SupportedPlatforms  []Platform
+	PackageDependencies []PackageId
 }
 
 // PackageInformation is a struct that contains informational data about the
-// package. It is typically used in `lucy info`
+// package. It is typically used in `lucy info`.
 type PackageInformation struct {
 	Urls   []PackageUrl
 	Author []struct {
