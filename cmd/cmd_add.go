@@ -8,7 +8,7 @@ import (
 	"lucy/logger"
 	"lucy/lucyerrors"
 	"lucy/lucytypes"
-	"lucy/sources/modrinth"
+	"lucy/remote/modrinth"
 	"lucy/syntax"
 	"lucy/util"
 )

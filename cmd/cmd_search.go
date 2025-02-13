@@ -7,7 +7,7 @@ import (
 	"lucy/apitypes"
 	"lucy/lucytypes"
 	"lucy/output"
-	"lucy/sources/modrinth"
+	"lucy/remote/modrinth"
 	"lucy/syntax"
 	"lucy/tools"
 	"os"

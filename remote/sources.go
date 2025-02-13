@@ -1,4 +1,4 @@
-package sources
+package remote
 
 import (
 	"fmt"
