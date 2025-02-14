@@ -3,11 +3,12 @@ package lucytypes
 type Source uint8
 
 const (
-	CurseForge Source = iota
+	Auto Source = iota
+	CurseForge
 	Modrinth
 	GitHub
-	McdrSite
-	UnknownSource
+	McdrRepo
+	Unknown
 )
 
 func (s Source) String() string {
@@ -18,8 +19,8 @@ func (s Source) String() string {
 		return "Modrinth"
 	case GitHub:
 		return "GitHub"
-	case McdrSite:
-		return "MCDR Site"
+	case McdrRepo:
+		return "MCDR"
 	default:
 		return "Unknown Source"
 	}

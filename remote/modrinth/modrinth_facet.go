@@ -4,6 +4,16 @@ import (
 	"strings"
 )
 
+type searchResultIndexing uint8
+
+const (
+	indexRelevance searchResultIndexing = iota
+	indexDownloads
+	indexFollows
+	indexNewest
+	indexUpdated
+)
+
 type facetItemOperation uint8
 
 const (

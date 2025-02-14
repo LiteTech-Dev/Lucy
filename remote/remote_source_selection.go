@@ -9,12 +9,10 @@ import (
 	"time"
 )
 
-type Source string
-
 var AvailableSources = map[lucytypes.Platform][]lucytypes.Source{
 	lucytypes.Fabric: {lucytypes.CurseForge, lucytypes.Modrinth},
 	lucytypes.Forge:  {lucytypes.CurseForge, lucytypes.Modrinth},
-	lucytypes.Mcdr:   {lucytypes.McdrSite},
+	lucytypes.Mcdr:   {lucytypes.McdrRepo},
 }
 
 var SpeedTestUrls = map[lucytypes.Source]string{
@@ -36,7 +34,7 @@ const slow float64 = 0x7FF0000000000000 // inf
 //   - Speed test might not be representative
 func SelectSource(platform lucytypes.Platform) lucytypes.Source {
 	slowest := slow
-	fastestSource := lucytypes.UnknownSource
+	fastestSource := lucytypes.Unknown
 	wg := sync.WaitGroup{}
 	for _, source := range AvailableSources[platform] {
 		wg.Add(1)
@@ -51,7 +49,7 @@ func SelectSource(platform lucytypes.Platform) lucytypes.Source {
 	}
 
 	wg.Wait()
-	if fastestSource == lucytypes.UnknownSource {
+	if fastestSource == lucytypes.Unknown {
 		panic("No available source")
 	}
 

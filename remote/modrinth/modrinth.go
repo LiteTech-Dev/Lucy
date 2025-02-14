@@ -16,6 +16,8 @@ import (
 // For Modrinth search API, see:
 // https://docs.modrinth.com/api/operations/searchprojects/
 
+// func GetFile(id lucytypes.PackageId) (url string)
+
 func GetNewestProjectVersion(slug lucytypes.PackageName) (newestVersion *apitypes.ModrinthProjectVersion) {
 	newestVersion = nil
 	versions := getProjectVersions(slug)
