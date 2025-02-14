@@ -25,8 +25,8 @@ func GetNewestProjectVersion(slug lucytypes.PackageName) (newestVersion *apitype
 	for _, version := range versions {
 		for _, gameVersion := range version.GameVersions {
 			if gameVersion == serverInfo.Executable.GameVersion &&
-				version.VersionType == "release" &&
-				(newestVersion == nil || version.DatePublished.After(newestVersion.DatePublished)) {
+			version.VersionType == "release" &&
+			(newestVersion == nil || version.DatePublished.After(newestVersion.DatePublished)) {
 				newestVersion = version
 			}
 		}
@@ -60,13 +60,13 @@ func GetProjectId(slug lucytypes.PackageName) (id string) {
 const searchUrlTemplate = `https://api.modrinth.com/v2/search?query={{.packageName}}&limit=100&index={{.indexBy}}&facets={{.facets}}`
 
 func Search(
-	platform lucytypes.Platform,
-	packageName lucytypes.PackageName,
-	showClientPackage bool,
-	indexBy string, // indexBy can be: relevance (default), downloads, follows, newest, updated
+platform lucytypes.Platform,
+packageName lucytypes.PackageName,
+showClientPackage bool,
+indexBy string, // indexBy can be: relevance (default), downloads, follows, newest, updated
 ) (result *apitypes.ModrinthSearchResults) {
 	// Construct the search url
-	var facets []*facet
+	var facets []facetItems
 	switch platform {
 	case lucytypes.Forge:
 		facets = append(facets, facetForge)
@@ -75,7 +75,7 @@ func Search(
 	}
 
 	if showClientPackage {
-		facets = append(facets, facetBothSupported)
+		facets = append(facets, facetServerSupported, facetClientSupported)
 	} else {
 		facets = append(facets, facetServerSupported)
 	}
@@ -87,7 +87,7 @@ func Search(
 		map[string]any{
 			"packageName": string(packageName),
 			"indexBy":     indexBy,
-			"facets":      url.QueryEscape(StringifyFacets(facets...)),
+			"facets":      url.QueryEscape(createFacet(facets...)),
 		},
 	)
 	searchUrl := urlBuilder.String()

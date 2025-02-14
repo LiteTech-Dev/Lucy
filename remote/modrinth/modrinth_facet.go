@@ -35,8 +35,17 @@ var facetItemOperationStrings = map[facetItemOperation]string{
 }
 
 // facet is the data structure to construct an advanced Modrinth search. It
-// do not contain all the search options, only the ones that are expected in this
+// does not contain all the search options, only the ones that are expected in this
 // program.
+//
+// From Modrinth docs:
+//
+// In order to then use these facets, you need a value to filter by, as well as
+// an operation to perform on this value. The most common operation is ':'
+// (same as =), though you can also use !=, >=, >, <=, and <. Join together the
+// type, operation, and value, and you’ve got your string.
+//
+// {type} {operation} {value}
 //
 // API Docs: https://docs.modrinth.com/api/operations/searchprojects/
 type facetItem struct {
@@ -45,10 +54,39 @@ type facetItem struct {
 	Value     string
 }
 
+func (f *facetItem) String() string {
+	return `"` + f.Type + facetItemOperationStrings[f.Operation] + f.Value + `"`
+}
+
+// facetItems is an array of facetItem. It represents an expression joined by OR statements.
+// a complete facet is an array of facetItems, with each array joined by AND statements.
+type facetItems []facetItem
+
+// A facet is an array of facetItems, with each array joined by AND statements.
 type facet struct {
-	// Expressions is a 2D array of facetItems. Each array in Expressions is joined by OR
-	// statements, and each item in an array is joined by AND statements.
-	Expressions [][]facetItem
+	Expressions []facetItems
+}
+
+// There are no facet data structures, rather, a function is used to directly
+// create a facet string that can be used in the URL.
+func createFacet(expressions ...facetItems) string {
+	var sb strings.Builder
+	sb.WriteRune('[')
+	for i, expression := range expressions {
+		if i > 0 {
+			sb.WriteRune(',')
+		}
+		sb.WriteRune('[')
+		for j, item := range expression {
+			if j > 0 {
+				sb.WriteRune(',')
+			}
+			sb.WriteString(item.String())
+		}
+		sb.WriteRune(']')
+	}
+	sb.WriteRune(']')
+	return sb.String()
 }
 
 // StringifyFacets builds multiple facet structs into a string that can be embedded
@@ -65,10 +103,14 @@ type facet struct {
 // You then join these strings together in arrays to signal AND and OR operators.
 //
 // OR
-// All elements in a single array are considered to be joined by OR statements. For example, the search [["versions:1.16.5", "versions:1.17.1"]] translates to Projects that support 1.16.5 OR 1.17.1.
+// All elements in a single array are considered to be joined by OR statements.
+// For example, the search [["versions:1.16.5", "versions:1.17.1"]] translates
+// to Projects that support 1.16.5 OR 1.17.1.
 //
 // AND
-// Separate arrays are considered to be joined by AND statements. For example, the search [["versions:1.16.5"], ["project_type:modpack"]] translates to Projects that support 1.16.5 AND are modpacks.
+// Separate arrays are considered to be joined by AND statements. For example,
+// the search [["versions:1.16.5"], ["project_type:modpack"]] translates to
+// Projects that support 1.16.5 AND are modpacks.
 func StringifyFacets(facets ...*facet) string {
 	var sb strings.Builder
 	sb.WriteString("[")
@@ -98,150 +140,126 @@ func StringifyFacets(facets ...*facet) string {
 	return sb.String()
 }
 
-var facetAllLoaders = &facet{
-	Expressions: [][]facetItem{
+var facetAllLoaders = facetItems{
+	{
+		Type:      "categories",
+		Operation: operationEq,
+		Value:     "forge",
+	},
+	{
+		Type:      "categories",
+		Operation: operationEq,
+		Value:     "fabric",
+	},
+	{
+		Type:      "categories",
+		Operation: operationEq,
+		Value:     "quilt",
+	},
+	{
+		Type:      "categories",
+		Operation: operationEq,
+		Value:     "liteloader",
+	},
+	{
+		Type:      "categories",
+		Operation: operationEq,
+		Value:     "modloader",
+	},
+	{
+		Type:      "categories",
+		Operation: operationEq,
+		Value:     "rift",
+	},
+	{
+		Type:      "categories",
+		Operation: operationEq,
+		Value:     "neoforge",
+	},
+}
+
+var facetForge = facetItems{
+	{
+		Type:      "categories",
+		Operation: operationEq,
+		Value:     "forge",
+	},
+}
+
+var facetFabric = facetItems{
+	{
+		Type:      "categories",
+		Operation: operationEq,
+		Value:     "fabric",
+	},
+}
+
+var facetServerSupported = facetItems{
+	{
+		Type:      "server_side",
+		Operation: operationEq,
+		Value:     "required",
+	},
+	{
+		Type:      "server_side",
+		Operation: operationEq,
+		Value:     "optional",
+	},
+}
+
+var facetClientSupported = facetItems{
+	{
+		Type:      "client_side",
+		Operation: operationEq,
+		Value:     "required",
+	},
+	{
+		Type:      "client_side",
+		Operation: operationEq,
+		Value:     "optional",
+	},
+}
+
+var facetBothRequired = []facetItems{
+	{
 		{
-			{
-				Type:      "categories",
-				Operation: operationEq,
-				Value:     "forge",
-			},
-			{
-				Type:      "categories",
-				Operation: operationEq,
-				Value:     "fabric",
-			},
-			{
-				Type:      "categories",
-				Operation: operationEq,
-				Value:     "quilt",
-			},
-			{
-				Type:      "categories",
-				Operation: operationEq,
-				Value:     "liteloader",
-			},
-			{
-				Type:      "categories",
-				Operation: operationEq,
-				Value:     "modloader",
-			},
-			{
-				Type:      "categories",
-				Operation: operationEq,
-				Value:     "rift",
-			},
-			{
-				Type:      "categories",
-				Operation: operationEq,
-				Value:     "neoforge",
-			},
+			Type:      "server_side",
+			Operation: operationEq,
+			Value:     "required",
+		},
+	},
+	{
+		{
+			Type:      "client_side",
+			Operation: operationEq,
+			Value:     "required",
 		},
 	},
 }
 
-var facetForge = &facet{
-	Expressions: [][]facetItem{
+var facetBothSupported = []facetItems{
+	{
 		{
-			{
-				Type:      "categories",
-				Operation: operationEq,
-				Value:     "forge",
-			},
+			Type:      "server_side",
+			Operation: operationEq,
+			Value:     "required",
+		},
+		{
+			Type:      "server_side",
+			Operation: operationEq,
+			Value:     "optional",
 		},
 	},
-}
-
-var facetFabric = &facet{
-	Expressions: [][]facetItem{
+	{
 		{
-			{
-				Type:      "categories",
-				Operation: operationEq,
-				Value:     "fabric",
-			},
-		},
-	},
-}
-
-var facetServerSupported = &facet{
-	Expressions: [][]facetItem{
-		{
-			{
-				Type:      "server_side",
-				Operation: operationEq,
-				Value:     "required",
-			},
-			{
-				Type:      "server_side",
-				Operation: operationEq,
-				Value:     "optional",
-			},
-		},
-	},
-}
-
-var facetClientSupported = &facet{
-	Expressions: [][]facetItem{
-		{
-			{
-				Type:      "client_side",
-				Operation: operationEq,
-				Value:     "required",
-			},
-			{
-				Type:      "client_side",
-				Operation: operationEq,
-				Value:     "optional",
-			},
-		},
-	},
-}
-
-var facetBothRequired = &facet{
-	Expressions: [][]facetItem{
-		{
-			{
-				Type:      "server_side",
-				Operation: operationEq,
-				Value:     "required",
-			},
+			Type:      "client_side",
+			Operation: operationEq,
+			Value:     "required",
 		},
 		{
-			{
-				Type:      "client_side",
-				Operation: operationEq,
-				Value:     "required",
-			},
-		},
-	},
-}
-
-var facetBothSupported = &facet{
-	Expressions: [][]facetItem{
-		{
-			{
-				Type:      "server_side",
-				Operation: operationEq,
-				Value:     "required",
-			},
-			{
-				Type:      "server_side",
-				Operation: operationEq,
-				Value:     "optional",
-			},
-		},
-		{
-			{
-				Type:      "client_side",
-				Operation: operationEq,
-				Value:     "required",
-			},
-			{
-				Type:      "client_side",
-				Operation: operationEq,
-				Value:     "optional",
-			},
+			Type:      "client_side",
+			Operation: operationEq,
+			Value:     "optional",
 		},
 	},
 }
