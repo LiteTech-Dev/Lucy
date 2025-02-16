@@ -24,7 +24,7 @@ func FetchSource(
 			LatestVersionUrl: modrinth.GetNewestProjectVersion(id.Name).Files[0].Url,
 		}
 	default:
-		logger.CreateFatal(fmt.Errorf("source fetch not supported yet:" + source.String()))
+		logger.Fatal(fmt.Errorf("source fetch not supported yet:" + source.String()))
 	}
 
 	return nil // unreachable

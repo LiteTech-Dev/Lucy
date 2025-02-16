@@ -8,6 +8,9 @@ import (
 )
 
 func main() {
+	defer func() {
+		logger.Info("program finished with exit code 0")
+		logger.WriteAll()
+	}()
 	cmd.Cli.Run(context.Background(), os.Args)
-	logger.WriteAll()
 }

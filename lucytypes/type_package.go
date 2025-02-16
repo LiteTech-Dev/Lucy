@@ -33,10 +33,9 @@ type PackageUrl struct {
 	Url  string
 }
 
-// Package is a package with all of its related information.
+// Package is a package identifier with its related information.
 //
-// Sources (web APIs and the user's local filesystem) gives different
-// information, and
+// In principle, only package remote and local can provide a package.
 type Package struct {
 	// Id is the basic package identifier
 	Id PackageId
@@ -81,8 +80,11 @@ type PackageInstallation struct {
 // PackageRemote is an optional attribution to lucytypes.Package. It is used for
 // packages that are known to be bound with a remote source.
 type PackageRemote struct {
-	Source           Source
-	RemoteId         string
-	FileUrl          string
+	Source   Source
+	RemoteId string
+	// The URL to download the package's specified version When package.Id.Version
+	// is set to "latest" or "any", this field will be identical to LatestFileUrl.
+	FileUrl string
+	// The URL to get the latest version of the package.
 	LatestVersionUrl string
 }

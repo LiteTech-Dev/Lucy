@@ -96,13 +96,13 @@ indexBy string, // indexBy can be: relevance (default), downloads, follows, newe
 	println("calling", searchUrl)
 	res, err := http.Get(searchUrl)
 	if err != nil {
-		logger.CreateFatal(err)
+		logger.Fatal(err)
 	}
 	data, err := io.ReadAll(res.Body)
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
 		if err != nil {
-			logger.CreateWarning(err)
+			logger.Warning(err)
 		}
 	}(res.Body)
 	err = json.Unmarshal(data, &result)

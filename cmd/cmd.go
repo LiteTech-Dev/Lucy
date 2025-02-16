@@ -3,7 +3,7 @@ package cmd
 import (
 	"context"
 	"github.com/urfave/cli/v3"
-	"lucy/output"
+	"lucy/logger"
 )
 
 // Frontend should change when user do not run the program in CLI
@@ -42,7 +42,7 @@ func mainAction(_ context.Context, cmd *cli.Command) error {
 	// 	"fabric-api-0.87.2+1.19.4.jar",
 	// )
 	if cmd.Bool("log-file") {
-		println("Log file at", output.LogFile.Name())
+		println("Log file at", logger.LogFile.Name())
 	}
 	return nil
 }

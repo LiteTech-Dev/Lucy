@@ -67,9 +67,9 @@ func actionAdd(_ context.Context, cmd *cli.Command) error {
 	)
 	if err != nil {
 		if errors.Is(err, lucyerrors.NoLucyError) {
-			logger.CreateWarning(err)
+			logger.Warning(err)
 		} else {
-			logger.CreateError(errors.New("failed at downloading: " + err.Error()))
+			logger.Error(errors.New("failed at downloading: " + err.Error()))
 			return nil
 		}
 	}

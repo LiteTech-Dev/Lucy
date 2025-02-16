@@ -162,7 +162,7 @@ var getServerDotProperties = tools.Memoize(
 		propertiesPath := path.Join(getServerWorkPath(), "server.properties")
 		file, err := ini.Load(propertiesPath)
 		if err != nil {
-			logger.CreateWarning(errors.New("this server is missing a server.properties"))
+			logger.Warning(errors.New("this server is missing a server.properties"))
 			return nil
 		}
 

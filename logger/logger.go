@@ -1,46 +1,47 @@
 package logger
 
 import (
+	"fmt"
 	"github.com/emirpasic/gods/lists/singlylinkedlist"
-	"lucy/lucytypes"
-	"lucy/output"
 	"os"
 )
 
-var messageQueue = singlylinkedlist.New()
-var DisplayLevel = lucytypes.LogLevel(2)
+var debug = false
+
+func SetDebug() {
+	debug = true
+}
+
+var queue = singlylinkedlist.New()
+
+func createLogFactory(level logLevel) func(content error) {
+	return func(content error) {
+		queue.Add(&logItem{Level: level, Content: content})
+	}
+
+}
+
+var (
+	Info = func(content any) {
+		queue.Add(&logItem{Level: lInfo, Content: content})
+	}
+	Warning = createLogFactory(lWarning)
+	Error   = createLogFactory(lError)
+	Fatal   = func(content error) {
+		defer os.Exit(1)
+		createLogFactory(lFatal)(content)
+		WriteAll()
+	}
+	Debug = func(content any) {
+		queue.Add(&logItem{Level: lDebug, Content: content})
+	}
+)
 
 func WriteAll() {
-	if messageQueue.Size() > 0 {
-		defer println()
+	if queue.Empty() == false {
+		_, _ = fmt.Fprintln(os.Stderr, "---")
 	}
-	for messageQueue.Empty() == false {
-		popLogItem()
+	for queue.Empty() == false {
+		pop()
 	}
-}
-
-func CreateInfo(err error) {
-	messageQueue.Add(&lucytypes.LogItem{Level: 0, Content: err})
-}
-
-func CreateWarning(err error) {
-	messageQueue.Add(&lucytypes.LogItem{Level: 1, Content: err})
-}
-
-func CreateError(err error) {
-	messageQueue.Add(&lucytypes.LogItem{Level: 2, Content: err})
-}
-
-func CreateFatal(err error) {
-	defer os.Exit(1)
-	messageQueue.Add(&lucytypes.LogItem{Level: 3, Content: err})
-	WriteAll()
-}
-
-func popLogItem() {
-	msg, _ := messageQueue.Get(0)
-	if msg.(*lucytypes.LogItem).Level >= DisplayLevel {
-		output.WriteLogItem(msg.(*lucytypes.LogItem))
-	}
-	messageQueue.Remove(0)
 }

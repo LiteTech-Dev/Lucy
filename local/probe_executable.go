@@ -32,7 +32,7 @@ var getExecutableInfo = tools.Memoize(
 		}
 
 		if len(valid) == 0 {
-			logger.CreateFatal(errors.New("no server executable found"))
+			logger.Fatal(errors.New("no server executable found"))
 		} else if len(valid) == 1 {
 			return valid[0]
 		}
@@ -55,7 +55,7 @@ func findJar(dir string) (jarFiles []*os.File) {
 		if path.Ext(entry.Name()) == ".jar" {
 			file, err := os.Open(path.Join(dir, entry.Name()))
 			if err != nil {
-				logger.CreateWarning(err)
+				logger.Warning(err)
 				continue
 			}
 			jarFiles = append(jarFiles, file)
@@ -127,7 +127,7 @@ func analyzeVanilla(versionJson *zip.File) (exec *lucytypes.ExecutableInfo) {
 	exec = &lucytypes.ExecutableInfo{}
 	exec.Platform = lucytypes.Minecraft
 	reader, _ := versionJson.Open()
-	defer tools.CloseReader(reader, logger.CreateWarning)
+	defer tools.CloseReader(reader, logger.Warning)
 	data, _ := io.ReadAll(reader)
 	obj := VersionDotJson{}
 	_ = json.Unmarshal(data, &obj)
@@ -143,7 +143,7 @@ func analyzeFabricSingle(installProperties *zip.File) (exec *lucytypes.Executabl
 	exec = &lucytypes.ExecutableInfo{}
 	exec.Platform = lucytypes.Fabric
 	r, _ := installProperties.Open()
-	defer tools.CloseReader(r, logger.CreateWarning)
+	defer tools.CloseReader(r, logger.Warning)
 	data, _ := io.ReadAll(r)
 	s := string(data)
 
@@ -170,12 +170,12 @@ func analyzeFabricSingle(installProperties *zip.File) (exec *lucytypes.Executabl
 // Note that line breaks are "\r\n " and the last line ends with "\r\n"
 
 func analyzeFabricLauncher(
-	manifest *zip.File,
+manifest *zip.File,
 ) (exec *lucytypes.ExecutableInfo) {
 	exec = &lucytypes.ExecutableInfo{}
 	exec.Platform = lucytypes.Fabric
 	r, _ := manifest.Open()
-	defer tools.CloseReader(r, logger.CreateWarning)
+	defer tools.CloseReader(r, logger.Warning)
 	data, _ := io.ReadAll(r)
 	s := string(data)
 	s = strings.Split(s, "Class-Path: ")[1] // Start reading from Class-Path

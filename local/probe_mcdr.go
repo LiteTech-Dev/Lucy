@@ -22,18 +22,18 @@ var getMcdrConfig = tools.Memoize(
 
 		configFile, err := os.Open(mcdrConfigFileName)
 		if err != nil {
-			logger.CreateWarning(err)
+			logger.Warning(err)
 		}
 
 		configData, err := io.ReadAll(configFile)
 		defer func(configFile io.ReadCloser) {
 			err := configFile.Close()
 			if err != nil {
-				logger.CreateWarning(err)
+				logger.Warning(err)
 			}
 		}(configFile)
 		if err != nil {
-			logger.CreateWarning(err)
+			logger.Warning(err)
 		}
 
 		if err := yaml.Unmarshal(configData, config); err != nil {

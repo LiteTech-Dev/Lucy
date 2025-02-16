@@ -49,7 +49,7 @@ func actionInfo(ctx context.Context, cmd *cli.Command) error {
 		// TODO: Wide range search
 		modrinthProject, err := modrinth.GetProjectByName(p.Name)
 		if err != nil {
-			logger.CreateWarning(err)
+			logger.Warning(err)
 			break
 		}
 		multiSourceData = append(
@@ -60,7 +60,7 @@ func actionInfo(ctx context.Context, cmd *cli.Command) error {
 		// TODO: Fabric specific search
 		modrinthProject, err := modrinth.GetProjectByName(p.Name)
 		if err != nil {
-			logger.CreateWarning(err)
+			logger.Warning(err)
 			break
 		}
 		multiSourceData = append(
@@ -69,11 +69,11 @@ func actionInfo(ctx context.Context, cmd *cli.Command) error {
 		)
 	case lucytypes.Forge:
 		// TODO: Forge
-		logger.CreateFatal(fmt.Errorf("forge is not yet supported"))
+		logger.Fatal(fmt.Errorf("forge is not yet supported"))
 	case lucytypes.Mcdr:
 		mcdrPlugin, err := mcdr.SearchMcdrPluginCatalogue(p.Name)
 		if err != nil {
-			logger.CreateWarning(err)
+			logger.Warning(err)
 			break
 		}
 		multiSourceData = append(
