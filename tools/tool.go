@@ -2,7 +2,9 @@ package tools
 
 import (
 	"io"
+	"net/http"
 	"sync"
+	"time"
 )
 
 // TernaryFunc gives a if expr == true, b if expr == false. For a simple
@@ -54,4 +56,28 @@ func CloseReader(reader io.ReadCloser, failAction func(error)) {
 	if err != nil {
 		failAction(err)
 	}
+}
+
+const NetworkTestTimeout = 5 // seconds
+const NetworkTestRetries = 3
+
+// NetworkTest is a simple the network connection test. You can use this before
+// any operation that strictly requires a network connection.
+//
+// A nil value means the connection is successful.
+func NetworkTest() (err error) {
+	retry := NetworkTestRetries
+	client := http.Client{
+		Timeout: NetworkTestTimeout * time.Second,
+	}
+Retry:
+	_, err = client.Get("https://example.com")
+	if err != nil {
+		retry--
+		if retry > 0 {
+			goto Retry
+		}
+		return err
+	}
+	return nil
 }
