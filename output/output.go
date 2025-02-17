@@ -138,10 +138,8 @@ func (f *FieldDynamicColumnLabels) Output() {
 		tab()
 	}
 
-	// As we mentioned, we refresh the indent while finished to quarantine the
-	// indent space.
+	// After output, we call flush() to reset the indent size.
 	flush()
-	// Maybe using an unique tab writer is better? TODO: Investigate this method
 }
 
 // FieldMultiShortTextWithAnnot accepts 2 arrays, Texts and Annots. len(Texts) determines

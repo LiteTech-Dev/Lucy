@@ -39,7 +39,6 @@ var subcmdInfo = &cli.Command{
 }
 
 func actionInfo(ctx context.Context, cmd *cli.Command) error {
-	// TODO: Error handling
 	p := syntax.Parse(cmd.Args().First())
 
 	var multiSourceData []*lucytypes.OutputData
@@ -118,7 +117,6 @@ func modrinthProjectToInfo(source *datatypes.ModrinthProject) *lucytypes.OutputD
 }
 
 // TODO: Link to newest version
-// TODO: Generate `lucy install` command
 
 func mcdrPluginInfoToInfo(source *datatypes.McdrPluginInfo) *lucytypes.OutputData {
 	info := &lucytypes.OutputData{

@@ -73,8 +73,8 @@ func ComparePackageVersions(p1, p2 *lucytypes.PackageId) (c int8, err error) {
 }
 
 func compareMinecraftVersions(v1, v2 lucytypes.PackageVersion) (
-c int8,
-err error,
+	c int8,
+	err error,
 ) {
 	manifest, err := GetVersionManifest()
 	if err != nil {
