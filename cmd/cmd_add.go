@@ -56,7 +56,7 @@ func actionAdd(_ context.Context, cmd *cli.Command) error {
 		return errors.New("platform mismatch")
 	}
 
-	newestVersion := modrinth.GetNewestProjectVersion(p.Name)
+	newestVersion := modrinth.LatestCompatibleVersion(p.Name)
 	downloadFile, err := util.DownloadFile(
 		// Not sure how to deal with multiple files
 		// As the motivation for publishers to provide multiple files is unclear

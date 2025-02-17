@@ -50,9 +50,9 @@ var (
 // Parse is exported to parse a string into a PackageId struct. This function
 // should only be used on user inputs. Therefore, It does NOT return an
 // error but instead invokes a panic if the syntax is invalid.
-func Parse(s string) (p *lucytypes.PackageId) {
+func Parse(s string) (p lucytypes.PackageId) {
 	s = sanitize(s)
-	p = &lucytypes.PackageId{}
+	p = lucytypes.PackageId{}
 	var err error
 	p.Platform, p.Name, p.Version, err = parseOperatorAt(s)
 	if err != nil {

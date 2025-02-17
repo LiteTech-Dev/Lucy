@@ -1,15 +1,25 @@
 // Package apitypes stores types of APIs and files.
 //
-// This package should not exist and should be deprecated in the future. We should
-// use the unified data structures if possible (rather than raw api/file read data
-// structure).
-//
-// I am planning to move all the declarations to either package sources or probe.
+// TODO: For web APIs, their types will be moved to where they are used.
 package apitypes
 
 // TODO: Rename this package to 'datatypes'
 
-import "time"
+import (
+	"time"
+)
+
+// Do not move this in future refactorings. This is used for API calls, not
+// receiving data.
+
+func ValidateModrinthSearchIndex(index string) string {
+	switch index {
+	case "relevance", "downloads", "updated", "created":
+		return index
+	default:
+		return "relevance"
+	}
+}
 
 // ModrinthProject is a struct that represents a Modrinth project, the basic
 // form of any item on Modrinth.
@@ -66,6 +76,13 @@ type ModrinthProject struct {
 	MonetizationStatus string        `json:"monetization_status"`
 }
 
+// ModrinthSearchResults
+//
+// Docs
+// https://docs.modrinth.com/api/operations/searchprojects/
+//
+// Example
+// https://api.modrinth.com/v2/search?query=carpet&limit=100&index=relevance&facets=%5B%5B%22server_side:required%22,%22server_side:optional%22%5D%5D
 type ModrinthSearchResults struct {
 	Hits []struct {
 		ProjectId         string    `json:"project_id"`
@@ -95,32 +112,96 @@ type ModrinthSearchResults struct {
 	TotalHits int `json:"total_hits"`
 }
 
-type ModrinthProjectVersion struct {
-	GameVersions    []string    `json:"game_versions"`
-	Loaders         []string    `json:"loaders"`
-	Id              string      `json:"id"`
-	ProjectId       string      `json:"project_id"`
-	AuthorId        string      `json:"author_id"`
-	Featured        bool        `json:"featured"`
-	Name            string      `json:"name"`
-	VersionNumber   string      `json:"version_number"`
-	Changelog       string      `json:"changelog"`
-	ChangelogUrl    interface{} `json:"changelog_url"`
-	DatePublished   time.Time   `json:"date_published"`
-	Downloads       int         `json:"downloads"`
-	VersionType     string      `json:"version_type"`
-	Status          string      `json:"status"`
-	RequestedStatus interface{} `json:"requested_status"`
-	Files           []struct {
-		Hashes struct {
-			Sha1   string `json:"sha1"`
-			Sha512 string `json:"sha512"`
-		} `json:"hashes"`
-		Url      string      `json:"url"`
-		Filename string      `json:"filename"`
-		Primary  bool        `json:"primary"`
-		Size     int         `json:"size"`
-		FileType interface{} `json:"file_type"`
-	} `json:"files"`
-	Dependencies []interface{} `json:"dependencies"`
+type ModrinthVersionFile struct {
+	Hashes struct {
+		Sha1   string `json:"sha1"`
+		Sha512 string `json:"sha512"`
+	} `json:"hashes"`
+	Url      string `json:"url"`
+	Filename string `json:"filename"`
+	Primary  bool   `json:"primary"`
+	Size     int    `json:"size"`
+	FileType string `json:"file_type"`
+}
+
+// ModrinthVersion
+//
+// Docs
+// https://docs.modrinth.com/api/operations/getversion/
+//
+// Example
+// https://api.modrinth.com/v2/version/F7LVluUL
+type ModrinthVersion struct {
+	GameVersions    []string                      `json:"game_versions"`
+	Loaders         []string                      `json:"loaders"`
+	Id              string                        `json:"id"`
+	ProjectId       string                        `json:"project_id"`
+	AuthorId        string                        `json:"author_id"`
+	Featured        bool                          `json:"featured"`
+	Name            string                        `json:"name"`
+	VersionNumber   string                        `json:"version_number"`
+	Changelog       string                        `json:"changelog"`
+	ChangelogUrl    interface{}                   `json:"changelog_url"`
+	DatePublished   time.Time                     `json:"date_published"`
+	Downloads       int                           `json:"downloads"`
+	VersionType     string                        `json:"version_type"`
+	Status          string                        `json:"status"`
+	RequestedStatus interface{}                   `json:"requested_status"`
+	Files           []ModrinthVersionFile         `json:"files"`
+	Dependencies    []ModrinthVersionDependencies `json:"dependencies"`
+}
+
+type ModrinthVersionDependencyType string
+
+const (
+	ModrinthVersionDependencyTypeRequired     ModrinthVersionDependencyType = "required"
+	ModrinthVersionDependencyTypeOptional     ModrinthVersionDependencyType = "optional"
+	ModrinthVersionDependencyTypeIncompatible ModrinthVersionDependencyType = "incompatible"
+	ModrinthVersionDependencyTypeEmbedded     ModrinthVersionDependencyType = "embedded"
+)
+
+type ModrinthVersionDependencies struct {
+	VersionId      string                        `json:"version_id"`
+	ProjectId      string                        `json:"project_id"`
+	FileName       string                        `json:"file_name"`
+	DependencyType ModrinthVersionDependencyType `json:"dependency_type"`
+}
+
+// ModrinthMember
+//
+// Docs
+// https://docs.modrinth.com/api/operations/getprojectteammembers/
+//
+// Example
+// https://api.modrinth.com/v2/project/carpet/members
+type ModrinthMember struct {
+	Role   string `json:"role"`
+	TeamId string `json:"team_id"`
+	User   struct {
+		Id                  string    `json:"id"`
+		Username            string    `json:"username"`
+		AvatarUrl           string    `json:"avatar_url"`
+		Bio                 string    `json:"bio"`
+		Created             time.Time `json:"created"`
+		Role                string    `json:"role"`
+		Badges              int       `json:"badges"`
+		AuthProviders       string    `json:"auth_providers"`
+		Email               string    `json:"email"`
+		EmailVerified       bool      `json:"email_verified"`
+		HasPassword         bool      `json:"has_password"`
+		HasTotp             bool      `json:"has_totp"`
+		PayoutData          string    `json:"payout_data"`
+		StripeCustomerId    string    `json:"stripe_customer_id"`
+		AllowFriendRequests bool      `json:"allow_friend_requests"`
+		GithubId            string    `json:"github_id"`
+	} `json:"user"`
+	Permissions  interface{} `json:"permissions"`
+	Accepted     bool        `json:"accepted"`
+	PayoutsSplit interface{} `json:"payouts_split"`
+	Ordering     int         `json:"ordering"`
+}
+
+type ModrinthProjectDependencies struct {
+	Projects []ModrinthProject `json:"projects"`
+	Versions []ModrinthVersion `json:"versions"`
 }

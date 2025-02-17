@@ -1,6 +1,7 @@
 package tools
 
 import (
+	"github.com/russross/blackfriday/v2"
 	"io"
 	"net/http"
 	"sync"
@@ -80,4 +81,9 @@ Retry:
 		return err
 	}
 	return nil
+}
+
+func MarkdownToPlainText(md string) (s string) {
+	s = string(blackfriday.Run([]byte(md)))
+	return
 }

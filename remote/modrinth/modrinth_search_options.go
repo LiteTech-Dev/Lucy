@@ -4,15 +4,37 @@ import (
 	"strings"
 )
 
-type searchResultIndexing uint8
+type searchOptions struct {
+	index  searchIndex
+	facets []facetItems
+}
+
+type searchIndex uint8
 
 const (
-	indexRelevance searchResultIndexing = iota
-	indexDownloads
-	indexFollows
-	indexNewest
-	indexUpdated
+	byRelevance searchIndex = iota
+	byDownloads
+	byFollows
+	byNewest
+	byUpdated
 )
+
+func (i searchIndex) String() string {
+	switch i {
+	case byRelevance:
+		return "relevance"
+	case byDownloads:
+		return "downloads"
+	case byFollows:
+		return "follows"
+	case byNewest:
+		return "newest"
+	case byUpdated:
+		return "updated"
+	default:
+		return "relevance"
+	}
+}
 
 type facetItemOperation uint8
 
@@ -25,13 +47,23 @@ const (
 	operationGt
 )
 
-var facetItemOperationStrings = map[facetItemOperation]string{
-	operationEq:  ":",
-	operationNeq: "!=",
-	operationLeq: "<=",
-	operationGeq: ">=",
-	operationLt:  "<",
-	operationGt:  ">",
+func (op facetItemOperation) String() string {
+	switch op {
+	case operationEq:
+		return ":"
+	case operationNeq:
+		return "!="
+	case operationLeq:
+		return "<="
+	case operationGeq:
+		return ">="
+	case operationLt:
+		return "<"
+	case operationGt:
+		return ">"
+	default:
+		return ""
+	}
 }
 
 // facet is the data structure to construct an advanced Modrinth search. It
@@ -47,6 +79,22 @@ var facetItemOperationStrings = map[facetItemOperation]string{
 //
 // {type} {operation} {value}
 //
+// categories = adventure
+// versions != 1.20.1
+// downloads <= 100
+//
+// You then join these strings together in arrays to signal AND OR operators.
+//
+// OR
+// All elements in a single array are considered to be joined by OR statements.
+// For example, the search [["versions:1.16.5", "versions:1.17.1"]] translates
+// to Projects that support 1.16.5 OR 1.17.1.
+//
+// AND
+// Separate arrays are considered to be joined by AND statements. For example,
+// the search [["versions:1.16.5"], ["project_type:modpack"]] translates to
+// Projects that support 1.16.5 AND are modpacks.
+//
 // API Docs: https://docs.modrinth.com/api/operations/searchprojects/
 type facetItem struct {
 	Type      string
@@ -55,21 +103,16 @@ type facetItem struct {
 }
 
 func (f *facetItem) String() string {
-	return `"` + f.Type + facetItemOperationStrings[f.Operation] + f.Value + `"`
+	return `"` + f.Type + f.Operation.String() + f.Value + `"`
 }
 
 // facetItems is an array of facetItem. It represents an expression joined by OR statements.
 // a complete facet is an array of facetItems, with each array joined by AND statements.
 type facetItems []facetItem
 
-// A facet is an array of facetItems, with each array joined by AND statements.
-type facet struct {
-	Expressions []facetItems
-}
-
 // There are no facet data structures, rather, a function is used to directly
 // create a facet string that can be used in the URL.
-func createFacet(expressions ...facetItems) string {
+func serializeFacet(expressions ...facetItems) string {
 	var sb strings.Builder
 	sb.WriteRune('[')
 	for i, expression := range expressions {
@@ -86,57 +129,6 @@ func createFacet(expressions ...facetItems) string {
 		sb.WriteRune(']')
 	}
 	sb.WriteRune(']')
-	return sb.String()
-}
-
-// StringifyFacets builds multiple facet structs into a string that can be embedded
-// into the url's facets props. It joins all facets with an AND operator.
-//
-// The facet prop uses a json-like format:
-//
-// {type} {operation} {value}
-//
-// categories = adventure
-// versions != 1.20.1
-// downloads <= 100
-//
-// You then join these strings together in arrays to signal AND and OR operators.
-//
-// OR
-// All elements in a single array are considered to be joined by OR statements.
-// For example, the search [["versions:1.16.5", "versions:1.17.1"]] translates
-// to Projects that support 1.16.5 OR 1.17.1.
-//
-// AND
-// Separate arrays are considered to be joined by AND statements. For example,
-// the search [["versions:1.16.5"], ["project_type:modpack"]] translates to
-// Projects that support 1.16.5 AND are modpacks.
-func StringifyFacets(facets ...*facet) string {
-	var sb strings.Builder
-	sb.WriteString("[")
-	for i, facet := range facets {
-		if i > 0 {
-			sb.WriteString(",")
-		}
-		sb.WriteString("[")
-		for j, items := range facet.Expressions {
-			if j > 0 {
-				sb.WriteString(",")
-			}
-			for k, item := range items {
-				if k > 0 {
-					sb.WriteString(",")
-				}
-				sb.WriteString(`"`)
-				sb.WriteString(item.Type)
-				sb.WriteString(facetItemOperationStrings[item.Operation])
-				sb.WriteString(item.Value)
-				sb.WriteString(`"`)
-			}
-		}
-		sb.WriteString("]")
-	}
-	sb.WriteString("]")
 	return sb.String()
 }
 

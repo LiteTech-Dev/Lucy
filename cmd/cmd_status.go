@@ -99,7 +99,7 @@ func serverInfoToStatus(data *lucytypes.ServerInfo) *lucytypes.OutputData {
 
 		status.Fields[statusFieldModdingPlatform] = &output.FieldShortText{
 			Title: "Platform",
-			Text:  data.Executable.Platform.String(),
+			Text:  data.Executable.Platform.Title(),
 		}
 		status.Fields[statusFieldMods] = &output.FieldMultiShortTextWithAnnot{
 			Title:  "Mod List",

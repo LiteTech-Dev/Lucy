@@ -1,73 +1,179 @@
+// Package modrinth provides functions to interact with Modrinth API
+//
+// We here use Modrinth terms in private functions:
+//   - Project: A project is a mod, plugin, or resource pack.
+//   - Version: A version is a release, beta, or alpha version of a project.
+//
+// Generally, a project in Modrinth is equivalent to a project in Lucy. And
+// a version in Modrinth is equivalent to a package in Lucy.
+//
+// Here, while referring to a project in lucy, we would try to the term "slug"
+// to refer to the project (or it's name).
 package modrinth
 
 import (
 	"encoding/json"
-	"html/template"
+	"errors"
 	"io"
 	"lucy/apitypes"
-	"lucy/local"
 	"lucy/logger"
 	"lucy/lucytypes"
+	"lucy/tools"
 	"net/http"
-	"net/url"
-	"strings"
 )
+
+var ErrorInvalidAPIResponse = errors.New("invalid data from modrinth api")
+
+func Fetch(id lucytypes.PackageId) (
+	remote *lucytypes.PackageRemote,
+	err error,
+) {
+	remote = &lucytypes.PackageRemote{
+		Source:   lucytypes.Modrinth,
+		RemoteId: getProjectId(id.Name),
+	}
+
+	fileUrl, filename, err := GetFile(id)
+	if err == nil {
+		remote.FileUrl = fileUrl
+		remote.Filename = filename
+	}
+
+	return remote, err
+}
+
+// TODO: Incomplete
+
+func Information(id lucytypes.PackageId) (
+	information *lucytypes.PackageInformation,
+	err error,
+) {
+	projcet := getProjectByName(id.Name)
+	information = &lucytypes.PackageInformation{
+		Name:        projcet.Title,
+		Brief:       projcet.Description,
+		Description: tools.MarkdownToPlainText(projcet.Body),
+		Author:      nil,
+		Urls:        []lucytypes.PackageUrl{},
+		License:     projcet.License.Name,
+	}
+
+	// Fill in URLs
+	if projcet.WikiUrl != "" {
+		information.Urls = append(
+			information.Urls,
+			lucytypes.PackageUrl{
+				Name: "Wiki",
+				Type: lucytypes.WikiUrl,
+				Url:  projcet.WikiUrl,
+			},
+		)
+	}
+
+	if projcet.SourceUrl != "" {
+		information.Urls = append(
+			information.Urls,
+			lucytypes.PackageUrl{
+				Name: "Source Code",
+				Type: lucytypes.SourceUrl,
+				Url:  projcet.SourceUrl,
+			},
+		)
+	}
+
+	if projcet.DonationUrls != nil {
+		for _, donationUrl := range projcet.DonationUrls {
+			information.Urls = append(
+				information.Urls,
+				lucytypes.PackageUrl{
+					Name: "Donation",
+					Type: lucytypes.OthersUrl,
+					Url:  donationUrl.Url,
+				},
+			)
+		}
+	}
+
+	return information, nil
+}
+
+// Dependencies from Modrinth API is extremely unreliable. A local check (if any
+// files were downloaded) is recommended.
+func Dependencies(packageId lucytypes.PackageId) (dependencies *lucytypes.PackageDependencies) {
+	projcet := getProjectByName(packageId.Name)
+	version, _ := getVersion(packageId)
+	dependencies = &lucytypes.PackageDependencies{
+		SupportedVersions:  []lucytypes.PackageVersion{},
+		SupportedPlatforms: []lucytypes.Platform{},
+		Required:           []lucytypes.PackageId{},
+	}
+
+	for _, version := range projcet.GameVersions {
+		dependencies.SupportedVersions = append(
+			dependencies.SupportedVersions,
+			lucytypes.PackageVersion(version),
+		)
+	}
+
+	for _, platform := range projcet.Loaders {
+		dependencies.SupportedPlatforms = append(
+			dependencies.SupportedPlatforms,
+			lucytypes.Platform(platform),
+		)
+	}
+
+	for _, dependency := range version.Dependencies {
+		switch dependency.DependencyType {
+		case apitypes.ModrinthVersionDependencyTypeIncompatible:
+			d, err := DependencyToPackage(packageId, &dependency)
+			if err != nil {
+				logger.Warning(err)
+				continue
+			}
+			dependencies.Incompatible = append(
+				dependencies.Incompatible,
+				d,
+			)
+		case apitypes.ModrinthVersionDependencyTypeOptional:
+			d, err := DependencyToPackage(packageId, &dependency)
+			if err != nil {
+				logger.Warning(err)
+				continue
+			}
+			dependencies.Optional = append(
+				dependencies.Optional,
+				d,
+			)
+		case apitypes.ModrinthVersionDependencyTypeRequired:
+			d, err := DependencyToPackage(packageId, &dependency)
+			if err != nil {
+				logger.Warning(err)
+				continue
+			}
+			dependencies.Required = append(
+				dependencies.Required,
+				d,
+			)
+		}
+	}
+
+	return dependencies
+}
+
+// TODO:
+// func Search(packageId lucytypes.PackageId, options SearchOptions) (result []*lucytypes.PackageId, err error)
 
 // For Modrinth search API, see:
 // https://docs.modrinth.com/api/operations/searchprojects/
 
-// func GetFile(id lucytypes.PackageId) (url string)
-
-func GetNewestProjectVersion(slug lucytypes.PackageName) (newestVersion *apitypes.ModrinthProjectVersion) {
-	newestVersion = nil
-	versions := getProjectVersions(slug)
-	serverInfo := local.GetServerInfo()
-	for _, version := range versions {
-		for _, gameVersion := range version.GameVersions {
-			if gameVersion == serverInfo.Executable.GameVersion &&
-			version.VersionType == "release" &&
-			(newestVersion == nil || version.DatePublished.After(newestVersion.DatePublished)) {
-				newestVersion = version
-			}
-		}
-	}
-
-	if newestVersion == nil {
-		println("No suitable version found for", slug)
-	}
-
-	return
-}
-
-func getProjectVersions(slug lucytypes.PackageName) (versions []*apitypes.ModrinthProjectVersion) {
-	res, _ := http.Get(constructProjectVersionsUrl(slug))
-	data, _ := io.ReadAll(res.Body)
-	json.Unmarshal(data, &versions)
-	return
-}
-
-func GetProjectId(slug lucytypes.PackageName) (id string) {
-	res, _ := http.Get(constructProjectUrl(slug))
-	modrinthProject := apitypes.ModrinthProject{}
-	data, _ := io.ReadAll(res.Body)
-	json.Unmarshal(data, &modrinthProject)
-	id = modrinthProject.Id
-	return
-}
-
-// TODO: Search() is way too long, refactor
-
-const searchUrlTemplate = `https://api.modrinth.com/v2/search?query={{.packageName}}&limit=100&index={{.indexBy}}&facets={{.facets}}`
-
 func Search(
-platform lucytypes.Platform,
-packageName lucytypes.PackageName,
-showClientPackage bool,
-indexBy string, // indexBy can be: relevance (default), downloads, follows, newest, updated
-) (result *apitypes.ModrinthSearchResults) {
-	// Construct the search url
+	packageId lucytypes.PackageId,
+	showClientPackage bool,
+) (result *apitypes.ModrinthSearchResults, err error) {
 	var facets []facetItems
-	switch platform {
+	query := packageId.Name
+
+	switch packageId.Platform {
 	case lucytypes.Forge:
 		facets = append(facets, facetForge)
 	case lucytypes.Fabric:
@@ -80,37 +186,45 @@ indexBy string, // indexBy can be: relevance (default), downloads, follows, newe
 		facets = append(facets, facetServerSupported)
 	}
 
-	templateUrl, _ := template.New("template_url").Parse(searchUrlTemplate)
-	urlBuilder := strings.Builder{}
-	_ = templateUrl.Execute(
-		&urlBuilder,
-		map[string]any{
-			"packageName": string(packageName),
-			"indexBy":     indexBy,
-			"facets":      url.QueryEscape(createFacet(facets...)),
-		},
-	)
-	searchUrl := urlBuilder.String()
+	option := searchOptions{
+		index:  byRelevance,
+		facets: facets,
+	}
+	searchUrl := searchUrl(query, option)
 
 	// Make the call to Modrinth API
-	println("calling", searchUrl)
+	logger.Debug("searching via modrinth api: " + searchUrl)
 	res, err := http.Get(searchUrl)
 	if err != nil {
-		logger.Fatal(err)
+		return nil, err
 	}
 	data, err := io.ReadAll(res.Body)
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			logger.Warning(err)
-		}
-	}(res.Body)
+	defer tools.CloseReader(res.Body, logger.Warning)
 	err = json.Unmarshal(data, &result)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
 
+func GetProjectByName(packageName lucytypes.PackageName) (
+	project *apitypes.ModrinthProject,
+	err error,
+) {
+	res, err := http.Get(projectUrl(string(packageName)))
+	if err != nil {
+		return
+	}
+	data, err := io.ReadAll(res.Body)
+	if err != nil {
+		return
+	}
+	project = &apitypes.ModrinthProject{}
+	err = json.Unmarshal(data, project)
 	return
 }
 
-func PackageFromModrinth(s *apitypes.ModrinthProject) *lucytypes.Package {
+func FullPackage(s *apitypes.ModrinthProject) *lucytypes.Package {
 	p := &lucytypes.Package{}
 	p.Dependencies = &lucytypes.PackageDependencies{}
 

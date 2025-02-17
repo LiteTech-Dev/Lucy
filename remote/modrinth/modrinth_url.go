@@ -1,40 +1,64 @@
 package modrinth
 
 import (
-	"encoding/json"
-	"io"
-	"lucy/apitypes"
+	"lucy/logger"
 	"lucy/lucytypes"
-	"net/http"
 	"net/url"
+	"strings"
+	"text/template"
 )
 
-func constructProjectVersionsUrl(slug lucytypes.PackageName) (urlString string) {
+const projectUrlPrefix = "https://api.modrinth.com/v2/project/"
+
+func versionsUrl(slug lucytypes.PackageName) (urlString string) {
 	urlString, _ = url.JoinPath(
-		"https://api.modrinth.com/v2/project",
+		projectUrlPrefix,
 		string(slug),
 		"version",
 	)
 	return
 }
 
-func constructProjectUrl(packageName lucytypes.PackageName) (url string) {
-	return "https://api.modrinth.com/v2/project/" + string(packageName)
+const versionUrlPrefix = `https://api.modrinth.com/v2/version/`
+
+func versionUrl(id string) (urlString string) {
+	return versionUrlPrefix + id
 }
 
-func GetProjectByName(packageName lucytypes.PackageName) (
-	project *apitypes.ModrinthProject,
-	err error,
-) {
-	res, err := http.Get(constructProjectUrl(packageName))
+// projectUrl returns the URL for a project with the given Modrinth project id
+// or slug (package name).
+func projectUrl(suffix string) (urlString string) {
+	return projectUrlPrefix + string(suffix)
+}
+
+func projectMemberUrl(suffix string) (urlString string) {
+	return projectUrl(suffix) + "/members"
+}
+
+func projectDependencyUrl(suffix string) (urlString string) {
+	return projectUrl(suffix) + "/dependencies"
+}
+
+const searchUrlTemplate = `https://api.modrinth.com/v2/search?query={{.query}}&limit=100&index={{.index}}&facets={{.facets}}`
+
+func searchUrl(
+	query lucytypes.PackageName,
+	option searchOptions,
+) (urlString string) {
+	urlTemplate, _ := template.New("modrinth_search_url").Parse(searchUrlTemplate)
+	urlBuilder := strings.Builder{}
+	err := urlTemplate.Execute(
+		&urlBuilder,
+		map[string]any{
+			"query":  query,
+			"index":  option.index.String(),
+			"facets": url.QueryEscape(serializeFacet(option.facets...)),
+		},
+	)
 	if err != nil {
-		return
+		logger.Error(err)
 	}
-	data, err := io.ReadAll(res.Body)
-	if err != nil {
-		return
-	}
-	project = &apitypes.ModrinthProject{}
-	err = json.Unmarshal(data, project)
-	return
+
+	urlString = urlBuilder.String()
+	return urlString
 }

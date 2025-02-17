@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/urfave/cli/v3"
 	"lucy/apitypes"
+	"lucy/logger"
 	"lucy/lucytypes"
 	"lucy/output"
 	"lucy/remote/modrinth"
@@ -66,16 +67,13 @@ var subcmdSearch = &cli.Command{
 func actionSearch(_ context.Context, cmd *cli.Command) error {
 	// TODO: Error handling
 	p := syntax.Parse(cmd.Args().First())
-	// indexBy can be: relevance (default), downloads, follows, newest, updated
-	indexBy := cmd.String("index")
+	_ = cmd.String("index") // TODO: Implement indexBy
 	showClientPackage := cmd.Bool("client")
 
-	res := modrinth.Search(
-		p.Platform,
-		p.Name,
-		showClientPackage,
-		indexBy,
-	)
+	res, err := modrinth.Search(p, showClientPackage)
+	if err != nil {
+		logger.Fatal(err)
+	}
 
 	if cmd.Bool("debug") {
 		tools.PrintAsJson(res)

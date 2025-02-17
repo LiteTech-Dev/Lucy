@@ -2,8 +2,6 @@ package lucytypes
 
 import (
 	"fmt"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 	"lucy/tools"
 	"strings"
 )
@@ -23,8 +21,7 @@ const (
 	AllPlatform Platform = "all"
 )
 
-// String by default returns a capitalized string
-func (p Platform) String() string {
+func (p Platform) Title() string {
 	if p.IsAll() {
 		return "Any"
 	}
@@ -63,18 +60,14 @@ var Platforms = []Platform{
 // exist on a remote API or user's local files.
 type PackageName string
 
-// Replace underlines or hyphens with spaces, then capitalize the first letter of
-// each word.
+// Title Replaces underlines or hyphens with spaces, then capitalize the first
+// letter.
+func (p PackageName) Title() string {
+	return tools.Capitalize(strings.ReplaceAll(string(p), "-", " "))
+}
+
 func (p PackageName) String() string {
-	return cases.Title(language.English).String(
-		strings.ReplaceAll(
-			strings.ReplaceAll(
-				string(p),
-				"-",
-				" ",
-			), "_", " ",
-		),
-	)
+	return string(p)
 }
 
 type PackageId struct {
@@ -112,7 +105,7 @@ func (p *PackageId) String() string {
 type PackageVersion string
 
 func (p PackageVersion) String() string {
-	if p == AllVersion {
+	if p == AllVersion || p == "" {
 		return "Any"
 	}
 	if p == NoVersion {

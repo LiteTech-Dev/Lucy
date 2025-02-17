@@ -51,9 +51,11 @@ type Package struct {
 // a Package struct. It is usually used in any command that requires operating
 // local packages, such as `lucy install` or `lucy remove`.
 type PackageDependencies struct {
-	SupportedVersions   []PackageVersion
-	SupportedPlatforms  []Platform
-	PackageDependencies []PackageId
+	SupportedVersions  []PackageVersion
+	SupportedPlatforms []Platform
+	Required           []PackageId
+	Optional           []PackageId
+	Incompatible       []PackageId
 }
 
 // PackageInformation is a struct that contains informational data about the
@@ -77,14 +79,20 @@ type PackageInstallation struct {
 	Path string
 }
 
-// PackageRemote is an optional attribution to lucytypes.Package. It is used for
-// packages that are known to be bound with a remote source.
+// PackageRemote is an optional attribution to lucytypes.Package. It is used to
+// represent package's presence in a remote source.
 type PackageRemote struct {
-	Source   Source
+	Source Source
+	// Whatever the remote source uses to identify this package.
 	RemoteId string
 	// The URL to download the package's specified version When package.Id.Version
-	// is set to "latest" or "any", this field will be identical to LatestFileUrl.
-	FileUrl string
-	// The URL to get the latest version of the package.
-	LatestVersionUrl string
+	FileUrl  string
+	Filename string
+}
+
+// PackageUpdate is a struct to represent the update status of a package. It must
+// be used with PackageRemote.
+type PackageUpdate struct {
+	// Just refer this to the PackageRemote under the same Package struct.
+	Current *PackageRemote
 }

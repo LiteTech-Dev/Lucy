@@ -188,7 +188,7 @@ func cInfoOutput(p lucytypes.Package) *lucytypes.OutputData {
 			Labels:   []string{},
 			MaxWidth: 0,
 		}
-		for _, version := range p.Dependencies.SupportedPlatforms {
+		for _, version := range p.Dependencies.SupportedVersions {
 			f.Labels = append(f.Labels, version.String())
 		}
 		o.Fields = append(o.Fields, f)

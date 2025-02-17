@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"lucy/logger"
 	"lucy/lucytypes"
-	"lucy/remote/modrinth"
 )
 
 func FetchSource(
@@ -17,12 +16,7 @@ func FetchSource(
 
 	switch source {
 	case lucytypes.Modrinth:
-		remote = &lucytypes.PackageRemote{
-			Source:           lucytypes.Modrinth,
-			RemoteId:         modrinth.GetProjectId(id.Name),
-			FileUrl:          modrinth.GetNewestProjectVersion(id.Name).Files[0].Url,
-			LatestVersionUrl: modrinth.GetNewestProjectVersion(id.Name).Files[0].Url,
-		}
+		// return modrinth.Fetch(id)
 	default:
 		logger.Fatal(fmt.Errorf("source fetch not supported yet:" + source.String()))
 	}
@@ -47,6 +41,6 @@ func GetInformation(
 func SearchForProject(
 	source lucytypes.Source,
 	query string,
-) []*lucytypes.PackageName {
+) []lucytypes.PackageName {
 	return nil
 }
