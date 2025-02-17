@@ -6,7 +6,7 @@ import (
 	"errors"
 	"gopkg.in/ini.v1"
 	"io"
-	"lucy/apitypes"
+	"lucy/datatypes"
 	"lucy/logger"
 	"lucy/lucytypes"
 	"lucy/tools"
@@ -235,7 +235,7 @@ func analyzeModJar(file *os.File) *lucytypes.Package {
 			if err != nil {
 				return nil
 			}
-			modInfo := &apitypes.FabricModIdentifier{}
+			modInfo := &datatypes.FabricModIdentifier{}
 			err = json.Unmarshal(data, modInfo)
 			if err != nil {
 				return nil

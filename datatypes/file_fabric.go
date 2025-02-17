@@ -1,4 +1,4 @@
-package apitypes
+package datatypes
 
 type FabricModIdentifier struct {
 	SchemaVersion int      `json:"schemaVersion"`

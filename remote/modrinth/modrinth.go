@@ -15,7 +15,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
-	"lucy/apitypes"
+	"lucy/datatypes"
 	"lucy/logger"
 	"lucy/lucytypes"
 	"lucy/tools"
@@ -124,7 +124,7 @@ func Dependencies(packageId lucytypes.PackageId) (dependencies *lucytypes.Packag
 
 	for _, dependency := range version.Dependencies {
 		switch dependency.DependencyType {
-		case apitypes.ModrinthVersionDependencyTypeIncompatible:
+		case datatypes.ModrinthVersionDependencyTypeIncompatible:
 			d, err := DependencyToPackage(packageId, &dependency)
 			if err != nil {
 				logger.Warning(err)
@@ -134,7 +134,7 @@ func Dependencies(packageId lucytypes.PackageId) (dependencies *lucytypes.Packag
 				dependencies.Incompatible,
 				d,
 			)
-		case apitypes.ModrinthVersionDependencyTypeOptional:
+		case datatypes.ModrinthVersionDependencyTypeOptional:
 			d, err := DependencyToPackage(packageId, &dependency)
 			if err != nil {
 				logger.Warning(err)
@@ -144,7 +144,7 @@ func Dependencies(packageId lucytypes.PackageId) (dependencies *lucytypes.Packag
 				dependencies.Optional,
 				d,
 			)
-		case apitypes.ModrinthVersionDependencyTypeRequired:
+		case datatypes.ModrinthVersionDependencyTypeRequired:
 			d, err := DependencyToPackage(packageId, &dependency)
 			if err != nil {
 				logger.Warning(err)
@@ -169,7 +169,7 @@ func Dependencies(packageId lucytypes.PackageId) (dependencies *lucytypes.Packag
 func Search(
 	packageId lucytypes.PackageId,
 	showClientPackage bool,
-) (result *apitypes.ModrinthSearchResults, err error) {
+) (result *datatypes.ModrinthSearchResults, err error) {
 	var facets []facetItems
 	query := packageId.Name
 
@@ -208,7 +208,7 @@ func Search(
 }
 
 func GetProjectByName(packageName lucytypes.PackageName) (
-	project *apitypes.ModrinthProject,
+	project *datatypes.ModrinthProject,
 	err error,
 ) {
 	res, err := http.Get(projectUrl(string(packageName)))
@@ -219,12 +219,12 @@ func GetProjectByName(packageName lucytypes.PackageName) (
 	if err != nil {
 		return
 	}
-	project = &apitypes.ModrinthProject{}
+	project = &datatypes.ModrinthProject{}
 	err = json.Unmarshal(data, project)
 	return
 }
 
-func FullPackage(s *apitypes.ModrinthProject) *lucytypes.Package {
+func FullPackage(s *datatypes.ModrinthProject) *lucytypes.Package {
 	p := &lucytypes.Package{}
 	p.Dependencies = &lucytypes.PackageDependencies{}
 

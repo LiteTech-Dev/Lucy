@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/urfave/cli/v3"
-	"lucy/apitypes"
+	"lucy/datatypes"
 	"lucy/logger"
 	"lucy/lucytypes"
 	"lucy/output"
@@ -83,7 +83,7 @@ func actionSearch(_ context.Context, cmd *cli.Command) error {
 	return nil
 }
 
-func modrinthResToSearch(res *apitypes.ModrinthSearchResults) *lucytypes.OutputData {
+func modrinthResToSearch(res *datatypes.ModrinthSearchResults) *lucytypes.OutputData {
 	hits := make([]string, len(res.Hits))
 	for i, hit := range res.Hits {
 		hits[i] = hit.Slug

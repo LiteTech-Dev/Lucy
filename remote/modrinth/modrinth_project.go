@@ -4,37 +4,37 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
-	"lucy/apitypes"
+	"lucy/datatypes"
 	"lucy/lucytypes"
 	"net/http"
 )
 
 func getProjectId(slug lucytypes.PackageName) (id string) {
 	res, _ := http.Get(projectUrl(string(slug)))
-	modrinthProject := apitypes.ModrinthProject{}
+	modrinthProject := datatypes.ModrinthProject{}
 	data, _ := io.ReadAll(res.Body)
 	json.Unmarshal(data, &modrinthProject)
 	id = modrinthProject.Id
 	return
 }
 
-func getProjectById(id string) (project *apitypes.ModrinthProject) {
+func getProjectById(id string) (project *datatypes.ModrinthProject) {
 	res, _ := http.Get(projectUrl(id))
 	data, _ := io.ReadAll(res.Body)
-	project = &apitypes.ModrinthProject{}
+	project = &datatypes.ModrinthProject{}
 	json.Unmarshal(data, project)
 	return
 }
 
-func getProjectByName(slug lucytypes.PackageName) (project *apitypes.ModrinthProject) {
+func getProjectByName(slug lucytypes.PackageName) (project *datatypes.ModrinthProject) {
 	res, _ := http.Get(projectUrl(string(slug)))
 	data, _ := io.ReadAll(res.Body)
-	project = &apitypes.ModrinthProject{}
+	project = &datatypes.ModrinthProject{}
 	json.Unmarshal(data, project)
 	return
 }
 
-func getProjectMembers(id string) (members []*apitypes.ModrinthMember) {
+func getProjectMembers(id string) (members []*datatypes.ModrinthMember) {
 	res, _ := http.Get(projectMemberUrl(id))
 	data, _ := io.ReadAll(res.Body)
 	json.Unmarshal(data, &members)
@@ -45,13 +45,13 @@ var ErrorInvalidDependency = errors.New("invalid dependency")
 
 func DependencyToPackage(
 	depedent lucytypes.PackageId,
-	dependency *apitypes.ModrinthVersionDependencies,
+	dependency *datatypes.ModrinthVersionDependencies,
 ) (
 	p lucytypes.PackageId,
 	err error,
 ) {
-	var version *apitypes.ModrinthVersion
-	var project *apitypes.ModrinthProject
+	var version *datatypes.ModrinthVersion
+	var project *datatypes.ModrinthProject
 
 	// I don't see a case where a package would depend on a project on another
 	// platform. So, we can safely assume that the platform of the dependent

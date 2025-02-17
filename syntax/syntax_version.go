@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"golang.org/x/mod/semver"
 	"io"
-	"lucy/apitypes"
+	"lucy/datatypes"
 	"lucy/lucytypes"
 	"net/http"
 )
@@ -21,8 +21,8 @@ var (
 
 const VersionManifestURL = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json"
 
-func GetVersionManifest() (manifest *apitypes.VersionManifest, err error) {
-	manifest = &apitypes.VersionManifest{}
+func GetVersionManifest() (manifest *datatypes.VersionManifest, err error) {
+	manifest = &datatypes.VersionManifest{}
 
 	// TODO: Add cache mechanism if http call is too slow or fails
 	resp, err := http.Get(VersionManifestURL)
@@ -73,8 +73,8 @@ func ComparePackageVersions(p1, p2 *lucytypes.PackageId) (c int8, err error) {
 }
 
 func compareMinecraftVersions(v1, v2 lucytypes.PackageVersion) (
-	c int8,
-	err error,
+c int8,
+err error,
 ) {
 	manifest, err := GetVersionManifest()
 	if err != nil {

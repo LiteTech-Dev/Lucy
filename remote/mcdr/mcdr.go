@@ -5,13 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/google/go-github/v50/github"
-	"lucy/apitypes"
+	"lucy/datatypes"
 	"lucy/lucytypes"
 	"lucy/syntax"
 	"path"
 )
 
-func mcdrPluginInfoToPackageInfo(s *apitypes.McdrPluginInfo) *lucytypes.Package {
+func mcdrPluginInfoToPackageInfo(s *datatypes.McdrPluginInfo) *lucytypes.Package {
 	name := lucytypes.PackageName(s.Id)
 
 	info := &lucytypes.Package{
@@ -26,7 +26,7 @@ func mcdrPluginInfoToPackageInfo(s *apitypes.McdrPluginInfo) *lucytypes.Package 
 }
 
 func SearchMcdrPluginCatalogue(search lucytypes.PackageName) (
-	pluginInfo *apitypes.McdrPluginInfo,
+	pluginInfo *datatypes.McdrPluginInfo,
 	err error,
 ) {
 	plugins := getMcdrPluginCatalogue()
@@ -56,7 +56,7 @@ func getMcdrPluginCatalogue() []*github.RepositoryContent {
 	return directoryContent
 }
 
-func getMcdrPluginInfo(pluginPath string) (pluginInfo *apitypes.McdrPluginInfo) {
+func getMcdrPluginInfo(pluginPath string) (pluginInfo *datatypes.McdrPluginInfo) {
 	ctx := context.Background()
 	client := github.NewClient(nil)
 
@@ -67,7 +67,7 @@ func getMcdrPluginInfo(pluginPath string) (pluginInfo *apitypes.McdrPluginInfo) 
 		path.Join(pluginPath, "plugin_info.json"),
 		nil,
 	)
-	pluginInfo = &apitypes.McdrPluginInfo{}
+	pluginInfo = &datatypes.McdrPluginInfo{}
 	content, _ := fileContent.GetContent()
 	_ = json.Unmarshal([]byte(content), pluginInfo)
 

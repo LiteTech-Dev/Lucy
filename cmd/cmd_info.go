@@ -3,7 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"lucy/apitypes"
+	"lucy/datatypes"
 	"lucy/logger"
 	"lucy/lucytypes"
 	"lucy/output"
@@ -93,7 +93,7 @@ func actionInfo(ctx context.Context, cmd *cli.Command) error {
 // TODO: Link to latest compatible version
 // TODO: Generate `lucy install` command
 
-func modrinthProjectToInfo(source *apitypes.ModrinthProject) *lucytypes.OutputData {
+func modrinthProjectToInfo(source *datatypes.ModrinthProject) *lucytypes.OutputData {
 	return &lucytypes.OutputData{
 		Fields: []lucytypes.Field{
 			&output.FieldShortText{
@@ -120,7 +120,7 @@ func modrinthProjectToInfo(source *apitypes.ModrinthProject) *lucytypes.OutputDa
 // TODO: Link to newest version
 // TODO: Generate `lucy install` command
 
-func mcdrPluginInfoToInfo(source *apitypes.McdrPluginInfo) *lucytypes.OutputData {
+func mcdrPluginInfoToInfo(source *datatypes.McdrPluginInfo) *lucytypes.OutputData {
 	info := &lucytypes.OutputData{
 		Fields: []lucytypes.Field{
 			&output.FieldShortText{

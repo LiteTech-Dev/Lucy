@@ -1,9 +1,7 @@
-// Package apitypes stores types of APIs and files.
+// Package datatypes stores types to store data
 //
 // TODO: For web APIs, their types will be moved to where they are used.
-package apitypes
-
-// TODO: Rename this package to 'datatypes'
+package datatypes
 
 import (
 	"time"

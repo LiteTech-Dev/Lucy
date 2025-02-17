@@ -1,7 +1,7 @@
 package modrinth
 
 import (
-	"lucy/apitypes"
+	"lucy/datatypes"
 	"lucy/lucytypes"
 )
 
@@ -14,7 +14,7 @@ func GetFile(id lucytypes.PackageId) (url string, filename string, err error) {
 	return primary.Url, primary.Filename, nil
 }
 
-func primaryFile(files []apitypes.ModrinthVersionFile) (primary apitypes.ModrinthVersionFile) {
+func primaryFile(files []datatypes.ModrinthVersionFile) (primary datatypes.ModrinthVersionFile) {
 	for _, file := range files {
 		if file.Primary {
 			return file

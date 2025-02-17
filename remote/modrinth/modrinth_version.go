@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"lucy/apitypes"
+	"lucy/datatypes"
 	"lucy/local"
 	"lucy/lucytypes"
 	"net/http"
@@ -18,7 +18,7 @@ var ErrorVersionNotFound = func(s string) error {
 	return fmt.Errorf("version %s not found", s)
 }
 
-func listVersions(slug lucytypes.PackageName) (versions []*apitypes.ModrinthVersion) {
+func listVersions(slug lucytypes.PackageName) (versions []*datatypes.ModrinthVersion) {
 	res, _ := http.Get(versionsUrl(slug))
 	data, _ := io.ReadAll(res.Body)
 	json.Unmarshal(data, &versions)
@@ -28,7 +28,7 @@ func listVersions(slug lucytypes.PackageName) (versions []*apitypes.ModrinthVers
 // getVersion is named as so because a Package in lucy is equivalent to a version
 // in Modrinth.
 func getVersion(id lucytypes.PackageId) (
-	v *apitypes.ModrinthVersion,
+	v *datatypes.ModrinthVersion,
 	err error,
 ) {
 	versions := listVersions(id.Name)
@@ -41,16 +41,16 @@ func getVersion(id lucytypes.PackageId) (
 	return nil, ErrorVersionNotFound(string(id.Version))
 }
 
-func getVersionById(id string) (v *apitypes.ModrinthVersion) {
+func getVersionById(id string) (v *datatypes.ModrinthVersion) {
 	res, _ := http.Get(versionUrl(id))
 	data, _ := io.ReadAll(res.Body)
-	v = &apitypes.ModrinthVersion{}
+	v = &datatypes.ModrinthVersion{}
 	json.Unmarshal(data, v)
 	return
 }
 
 func versionSupportsLoader(
-	version *apitypes.ModrinthVersion,
+	version *datatypes.ModrinthVersion,
 	loader lucytypes.Platform,
 ) bool {
 	for _, l := range version.Loaders {
@@ -61,7 +61,7 @@ func versionSupportsLoader(
 	return false
 }
 
-func latestVersion(slug lucytypes.PackageName) (v *apitypes.ModrinthVersion) {
+func latestVersion(slug lucytypes.PackageName) (v *datatypes.ModrinthVersion) {
 	versions := listVersions(slug)
 	for _, version := range versions {
 		if version.VersionType == "release" &&
@@ -72,7 +72,7 @@ func latestVersion(slug lucytypes.PackageName) (v *apitypes.ModrinthVersion) {
 	return v
 }
 
-func LatestCompatibleVersion(slug lucytypes.PackageName) (v *apitypes.ModrinthVersion) {
+func LatestCompatibleVersion(slug lucytypes.PackageName) (v *datatypes.ModrinthVersion) {
 	versions := listVersions(slug)
 	serverInfo := local.GetServerInfo()
 	for _, version := range versions {

@@ -1,4 +1,4 @@
-package apitypes
+package datatypes
 
 type McdrPluginInfo struct {
 	Id      string `json:"id"`
