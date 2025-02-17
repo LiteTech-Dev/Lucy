@@ -62,3 +62,10 @@ func searchUrl(
 	urlString = urlBuilder.String()
 	return urlString
 }
+
+const userHomepageUrlPrefix = `https://modrinth.com/user/`
+
+// userHomepageUrl's suffix is the user's username or id.
+func userHomepageUrl(suffix string) (urlString string) {
+	return userHomepageUrlPrefix + suffix
+}

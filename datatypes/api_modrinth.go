@@ -7,18 +7,6 @@ import (
 	"time"
 )
 
-// Do not move this in future refactorings. This is used for API calls, not
-// receiving data.
-
-func ValidateModrinthSearchIndex(index string) string {
-	switch index {
-	case "relevance", "downloads", "updated", "created":
-		return index
-	default:
-		return "relevance"
-	}
-}
-
 // ModrinthProject is a struct that represents a Modrinth project, the basic
 // form of any item on Modrinth.
 //
@@ -173,30 +161,38 @@ type ModrinthVersionDependencies struct {
 // Example
 // https://api.modrinth.com/v2/project/carpet/members
 type ModrinthMember struct {
-	Role   string `json:"role"`
-	TeamId string `json:"team_id"`
-	User   struct {
-		Id                  string    `json:"id"`
-		Username            string    `json:"username"`
-		AvatarUrl           string    `json:"avatar_url"`
-		Bio                 string    `json:"bio"`
-		Created             time.Time `json:"created"`
-		Role                string    `json:"role"`
-		Badges              int       `json:"badges"`
-		AuthProviders       string    `json:"auth_providers"`
-		Email               string    `json:"email"`
-		EmailVerified       bool      `json:"email_verified"`
-		HasPassword         bool      `json:"has_password"`
-		HasTotp             bool      `json:"has_totp"`
-		PayoutData          string    `json:"payout_data"`
-		StripeCustomerId    string    `json:"stripe_customer_id"`
-		AllowFriendRequests bool      `json:"allow_friend_requests"`
-		GithubId            string    `json:"github_id"`
-	} `json:"user"`
-	Permissions  interface{} `json:"permissions"`
-	Accepted     bool        `json:"accepted"`
-	PayoutsSplit interface{} `json:"payouts_split"`
-	Ordering     int         `json:"ordering"`
+	Role         string       `json:"role"`
+	TeamId       string       `json:"team_id"`
+	User         ModrinthUser `json:"user"`
+	Permissions  interface{}  `json:"permissions"`
+	Accepted     bool         `json:"accepted"`
+	PayoutsSplit interface{}  `json:"payouts_split"`
+	Ordering     int          `json:"ordering"`
+}
+
+// ModrinthUser
+//
+// The url can either be a id or username
+//
+// Example
+// https://modrinth.com/user/gnembon
+type ModrinthUser struct {
+	Id                  string    `json:"id"`
+	Username            string    `json:"username"`
+	AvatarUrl           string    `json:"avatar_url"`
+	Bio                 string    `json:"bio"`
+	Created             time.Time `json:"created"`
+	Role                string    `json:"role"`
+	Badges              int       `json:"badges"`
+	AuthProviders       string    `json:"auth_providers"`
+	Email               string    `json:"email"`
+	EmailVerified       bool      `json:"email_verified"`
+	HasPassword         bool      `json:"has_password"`
+	HasTotp             bool      `json:"has_totp"`
+	PayoutData          string    `json:"payout_data"`
+	StripeCustomerId    string    `json:"stripe_customer_id"`
+	AllowFriendRequests bool      `json:"allow_friend_requests"`
+	GithubId            string    `json:"github_id"`
 }
 
 type ModrinthProjectDependencies struct {

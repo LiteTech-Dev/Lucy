@@ -25,8 +25,8 @@ import (
 var ErrorInvalidAPIResponse = errors.New("invalid data from modrinth api")
 
 func Fetch(id lucytypes.PackageId) (
-	remote *lucytypes.PackageRemote,
-	err error,
+remote *lucytypes.PackageRemote,
+err error,
 ) {
 	remote = &lucytypes.PackageRemote{
 		Source:   lucytypes.Modrinth,
@@ -42,47 +42,45 @@ func Fetch(id lucytypes.PackageId) (
 	return remote, err
 }
 
-// TODO: Incomplete
-
 func Information(id lucytypes.PackageId) (
-	information *lucytypes.PackageInformation,
-	err error,
+information *lucytypes.PackageInformation,
+err error,
 ) {
-	projcet := getProjectByName(id.Name)
+	project := getProjectByName(id.Name)
 	information = &lucytypes.PackageInformation{
-		Name:        projcet.Title,
-		Brief:       projcet.Description,
-		Description: tools.MarkdownToPlainText(projcet.Body),
+		Name:        project.Title,
+		Brief:       project.Description,
+		Description: tools.MarkdownToPlainText(project.Body),
 		Author:      nil,
 		Urls:        []lucytypes.PackageUrl{},
-		License:     projcet.License.Name,
+		License:     project.License.Name,
 	}
 
 	// Fill in URLs
-	if projcet.WikiUrl != "" {
+	if project.WikiUrl != "" {
 		information.Urls = append(
 			information.Urls,
 			lucytypes.PackageUrl{
 				Name: "Wiki",
 				Type: lucytypes.WikiUrl,
-				Url:  projcet.WikiUrl,
+				Url:  project.WikiUrl,
 			},
 		)
 	}
 
-	if projcet.SourceUrl != "" {
+	if project.SourceUrl != "" {
 		information.Urls = append(
 			information.Urls,
 			lucytypes.PackageUrl{
 				Name: "Source Code",
 				Type: lucytypes.SourceUrl,
-				Url:  projcet.SourceUrl,
+				Url:  project.SourceUrl,
 			},
 		)
 	}
 
-	if projcet.DonationUrls != nil {
-		for _, donationUrl := range projcet.DonationUrls {
+	if project.DonationUrls != nil {
+		for _, donationUrl := range project.DonationUrls {
 			information.Urls = append(
 				information.Urls,
 				lucytypes.PackageUrl{
@@ -92,6 +90,20 @@ func Information(id lucytypes.PackageId) (
 				},
 			)
 		}
+	}
+
+	// Fill in authors
+	members := getProjectMembers(project.Id)
+	for _, member := range members {
+		information.Author = append(
+			information.Author,
+			lucytypes.PackageMember{
+				Name:  member.User.Username,
+				Role:  member.Role,
+				Url:   userHomepageUrl(member.User.Id),
+				Email: member.User.Email,
+			},
+		)
 	}
 
 	return information, nil
@@ -167,8 +179,8 @@ func Dependencies(packageId lucytypes.PackageId) (dependencies *lucytypes.Packag
 // https://docs.modrinth.com/api/operations/searchprojects/
 
 func Search(
-	packageId lucytypes.PackageId,
-	showClientPackage bool,
+packageId lucytypes.PackageId,
+showClientPackage bool,
 ) (result *datatypes.ModrinthSearchResults, err error) {
 	var facets []facetItems
 	query := packageId.Name
@@ -208,8 +220,8 @@ func Search(
 }
 
 func GetProjectByName(packageName lucytypes.PackageName) (
-	project *datatypes.ModrinthProject,
-	err error,
+project *datatypes.ModrinthProject,
+err error,
 ) {
 	res, err := http.Get(projectUrl(string(packageName)))
 	if err != nil {

@@ -64,13 +64,16 @@ type PackageInformation struct {
 	Name        string
 	Brief       string
 	Description string
-	Author      []struct {
-		Name  string
-		Url   string
-		Email string
-	}
-	Urls    []PackageUrl
-	License string
+	Author      []PackageMember
+	Urls        []PackageUrl
+	License     string
+}
+
+type PackageMember struct {
+	Name  string
+	Role  string
+	Url   string
+	Email string
 }
 
 // PackageInstallation is an optional attribution to lucytypes.Package. It is
