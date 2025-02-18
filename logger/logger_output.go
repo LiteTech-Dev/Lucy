@@ -10,9 +10,6 @@ import (
 func pop() {
 	item, _ := queue.Get(0)
 	writeItem(item.(*logItem))
-	if debug && item.(*logItem).Level == lDebug {
-		writeItem(item.(*logItem))
-	}
 	queue.Remove(0)
 }
 

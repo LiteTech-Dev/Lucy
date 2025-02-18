@@ -33,7 +33,9 @@ var (
 		WriteAll()
 	}
 	Debug = func(content any) {
-		queue.Add(&logItem{Level: lDebug, Content: content})
+		if debug {
+			queue.Add(&logItem{Level: lDebug, Content: content})
+		}
 	}
 )
 
