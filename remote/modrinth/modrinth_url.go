@@ -51,7 +51,7 @@ func searchUrl(
 		&urlBuilder,
 		map[string]any{
 			"query":  query,
-			"index":  option.index.String(),
+			"index":  option.index,
 			"facets": url.QueryEscape(serializeFacet(option.facets...)),
 		},
 	)

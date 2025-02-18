@@ -24,6 +24,65 @@ import (
 
 var ErrorInvalidAPIResponse = errors.New("invalid data from modrinth api")
 
+// Search
+//
+// For Modrinth search API, see:
+// https://docs.modrinth.com/api/operations/searchprojects/
+func Search(
+packageId lucytypes.PackageId,
+options lucytypes.SearchOptions,
+) (result *lucytypes.SearchResults, err error) {
+	var facets []facetItems
+	query := packageId.Name
+
+	// switch packageId.Platform {
+	// case lucytypes.Forge:
+	// 	facets = append(facets, facetForge)
+	// case lucytypes.Fabric:
+	// 	facets = append(facets, facetFabric)
+	// }
+
+	if options.ShowClientPackage {
+		facets = append(facets, facetServerSupported, facetClientSupported)
+	} else {
+		facets = append(facets, facetServerSupported)
+	}
+
+	internalOptions := searchOptions{
+		index:  options.IndexBy.ToModrinth(),
+		facets: facets,
+	}
+	searchUrl := searchUrl(
+		query,
+		internalOptions,
+	)
+
+	// Make the call to Modrinth API
+	logger.Debug("searching via modrinth api: " + searchUrl)
+	resp, err := http.Get(searchUrl)
+	if err != nil {
+		return nil, ErrorInvalidAPIResponse
+	}
+	data, err := io.ReadAll(resp.Body)
+	defer tools.CloseReader(resp.Body, logger.Warning)
+	var searchResults datatypes.ModrinthSearchResults
+	err = json.Unmarshal(data, &searchResults)
+	if err != nil {
+		return nil, err
+	}
+
+	if searchResults.Hits == nil {
+		return nil, nil
+	}
+	result = &lucytypes.SearchResults{}
+	result.Results = make([]string, 0, len(searchResults.Hits))
+	result.Source = lucytypes.Modrinth
+	for _, hit := range searchResults.Hits {
+		result.Results = append(result.Results, hit.Slug)
+	}
+	return result, nil
+}
+
 func Fetch(id lucytypes.PackageId) (
 remote *lucytypes.PackageRemote,
 err error,
@@ -112,7 +171,7 @@ err error,
 // Dependencies from Modrinth API is extremely unreliable. A local check (if any
 // files were downloaded) is recommended.
 func Dependencies(packageId lucytypes.PackageId) (dependencies *lucytypes.PackageDependencies) {
-	projcet := getProjectByName(packageId.Name)
+	project := getProjectByName(packageId.Name)
 	version, _ := getVersion(packageId)
 	dependencies = &lucytypes.PackageDependencies{
 		SupportedVersions:  []lucytypes.PackageVersion{},
@@ -120,14 +179,14 @@ func Dependencies(packageId lucytypes.PackageId) (dependencies *lucytypes.Packag
 		Required:           []lucytypes.PackageId{},
 	}
 
-	for _, version := range projcet.GameVersions {
+	for _, version := range project.GameVersions {
 		dependencies.SupportedVersions = append(
 			dependencies.SupportedVersions,
 			lucytypes.PackageVersion(version),
 		)
 	}
 
-	for _, platform := range projcet.Loaders {
+	for _, platform := range project.Loaders {
 		dependencies.SupportedPlatforms = append(
 			dependencies.SupportedPlatforms,
 			lucytypes.Platform(platform),
@@ -170,53 +229,6 @@ func Dependencies(packageId lucytypes.PackageId) (dependencies *lucytypes.Packag
 	}
 
 	return dependencies
-}
-
-// TODO:
-// func Search(packageId lucytypes.PackageId, options SearchOptions) (result []*lucytypes.PackageId, err error)
-
-// For Modrinth search API, see:
-// https://docs.modrinth.com/api/operations/searchprojects/
-
-func Search(
-packageId lucytypes.PackageId,
-showClientPackage bool,
-) (result *datatypes.ModrinthSearchResults, err error) {
-	var facets []facetItems
-	query := packageId.Name
-
-	switch packageId.Platform {
-	case lucytypes.Forge:
-		facets = append(facets, facetForge)
-	case lucytypes.Fabric:
-		facets = append(facets, facetFabric)
-	}
-
-	if showClientPackage {
-		facets = append(facets, facetServerSupported, facetClientSupported)
-	} else {
-		facets = append(facets, facetServerSupported)
-	}
-
-	option := searchOptions{
-		index:  byRelevance,
-		facets: facets,
-	}
-	searchUrl := searchUrl(query, option)
-
-	// Make the call to Modrinth API
-	logger.Debug("searching via modrinth api: " + searchUrl)
-	res, err := http.Get(searchUrl)
-	if err != nil {
-		return nil, err
-	}
-	data, err := io.ReadAll(res.Body)
-	defer tools.CloseReader(res.Body, logger.Warning)
-	err = json.Unmarshal(data, &result)
-	if err != nil {
-		return nil, err
-	}
-	return result, nil
 }
 
 func GetProjectByName(packageName lucytypes.PackageName) (

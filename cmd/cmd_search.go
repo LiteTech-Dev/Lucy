@@ -4,16 +4,12 @@ import (
 	"context"
 	"fmt"
 	"github.com/urfave/cli/v3"
-	"lucy/datatypes"
 	"lucy/logger"
 	"lucy/lucytypes"
 	"lucy/output"
 	"lucy/remote/modrinth"
 	"lucy/syntax"
-	"lucy/tools"
-	"os"
 	"strconv"
-	"text/tabwriter"
 )
 
 var subcmdSearch = &cli.Command{
@@ -65,61 +61,38 @@ var subcmdSearch = &cli.Command{
 }
 
 func actionSearch(_ context.Context, cmd *cli.Command) error {
-	// TODO: Error handling
 	p := syntax.Parse(cmd.Args().First())
-	_ = cmd.String("index") // TODO: Implement indexBy
+	_ = cmd.String("index")
 	showClientPackage := cmd.Bool("client")
+	indexBy := lucytypes.InputSearchIndex(cmd.String("index"))
 
-	res, err := modrinth.Search(p, showClientPackage)
+	res, err := modrinth.Search(
+		p,
+		lucytypes.SearchOptions{
+			ShowClientPackage: showClientPackage,
+			IndexBy:           indexBy,
+		},
+	)
 	if err != nil {
 		logger.Fatal(err)
 	}
+	output.Flush(generateSearchOutput(res))
 
-	if cmd.Bool("debug") {
-		tools.PrintAsJson(res)
-		return nil
-	}
-	output.Flush(modrinthResToSearch(res))
 	return nil
 }
 
-func modrinthResToSearch(res *datatypes.ModrinthSearchResults) *lucytypes.OutputData {
-	hits := make([]string, len(res.Hits))
-	for i, hit := range res.Hits {
-		hits[i] = hit.Slug
-	}
+func generateSearchOutput(res *lucytypes.SearchResults) *lucytypes.OutputData {
 	return &lucytypes.OutputData{
 		Fields: []lucytypes.Field{
 			&output.FieldShortText{
 				Title: "#  ",
-				Text:  strconv.Itoa(res.TotalHits),
+				Text:  strconv.Itoa(len(res.Results)),
 			},
 			&output.FieldDynamicColumnLabels{
-				Title:  ">>>",
-				Labels: hits,
+				Title:    ">>>",
+				Labels:   res.Results,
+				MaxLines: 12,
 			},
 		},
 	}
-}
-
-func generateSearchOutput(slugs []lucytypes.PackageName) {
-	maxSlugLen := 0
-	for i := 0; i < len(slugs); i += 1 {
-		if len(slugs[i]) > maxSlugLen {
-			maxSlugLen = len(slugs[i])
-		}
-	}
-	columns := tools.TermWidth() / (maxSlugLen + 2)
-
-	writer := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
-	fmt.Printf("Found %d results from Modrinth\n", len(slugs))
-	for i := 0; i < len(slugs); i += 1 {
-		if (i+1)%columns == 0 || i == len(slugs)-1 {
-			fmt.Fprintf(writer, "%s\n", slugs[i])
-		} else {
-			fmt.Fprintf(writer, "%s\t", slugs[i])
-		}
-	}
-
-	writer.Flush()
 }

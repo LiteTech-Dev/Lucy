@@ -7,6 +7,7 @@ package output
 import (
 	"lucy/lucytypes"
 	"lucy/tools"
+	"strconv"
 	"strings"
 )
 
@@ -104,8 +105,9 @@ func (f *FieldLabels) Output() {
 }
 
 type FieldDynamicColumnLabels struct {
-	Title  string
-	Labels []string
+	Title    string
+	Labels   []string
+	MaxLines int
 }
 
 func (f *FieldDynamicColumnLabels) Output() {
@@ -118,6 +120,7 @@ func (f *FieldDynamicColumnLabels) Output() {
 	flush()
 	key(f.Title)
 
+	lines := 1
 	maxLabelLen := 0
 	for _, label := range f.Labels {
 		if len(label) > maxLabelLen {
@@ -134,6 +137,13 @@ func (f *FieldDynamicColumnLabels) Output() {
 		value(label)
 		if (i+1)%columns == 0 || i == len(f.Labels)-1 {
 			newLine()
+			lines++
+			if f.MaxLines != 0 && lines > f.MaxLines {
+				tab()
+				annot("(" + strconv.Itoa(len(f.Labels)-i-1) + " more)")
+				newLine()
+				break
+			}
 		}
 		tab()
 	}

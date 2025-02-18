@@ -1,5 +1,4 @@
 //go:build unix || linux || darwin
-// +build unix linux darwin
 
 package local
 

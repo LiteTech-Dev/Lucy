@@ -5,35 +5,8 @@ import (
 )
 
 type searchOptions struct {
-	index  searchIndex
+	index  string
 	facets []facetItems
-}
-
-type searchIndex uint8
-
-const (
-	byRelevance searchIndex = iota
-	byDownloads
-	byFollows
-	byNewest
-	byUpdated
-)
-
-func (i searchIndex) String() string {
-	switch i {
-	case byRelevance:
-		return "relevance"
-	case byDownloads:
-		return "downloads"
-	case byFollows:
-		return "follows"
-	case byNewest:
-		return "newest"
-	case byUpdated:
-		return "updated"
-	default:
-		return "relevance"
-	}
 }
 
 type facetItemOperation uint8
