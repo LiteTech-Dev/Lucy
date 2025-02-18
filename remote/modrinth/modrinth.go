@@ -70,10 +70,13 @@ options lucytypes.SearchOptions,
 	if err != nil {
 		return nil, err
 	}
-
 	if searchResults.Hits == nil {
 		return nil, nil
 	}
+	if searchResults.TotalHits > 100 {
+		logger.Info("more than 100 results found on modrinth, only showing first 100")
+	}
+
 	result = &lucytypes.SearchResults{}
 	result.Results = make([]string, 0, len(searchResults.Hits))
 	result.Source = lucytypes.Modrinth

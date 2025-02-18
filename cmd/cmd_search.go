@@ -89,8 +89,8 @@ func actionSearch(_ context.Context, cmd *cli.Command) error {
 }
 
 func generateSearchOutput(
-	res *lucytypes.SearchResults,
-	showAll bool,
+res *lucytypes.SearchResults,
+showAll bool,
 ) *lucytypes.OutputData {
 	return &lucytypes.OutputData{
 		Fields: []lucytypes.Field{
@@ -101,8 +101,7 @@ func generateSearchOutput(
 			&output.FieldDynamicColumnLabels{
 				Title:    ">>>",
 				Labels:   res.Results,
-				MaxLines: tools.Ternary(showAll, 0, tools.TermHeight()-6
-				),
+				MaxLines: tools.Ternary(showAll, 0, tools.TermHeight()-6),
 			},
 		},
 	}
