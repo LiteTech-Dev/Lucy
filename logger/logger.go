@@ -1,15 +1,19 @@
 package logger
 
 import (
-	"fmt"
 	"github.com/emirpasic/gods/lists/singlylinkedlist"
 	"os"
 )
 
-var debug = false
+var debug = true
+var toConsole = true
 
 func SetDebug() {
 	debug = true
+}
+
+func SetToConsole() {
+	toConsole = true
 }
 
 var queue = singlylinkedlist.New()
@@ -18,7 +22,6 @@ func createLogFactory(level logLevel) func(content error) {
 	return func(content error) {
 		queue.Add(&logItem{Level: level, Content: content})
 	}
-
 }
 
 var (
@@ -40,9 +43,6 @@ var (
 )
 
 func WriteAll() {
-	if queue.Empty() == false {
-		_, _ = fmt.Fprintln(os.Stderr, "")
-	}
 	for queue.Empty() == false {
 		pop()
 	}

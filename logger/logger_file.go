@@ -1,17 +1,12 @@
 package logger
 
 import (
-	"log"
 	"os"
 	"path/filepath"
 	"runtime"
 )
 
 var LogFile = logFile()
-
-func init() {
-	log.SetOutput(LogFile)
-}
 
 func logDir() string {
 	var logDir string

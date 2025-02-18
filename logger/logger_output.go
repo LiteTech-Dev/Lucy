@@ -2,9 +2,9 @@ package logger
 
 import (
 	"fmt"
-	"log"
 	"lucy/tools"
 	"os"
+	"time"
 )
 
 func pop() {
@@ -30,6 +30,18 @@ func (level logLevel) prefix(colored bool) string {
 }
 
 func writeItem(message *logItem) {
-	_, _ = fmt.Fprintln(os.Stderr, message.Level.prefix(true), message.Content)
-	log.Println(message.Level.prefix(false), message.Content)
+	if toConsole {
+		_, _ = fmt.Fprintln(
+			os.Stderr,
+			message.Level.prefix(true),
+			message.Content,
+		)
+	}
+	timestamp := time.Now().Format("2006-01-02 15:04:05")
+	_, _ = fmt.Fprintln(
+		LogFile,
+		timestamp,
+		message.Level.prefix(false),
+		message.Content,
+	)
 }
