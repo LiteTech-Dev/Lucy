@@ -41,7 +41,7 @@ var (
 
 func WriteAll() {
 	if queue.Empty() == false {
-		_, _ = fmt.Fprintln(os.Stderr, "---")
+		_, _ = fmt.Fprintln(os.Stderr, "")
 	}
 	for queue.Empty() == false {
 		pop()

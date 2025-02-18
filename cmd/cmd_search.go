@@ -9,6 +9,7 @@ import (
 	"lucy/output"
 	"lucy/remote/modrinth"
 	"lucy/syntax"
+	"lucy/tools"
 	"strconv"
 )
 
@@ -56,6 +57,12 @@ var subcmdSearch = &cli.Command{
 			Usage:   "Output raw JSON response",
 			Value:   false,
 		},
+		&cli.BoolFlag{
+			Name:    "all",
+			Usage:   "Show all search results",
+			Value:   false,
+			Aliases: []string{"a"},
+		},
 	},
 	Action: actionSearch,
 }
@@ -76,12 +83,15 @@ func actionSearch(_ context.Context, cmd *cli.Command) error {
 	if err != nil {
 		logger.Fatal(err)
 	}
-	output.Flush(generateSearchOutput(res))
+	output.Flush(generateSearchOutput(res, cmd.Bool("all")))
 
 	return nil
 }
 
-func generateSearchOutput(res *lucytypes.SearchResults) *lucytypes.OutputData {
+func generateSearchOutput(
+	res *lucytypes.SearchResults,
+	showAll bool,
+) *lucytypes.OutputData {
 	return &lucytypes.OutputData{
 		Fields: []lucytypes.Field{
 			&output.FieldShortText{
@@ -91,7 +101,8 @@ func generateSearchOutput(res *lucytypes.SearchResults) *lucytypes.OutputData {
 			&output.FieldDynamicColumnLabels{
 				Title:    ">>>",
 				Labels:   res.Results,
-				MaxLines: 12,
+				MaxLines: tools.Ternary(showAll, 0, tools.TermHeight()-6
+				),
 			},
 		},
 	}

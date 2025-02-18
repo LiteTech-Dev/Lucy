@@ -70,3 +70,8 @@ func TermWidth() int {
 	width, _, _ := term.GetSize(0)
 	return width
 }
+
+func TermHeight() int {
+	_, height, _ := term.GetSize(0)
+	return height
+}
