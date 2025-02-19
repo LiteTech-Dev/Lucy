@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strconv"
 
@@ -37,13 +38,10 @@ var subcmdSearch = &cli.Command{
 			Usage:   "Index search results by `INDEX`",
 			Value:   "relevance",
 			Validator: func(s string) error {
-				if s != "relevance" && s != "downloads" && s != "follows" && s != "newest" && s != "updated" {
-					return fmt.Errorf(
-						`unsupported index: %s, value must be one of "relevance", "downloads", "follows", "newest", "updated"`,
-						s,
-					)
+				if lucytypes.SearchIndex(s).Validate() {
+					return nil
 				}
-				return nil
+				return errors.New("must be one of \"relevance\", \"downloads\",\"newest\"")
 			},
 		},
 		&cli.BoolFlag{
@@ -72,7 +70,7 @@ func actionSearch(_ context.Context, cmd *cli.Command) error {
 	p := syntax.Parse(cmd.Args().First())
 	_ = cmd.String("index")
 	showClientPackage := cmd.Bool("client")
-	indexBy := lucytypes.InputSearchIndex(cmd.String("index"))
+	indexBy := lucytypes.SearchIndex(cmd.String("index"))
 
 	res, err := modrinth.Search(
 		p,
@@ -90,8 +88,8 @@ func actionSearch(_ context.Context, cmd *cli.Command) error {
 }
 
 func generateSearchOutput(
-	res *lucytypes.SearchResults,
-	showAll bool,
+res *lucytypes.SearchResults,
+showAll bool,
 ) *lucytypes.OutputData {
 	return &lucytypes.OutputData{
 		Fields: []lucytypes.Field{

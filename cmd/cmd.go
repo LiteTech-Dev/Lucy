@@ -8,6 +8,7 @@ import (
 )
 
 // Frontend should change when user do not run the program in CLI
+// This is prepared for possible GUI implementation
 var Frontend = "cli"
 
 // Each subcommand (and its action function) should be in its own file

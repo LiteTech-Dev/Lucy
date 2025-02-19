@@ -5,24 +5,20 @@ type SearchOptions struct {
 	IndexBy           SearchIndex
 }
 
-type SearchIndex uint8
+type SearchIndex string
 
 const (
-	ByRelevance SearchIndex = iota
-	ByDownloads
-	ByNewest
+	ByRelevance = "relevance"
+	ByDownloads = "downloads"
+	ByNewest    = "newest"
 )
 
-func InputSearchIndex(input string) SearchIndex {
-	switch input {
-	case "relevance":
-		return ByRelevance
-	case "downloads":
-		return ByDownloads
-	case "newest":
-		return ByNewest
+func (i SearchIndex) Validate() bool {
+	switch i {
+	case ByRelevance, ByDownloads, ByNewest:
+		return true
 	default:
-		return ByRelevance
+		return false
 	}
 }
 

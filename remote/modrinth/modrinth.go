@@ -36,12 +36,15 @@ func Search(
 	var facets []facetItems
 	query := packageId.Name
 
-	// switch packageId.Platform {
-	// case lucytypes.Forge:
-	// 	facets = append(facets, facetForge)
-	// case lucytypes.Fabric:
-	// 	facets = append(facets, facetFabric)
-	// }
+	switch packageId.Platform {
+	case lucytypes.Forge:
+		facets = append(facets, facetForge)
+	case lucytypes.Fabric:
+		facets = append(facets, facetFabric)
+	default:
+		facets = append(facets, facetForge, facetAllLoaders)
+
+	}
 
 	if options.ShowClientPackage {
 		facets = append(facets, facetServerSupported, facetClientSupported)
