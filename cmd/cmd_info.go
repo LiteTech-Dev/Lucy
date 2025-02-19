@@ -3,6 +3,9 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"slices"
+	"strconv"
+
 	"lucy/datatypes"
 	"lucy/logger"
 	"lucy/lucytypes"
@@ -11,8 +14,6 @@ import (
 	"lucy/remote/modrinth"
 	"lucy/syntax"
 	"lucy/tools"
-	"slices"
-	"strconv"
 
 	"github.com/urfave/cli/v3"
 )

@@ -2,9 +2,10 @@ package main
 
 import (
 	"context"
+	"os"
+
 	"lucy/cmd"
 	"lucy/logger"
-	"os"
 )
 
 func main() {

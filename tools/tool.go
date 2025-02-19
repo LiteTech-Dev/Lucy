@@ -1,11 +1,12 @@
 package tools
 
 import (
-	"github.com/russross/blackfriday/v2"
 	"io"
 	"net/http"
 	"sync"
 	"time"
+
+	"github.com/russross/blackfriday/v2"
 )
 
 // TernaryFunc gives a if expr == true, b if expr == false. For a simple
@@ -59,8 +60,10 @@ func CloseReader(reader io.ReadCloser, failAction func(error)) {
 	}
 }
 
-const NetworkTestTimeout = 5 // seconds
-const NetworkTestRetries = 3
+const (
+	NetworkTestTimeout = 5 // seconds
+	NetworkTestRetries = 3
+)
 
 // NetworkTest is a simple the network connection test. You can use this before
 // any operation that strictly requires a network connection.

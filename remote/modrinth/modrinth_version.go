@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net/http"
+
 	"lucy/datatypes"
 	"lucy/local"
 	"lucy/lucytypes"
-	"net/http"
 )
 
 // TODO: Refactor to separate all API functions to accept an url. While the urls

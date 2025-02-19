@@ -2,9 +2,10 @@ package output
 
 import (
 	"fmt"
-	"lucy/tools"
 	"os"
 	"text/tabwriter"
+
+	"lucy/tools"
 )
 
 const debugOutput = false

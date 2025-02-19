@@ -4,11 +4,12 @@ package local
 
 import (
 	"errors"
-	"lucy/lucytypes"
-	"lucy/tools"
 	"os"
 	"path"
 	"syscall"
+
+	"lucy/lucytypes"
+	"lucy/tools"
 )
 
 var checkServerFileLock = tools.Memoize(
@@ -21,7 +22,7 @@ var checkServerFileLock = tools.Memoize(
 			getSavePath(),
 			"session.lock",
 		)
-		file, err := os.OpenFile(lockPath, os.O_RDWR, 0666)
+		file, err := os.OpenFile(lockPath, os.O_RDWR, 0o666)
 		defer file.Close()
 
 		if err != nil {

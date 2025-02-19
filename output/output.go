@@ -5,10 +5,11 @@
 package output
 
 import (
-	"lucy/lucytypes"
-	"lucy/tools"
 	"strconv"
 	"strings"
+
+	"lucy/lucytypes"
+	"lucy/tools"
 )
 
 func SourceInfo(source string) {

@@ -15,11 +15,12 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"net/http"
+
 	"lucy/datatypes"
 	"lucy/logger"
 	"lucy/lucytypes"
 	"lucy/tools"
-	"net/http"
 )
 
 var ErrorInvalidAPIResponse = errors.New("invalid data from modrinth api")
@@ -29,8 +30,8 @@ var ErrorInvalidAPIResponse = errors.New("invalid data from modrinth api")
 // For Modrinth search API, see:
 // https://docs.modrinth.com/api/operations/searchprojects/
 func Search(
-packageId lucytypes.PackageId,
-options lucytypes.SearchOptions,
+	packageId lucytypes.PackageId,
+	options lucytypes.SearchOptions,
 ) (result *lucytypes.SearchResults, err error) {
 	var facets []facetItems
 	query := packageId.Name
@@ -87,8 +88,8 @@ options lucytypes.SearchOptions,
 }
 
 func Fetch(id lucytypes.PackageId) (
-remote *lucytypes.PackageRemote,
-err error,
+	remote *lucytypes.PackageRemote,
+	err error,
 ) {
 	remote = &lucytypes.PackageRemote{
 		Source:   lucytypes.Modrinth,
@@ -105,8 +106,8 @@ err error,
 }
 
 func Information(id lucytypes.PackageId) (
-information *lucytypes.PackageInformation,
-err error,
+	information *lucytypes.PackageInformation,
+	err error,
 ) {
 	project := getProjectByName(id.Name)
 	information = &lucytypes.PackageInformation{
@@ -235,8 +236,8 @@ func Dependencies(packageId lucytypes.PackageId) (dependencies *lucytypes.Packag
 }
 
 func GetProjectByName(packageName lucytypes.PackageName) (
-project *datatypes.ModrinthProject,
-err error,
+	project *datatypes.ModrinthProject,
+	err error,
 ) {
 	res, err := http.Get(projectUrl(string(packageName)))
 	if err != nil {

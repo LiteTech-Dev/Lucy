@@ -33,7 +33,7 @@ func logDir() string {
 
 func logFile() *os.File {
 	logDir := logDir()
-	err := os.MkdirAll(logDir, 0755)
+	err := os.MkdirAll(logDir, 0o755)
 	if err != nil {
 		devNull, _ := os.Open(os.DevNull)
 		return devNull
@@ -43,7 +43,7 @@ func logFile() *os.File {
 	logFile, err := os.OpenFile(
 		logFilePath,
 		os.O_APPEND|os.O_CREATE|os.O_WRONLY,
-		0755,
+		0o755,
 	)
 	if err != nil {
 		println(err.Error())

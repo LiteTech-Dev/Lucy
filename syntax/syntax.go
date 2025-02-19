@@ -17,8 +17,9 @@ package syntax
 import (
 	"errors"
 	"log"
-	"lucy/lucytypes"
 	"strings"
+
+	"lucy/lucytypes"
 )
 
 // sanitize tolerates some common interchangeability between characters. This

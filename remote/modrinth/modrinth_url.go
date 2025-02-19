@@ -1,11 +1,12 @@
 package modrinth
 
 import (
-	"lucy/logger"
-	"lucy/lucytypes"
 	"net/url"
 	"strings"
 	"text/template"
+
+	"lucy/logger"
+	"lucy/lucytypes"
 )
 
 const projectUrlPrefix = "https://api.modrinth.com/v2/project/"

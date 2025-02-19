@@ -172,7 +172,7 @@ type ModrinthMember struct {
 
 // ModrinthUser
 //
-// The url can either be a id or username
+// # The url can either be a id or username
 //
 // Example
 // https://modrinth.com/user/gnembon

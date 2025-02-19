@@ -9,5 +9,4 @@ type LucyEnvConfig struct {
 	BootCommand      string
 }
 
-type LucyGlobalConfig struct {
-}
+type LucyGlobalConfig struct{}

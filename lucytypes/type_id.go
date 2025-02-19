@@ -2,8 +2,9 @@ package lucytypes
 
 import (
 	"fmt"
-	"lucy/tools"
 	"strings"
+
+	"lucy/tools"
 )
 
 // Platform is an enum of several string constants. All platform is a package under
@@ -117,6 +118,8 @@ func (p PackageVersion) String() string {
 	return string(p)
 }
 
-var AllVersion PackageVersion = "all"
-var NoVersion PackageVersion = "none"
-var LatestVersion PackageVersion = "latest"
+var (
+	AllVersion    PackageVersion = "all"
+	NoVersion     PackageVersion = "none"
+	LatestVersion PackageVersion = "latest"
+)

@@ -2,9 +2,10 @@ package logger
 
 import (
 	"fmt"
-	"lucy/tools"
 	"os"
 	"time"
+
+	"lucy/tools"
 )
 
 func pop() {

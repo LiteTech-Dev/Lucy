@@ -6,13 +6,14 @@ import (
 	"errors"
 	"io"
 	"log"
+	"os"
+	"path"
+	"strings"
+
 	"lucy/logger"
 	"lucy/lucytypes"
 	"lucy/output"
 	"lucy/tools"
-	"os"
-	"path"
-	"strings"
 )
 
 // TODO: Improve probe logic, plain executable unpacking do not work well
@@ -72,10 +73,12 @@ var unknownExecutable = &lucytypes.ExecutableInfo{
 	Platform:    "unknown",
 }
 
-const fabricSingleIdentifierFile = "install.properties"
-const vanillaIdentifierFile = "version.json"
-const fabricLauncherIdentifierFile = "fabric-server-launch.properties"
-const fabricLauncherManifest = "META-INF/MANIFEST.MF"
+const (
+	fabricSingleIdentifierFile   = "install.properties"
+	vanillaIdentifierFile        = "version.json"
+	fabricLauncherIdentifierFile = "fabric-server-launch.properties"
+	fabricLauncherManifest       = "META-INF/MANIFEST.MF"
+)
 
 // analyzeExecutable gives nil if the jar file is invalid. The constant unknownExecutable
 // is not yet used in the codebase, however still reserved for future use.

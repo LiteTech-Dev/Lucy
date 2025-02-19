@@ -2,16 +2,18 @@ package util
 
 import (
 	"fmt"
-	"github.com/schollz/progressbar/v3"
-	"golang.org/x/term"
 	"io"
-	"lucy/lucyerrors"
-	"lucy/tools"
 	"net/http"
 	"os"
 	"path"
 	"strconv"
 	"sync"
+
+	"github.com/schollz/progressbar/v3"
+	"golang.org/x/term"
+
+	"lucy/lucyerrors"
+	"lucy/tools"
 )
 
 // DownloadFile

@@ -3,6 +3,8 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"strconv"
+
 	"github.com/urfave/cli/v3"
 	"lucy/logger"
 	"lucy/lucytypes"
@@ -10,7 +12,6 @@ import (
 	"lucy/remote/modrinth"
 	"lucy/syntax"
 	"lucy/tools"
-	"strconv"
 )
 
 var subcmdSearch = &cli.Command{

@@ -7,9 +7,9 @@ import (
 )
 
 func InstallLucy() {
-	os.Mkdir(ProgramPath, 0755)
-	os.Mkdir(DownloadPath, 0755)
-	os.Mkdir(CachePath, 0755)
+	os.Mkdir(ProgramPath, 0o755)
+	os.Mkdir(DownloadPath, 0o755)
+	os.Mkdir(CachePath, 0o755)
 	// 	TODO: create empty config
 }
 

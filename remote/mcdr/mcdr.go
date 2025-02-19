@@ -4,11 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"path"
+
 	"github.com/google/go-github/v50/github"
 	"lucy/datatypes"
 	"lucy/lucytypes"
 	"lucy/syntax"
-	"path"
 )
 
 func mcdrPluginInfoToPackageInfo(s *datatypes.McdrPluginInfo) *lucytypes.Package {

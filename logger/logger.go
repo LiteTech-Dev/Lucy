@@ -1,12 +1,15 @@
 package logger
 
 import (
-	"github.com/emirpasic/gods/lists/singlylinkedlist"
 	"os"
+
+	"github.com/emirpasic/gods/lists/singlylinkedlist"
 )
 
-var debug = true
-var toConsole = true
+var (
+	debug     = true
+	toConsole = true
+)
 
 func SetDebug() {
 	debug = true

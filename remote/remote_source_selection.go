@@ -3,10 +3,11 @@ package remote
 import (
 	"fmt"
 	"io"
-	"lucy/lucytypes"
 	"net/http"
 	"sync"
 	"time"
+
+	"lucy/lucytypes"
 )
 
 var AvailableSources = map[lucytypes.Platform][]lucytypes.Source{

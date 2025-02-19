@@ -4,16 +4,18 @@ import (
 	"archive/zip"
 	"encoding/json"
 	"errors"
-	"gopkg.in/ini.v1"
 	"io"
-	"lucy/datatypes"
-	"lucy/logger"
-	"lucy/lucytypes"
-	"lucy/tools"
 	"os"
 	"path"
 	"sort"
 	"sync"
+
+	"gopkg.in/ini.v1"
+
+	"lucy/datatypes"
+	"lucy/logger"
+	"lucy/lucytypes"
+	"lucy/tools"
 )
 
 const mcdrConfigFileName = "config.yml"

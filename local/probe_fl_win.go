@@ -4,11 +4,12 @@
 package local
 
 import (
+	"os"
+	"path"
+
 	"golang.org/x/sys/windows"
 	"lucy/lucytypes"
 	"lucy/tools"
-	"os"
-	"path"
 )
 
 // This is AI generated code, please check it before use.
@@ -19,7 +20,7 @@ var checkServerFileLock = tools.Memoize(
 			getSavePath(),
 			"session.lock",
 		)
-		file, err := os.OpenFile(lockPath, os.O_RDWR, 0666)
+		file, err := os.OpenFile(lockPath, os.O_RDWR, 0o666)
 		defer file.Close()
 
 		if err != nil {
