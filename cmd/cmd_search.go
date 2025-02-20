@@ -3,7 +3,6 @@ package cmd
 import (
 	"context"
 	"errors"
-	"fmt"
 	"strconv"
 
 	"github.com/urfave/cli/v3"
@@ -20,18 +19,7 @@ var subcmdSearch = &cli.Command{
 	Usage: "Search for mods and plugins",
 	Flags: []cli.Flag{
 		// TODO: This flag is not yet implemented
-		&cli.StringFlag{
-			Name:    "source",
-			Aliases: []string{"s"},
-			Usage:   "To search from `SOURCE`",
-			Value:   "modrinth",
-			Validator: func(s string) error {
-				if s != "modrinth" && s != "curseforge" {
-					return fmt.Errorf("unsupported source: %s", s)
-				}
-				return nil
-			},
-		},
+		sourceFlag(lucytypes.Modrinth),
 		&cli.StringFlag{
 			Name:    "index",
 			Aliases: []string{"i"},
@@ -50,18 +38,8 @@ var subcmdSearch = &cli.Command{
 			Usage:   "Also show client-only mods in results",
 			Value:   false,
 		},
-		&cli.BoolFlag{
-			Name:    "debug",
-			Aliases: []string{"d"},
-			Usage:   "Output raw JSON response",
-			Value:   false,
-		},
-		&cli.BoolFlag{
-			Name:    "all",
-			Usage:   "Show all search results",
-			Value:   false,
-			Aliases: []string{"a"},
-		},
+		flagJsonOutput,
+		flagLongOutput,
 	},
 	Action: tools.Decorate(
 		actionSearch,
@@ -89,7 +67,7 @@ cmd *cli.Command,
 	if err != nil {
 		logger.Fatal(err)
 	}
-	output.Flush(generateSearchOutput(res, cmd.Bool("all")))
+	output.Flush(generateSearchOutput(res, cmd.Bool("long")))
 
 	return nil
 }

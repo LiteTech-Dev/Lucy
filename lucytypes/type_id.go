@@ -29,7 +29,7 @@ func (p Platform) Title() string {
 	if p.Valid() {
 		return strings.ToUpper(string(p)[0:1]) + string(p)[1:]
 	}
-	return "Invalid Platform"
+	return "Unknown"
 }
 
 func (p Platform) IsAll() bool {
@@ -39,7 +39,7 @@ func (p Platform) IsAll() bool {
 // Valid should be edited if you added a new platform.
 func (p Platform) Valid() bool {
 	switch p {
-	case Minecraft, Fabric, Forge, Neoforge, Mcdr, AllPlatform:
+	case Minecraft, Fabric, Forge, Neoforge, Mcdr, AllPlatform, UnknownPlatform:
 		return true
 	}
 	return false

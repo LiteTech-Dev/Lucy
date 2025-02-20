@@ -16,10 +16,7 @@ var subcmdStatus = &cli.Command{
 	Usage:  "Display basic information of the current server",
 	Action: tools.Decorate(actionStatus, globalFlagsDecorator),
 	Flags: []cli.Flag{
-		&cli.BoolFlag{
-			Name:  "debug",
-			Usage: "Output in raw JSON format",
-		},
+		flagJsonOutput,
 	},
 }
 
@@ -28,7 +25,7 @@ var actionStatus cli.ActionFunc = func(
 	cmd *cli.Command,
 ) error {
 	serverInfo := local.GetServerInfo()
-	if cmd.Bool("debug") {
+	if cmd.Bool("json") {
 		tools.PrintAsJson(serverInfo)
 	} else {
 		output.Flush(serverInfoToStatus(&serverInfo))

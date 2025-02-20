@@ -20,7 +20,6 @@ import (
 	"strings"
 
 	"lucy/logger"
-
 	"lucy/lucytypes"
 )
 
@@ -72,10 +71,10 @@ func Parse(s string) (p lucytypes.PackageId) {
 // parseOperatorAt is called first since '@' operator always occur after '/' (equivalent
 // to a lower priority).
 func parseOperatorAt(s string) (
-	pl lucytypes.Platform,
-	n lucytypes.PackageName,
-	v lucytypes.PackageVersion,
-	err error,
+pl lucytypes.Platform,
+n lucytypes.PackageName,
+v lucytypes.PackageVersion,
+err error,
 ) {
 	split := strings.Split(s, "@")
 
@@ -99,9 +98,9 @@ func parseOperatorAt(s string) (
 }
 
 func parseOperatorSlash(s string) (
-	pl lucytypes.Platform,
-	n lucytypes.PackageName,
-	err error,
+pl lucytypes.Platform,
+n lucytypes.PackageName,
+err error,
 ) {
 	split := strings.Split(s, "/")
 

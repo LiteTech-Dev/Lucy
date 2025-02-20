@@ -23,18 +23,13 @@ var subcmdInfo = &cli.Command{
 	Usage: "Display information of a mod or plugin",
 	Flags: []cli.Flag{
 		// TODO: This flag is not yet implemented
-		&cli.StringFlag{
-			Name:    "source",
-			Aliases: []string{"s"},
-			Usage:   "To fetch info from `SOURCE`",
-			Value:   "modrinth",
-		},
 		&cli.BoolFlag{
 			Name:    "markdown",
 			Aliases: []string{"Md"},
 			Usage:   "Print raw Markdown",
 			Value:   false,
 		},
+		sourceFlag(lucytypes.Modrinth),
 	},
 	Action: tools.Decorate(
 		actionInfo,
