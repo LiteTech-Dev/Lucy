@@ -94,7 +94,7 @@ func serverInfoToStatus(data *lucytypes.ServerInfo) *lucytypes.OutputData {
 			mods = append(mods, tools.Dim("(None)"))
 		}
 		for _, mod := range data.Mods {
-			mods = append(mods, string(mod.Id.Name))
+			mods = append(mods, mod.Id.FullString())
 			modPaths = append(modPaths, mod.Local.Path)
 		}
 
@@ -102,6 +102,7 @@ func serverInfoToStatus(data *lucytypes.ServerInfo) *lucytypes.OutputData {
 			Title: "Platform",
 			Text:  data.Executable.Platform.Title(),
 		}
+
 		status.Fields[statusFieldMods] = &output.FieldMultiShortTextWithAnnot{
 			Title:  "Mod List",
 			Texts:  mods,

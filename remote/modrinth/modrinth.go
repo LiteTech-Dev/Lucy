@@ -16,6 +16,7 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"strconv"
 
 	"lucy/datatypes"
 	"lucy/logger"
@@ -78,7 +79,7 @@ func Search(
 		return nil, nil
 	}
 	if searchResults.TotalHits > 100 {
-		logger.Info("more than 100 results found on modrinth, only showing first 100")
+		logger.Info(strconv.Itoa(searchResults.TotalHits) + " results found on modrinth, only showing first 100")
 	}
 
 	result = &lucytypes.SearchResults{}

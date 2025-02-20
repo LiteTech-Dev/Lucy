@@ -192,6 +192,8 @@ func cInfoOutput(p lucytypes.Package) *lucytypes.OutputData {
 		},
 	)
 
+	// TODO: Put current server version on the top
+	// TODO: Hide snapshot versions, except if the current server is using it
 	if !slices.Contains(p.Dependencies.SupportedPlatforms, lucytypes.Mcdr) &&
 		(p.Dependencies.SupportedPlatforms != nil || len(p.Dependencies.SupportedPlatforms) != 0) {
 		f := &output.FieldLabels{

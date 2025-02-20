@@ -111,7 +111,7 @@ func (f *FieldLabels) Output() {
 			width = 0
 			lines++
 			if f.MaxLines != 0 && lines > f.MaxLines {
-				annot("(" + strconv.Itoa(len(f.Labels)-i-1) + " more)")
+				annot("(" + strconv.Itoa(len(f.Labels)-i-1) + " more, use -e to show all)")
 				newLine()
 				break
 			}
