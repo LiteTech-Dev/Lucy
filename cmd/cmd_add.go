@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"errors"
+	"lucy/tools"
 
 	"github.com/urfave/cli/v3"
 	"lucy/local"
@@ -25,7 +26,9 @@ var subcmdAdd = &cli.Command{
 			Value:   false,
 		},
 	},
-	Action: actionAdd,
+	Action: tools.Decorate(actionAdd, globalFlagsDecorator,
+		helpOnNoInputDecorator
+	),
 }
 
 // actionAdd
@@ -36,7 +39,10 @@ var subcmdAdd = &cli.Command{
 //   - Release version
 //
 // TODO: Version specification
-func actionAdd(_ context.Context, cmd *cli.Command) error {
+var actionAdd cli.ActionFunc = func(
+	ctx context.Context,
+	cmd *cli.Command,
+) error {
 	// TODO: Platform specification
 	// TODO: Platform compatibility check
 	// TODO: Error handling

@@ -63,10 +63,15 @@ var subcmdSearch = &cli.Command{
 			Aliases: []string{"a"},
 		},
 	},
-	Action: actionSearch,
+	Action: tools.Decorate(actionSearch, globalFlagsDecorator,
+		helpOnNoInputDecorator
+	),
 }
 
-func actionSearch(_ context.Context, cmd *cli.Command) error {
+var actionSearch cli.ActionFunc = func(
+	_ context.Context,
+	cmd *cli.Command,
+) error {
 	p := syntax.Parse(cmd.Args().First())
 	_ = cmd.String("index")
 	showClientPackage := cmd.Bool("client")

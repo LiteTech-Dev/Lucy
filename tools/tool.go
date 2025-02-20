@@ -90,3 +90,12 @@ func MarkdownToPlainText(md string) (s string) {
 	s = string(blackfriday.Run([]byte(md)))
 	return
 }
+
+// Decorate applies a series of decorators to a function. This is used to
+// prevent nested function calls for better readability.
+func Decorate[T interface{}](f T, decorators ...func(T) T) T {
+	for _, decorator := range decorators {
+		f = decorator(f)
+	}
+	return f
+}

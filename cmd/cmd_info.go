@@ -36,10 +36,15 @@ var subcmdInfo = &cli.Command{
 			Value:   false,
 		},
 	},
-	Action: actionInfo,
+	Action: tools.Decorate(actionInfo, globalFlagsDecorator,
+		helpOnNoInputDecorator
+	),
 }
 
-func actionInfo(ctx context.Context, cmd *cli.Command) error {
+var actionInfo cli.ActionFunc = func(
+	ctx context.Context,
+	cmd *cli.Command,
+) error {
 	p := syntax.Parse(cmd.Args().First())
 
 	var multiSourceData []*lucytypes.OutputData

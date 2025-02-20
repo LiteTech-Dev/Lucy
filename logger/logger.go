@@ -7,15 +7,15 @@ import (
 )
 
 var (
-	debug     = true
-	toConsole = true
+	debug     = false
+	toConsole = false
 )
 
-func SetDebug() {
+func UseDebug() {
 	debug = true
 }
 
-func SetToConsole() {
+func UseConsoleOutput() {
 	toConsole = true
 }
 

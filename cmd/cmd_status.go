@@ -14,7 +14,7 @@ import (
 var subcmdStatus = &cli.Command{
 	Name:   "status",
 	Usage:  "Display basic information of the current server",
-	Action: actionStatus,
+	Action: tools.Decorate(actionStatus, globalFlagsDecorator),
 	Flags: []cli.Flag{
 		&cli.BoolFlag{
 			Name:  "debug",
@@ -23,7 +23,10 @@ var subcmdStatus = &cli.Command{
 	},
 }
 
-func actionStatus(_ context.Context, cmd *cli.Command) error {
+var actionStatus cli.ActionFunc = func(
+	_ context.Context,
+	cmd *cli.Command,
+) error {
 	serverInfo := local.GetServerInfo()
 	if cmd.Bool("debug") {
 		tools.PrintAsJson(serverInfo)

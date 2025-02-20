@@ -29,8 +29,8 @@ func listVersions(slug lucytypes.PackageName) (versions []*datatypes.ModrinthVer
 // getVersion is named as so because a Package in lucy is equivalent to a version
 // in Modrinth.
 func getVersion(id lucytypes.PackageId) (
-v *datatypes.ModrinthVersion,
-err error,
+	v *datatypes.ModrinthVersion,
+	err error,
 ) {
 	versions := listVersions(id.Name)
 	if id.Version == lucytypes.LatestVersion {
@@ -38,7 +38,7 @@ err error,
 	}
 	for _, version := range versions {
 		if version.VersionNumber == id.Version &&
-		versionSupportsLoader(version, id.Platform) {
+			versionSupportsLoader(version, id.Platform) {
 			return version, nil
 		}
 	}
@@ -54,8 +54,8 @@ func getVersionById(id string) (v *datatypes.ModrinthVersion) {
 }
 
 func versionSupportsLoader(
-version *datatypes.ModrinthVersion,
-loader lucytypes.Platform,
+	version *datatypes.ModrinthVersion,
+	loader lucytypes.Platform,
 ) bool {
 	for _, l := range version.Loaders {
 		if lucytypes.Platform(l).Eq(loader) {
@@ -69,7 +69,7 @@ func latestVersion(slug lucytypes.PackageName) (v *datatypes.ModrinthVersion) {
 	versions := listVersions(slug)
 	for _, version := range versions {
 		if version.VersionType == "release" &&
-		(v == nil || version.DatePublished.After(v.DatePublished)) {
+			(v == nil || version.DatePublished.After(v.DatePublished)) {
 			v = version
 		}
 	}
@@ -91,8 +91,8 @@ func LatestCompatibleVersion(slug lucytypes.PackageName) (v *datatypes.ModrinthV
 	for _, version := range versions {
 		for _, gameVersion := range version.GameVersions {
 			if gameVersion == serverInfo.Executable.GameVersion &&
-			version.VersionType == "release" &&
-			(v == nil || version.DatePublished.After(v.DatePublished)) {
+				version.VersionType == "release" &&
+				(v == nil || version.DatePublished.After(v.DatePublished)) {
 				v = version
 			}
 		}
