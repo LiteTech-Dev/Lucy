@@ -184,12 +184,21 @@ func cInfoOutput(p lucytypes.Package) *lucytypes.OutputData {
 		)
 	}
 
+	o.Fields = append(
+		o.Fields, &output.FieldAnnotatedShortText{
+			Title:      "Download",
+			Text:       tools.Underline(p.Remote.FileUrl),
+			Annotation: p.Remote.Filename,
+		},
+	)
+
 	if !slices.Contains(p.Dependencies.SupportedPlatforms, lucytypes.Mcdr) &&
 		(p.Dependencies.SupportedPlatforms != nil || len(p.Dependencies.SupportedPlatforms) != 0) {
 		f := &output.FieldLabels{
 			Title:    "Game Versions",
 			Labels:   []string{},
 			MaxWidth: 0,
+			MaxLines: tools.TermHeight() / 2,
 		}
 		for _, version := range p.Dependencies.SupportedVersions {
 			f.Labels = append(f.Labels, version.String())
