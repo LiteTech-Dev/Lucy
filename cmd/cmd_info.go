@@ -36,8 +36,10 @@ var subcmdInfo = &cli.Command{
 			Value:   false,
 		},
 	},
-	Action: tools.Decorate(actionInfo, globalFlagsDecorator,
-		helpOnNoInputDecorator
+	Action: tools.Decorate(
+		actionInfo,
+		globalFlagsDecorator,
+		helpOnNoInputDecorator,
 	),
 }
 

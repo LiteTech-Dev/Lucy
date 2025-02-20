@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+
 	"github.com/urfave/cli/v3"
 )
 
@@ -12,8 +13,8 @@ var subcmdInit = &cli.Command{
 }
 
 var actionInit cli.ActionFunc = func(
-ctx context.Context,
-cmd *cli.Command,
+	ctx context.Context,
+	cmd *cli.Command,
 ) error {
 	return nil
 }

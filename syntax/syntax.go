@@ -17,8 +17,9 @@ package syntax
 import (
 	"errors"
 	"log"
-	"lucy/logger"
 	"strings"
+
+	"lucy/logger"
 
 	"lucy/lucytypes"
 )

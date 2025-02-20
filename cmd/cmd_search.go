@@ -63,14 +63,16 @@ var subcmdSearch = &cli.Command{
 			Aliases: []string{"a"},
 		},
 	},
-	Action: tools.Decorate(actionSearch, globalFlagsDecorator,
-		helpOnNoInputDecorator
+	Action: tools.Decorate(
+		actionSearch,
+		globalFlagsDecorator,
+		helpOnNoInputDecorator,
 	),
 }
 
 var actionSearch cli.ActionFunc = func(
-	_ context.Context,
-	cmd *cli.Command,
+_ context.Context,
+cmd *cli.Command,
 ) error {
 	p := syntax.Parse(cmd.Args().First())
 	_ = cmd.String("index")
@@ -93,8 +95,8 @@ var actionSearch cli.ActionFunc = func(
 }
 
 func generateSearchOutput(
-	res *lucytypes.SearchResults,
-	showAll bool,
+res *lucytypes.SearchResults,
+showAll bool,
 ) *lucytypes.OutputData {
 	return &lucytypes.OutputData{
 		Fields: []lucytypes.Field{

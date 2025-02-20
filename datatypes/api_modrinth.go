@@ -4,8 +4,9 @@
 package datatypes
 
 import (
-	"lucy/lucytypes"
 	"time"
+
+	"lucy/lucytypes"
 )
 
 // ModrinthProject is a struct that represents a Modrinth project, the basic

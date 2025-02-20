@@ -26,8 +26,10 @@ var subcmdAdd = &cli.Command{
 			Value:   false,
 		},
 	},
-	Action: tools.Decorate(actionAdd, globalFlagsDecorator,
-		helpOnNoInputDecorator
+	Action: tools.Decorate(
+		actionAdd,
+		globalFlagsDecorator,
+		helpOnNoInputDecorator,
 	),
 }
 
@@ -40,8 +42,8 @@ var subcmdAdd = &cli.Command{
 //
 // TODO: Version specification
 var actionAdd cli.ActionFunc = func(
-	ctx context.Context,
-	cmd *cli.Command,
+ctx context.Context,
+cmd *cli.Command,
 ) error {
 	// TODO: Platform specification
 	// TODO: Platform compatibility check

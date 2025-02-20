@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+
 	"lucy/tools"
 
 	"github.com/urfave/cli/v3"
@@ -16,10 +17,12 @@ var Frontend = "cli"
 
 // Cli is the main command for lucy
 var Cli = &cli.Command{
-	Name:   "lucy",
-	Usage:  "The Minecraft server-side package manager",
-	Action: tools.Decorate(actionEmpty, globalFlagsDecorator,
-		helpOnNoInputDecorator
+	Name:  "lucy",
+	Usage: "The Minecraft server-side package manager",
+	Action: tools.Decorate(
+		actionEmpty,
+		globalFlagsDecorator,
+		helpOnNoInputDecorator,
 	),
 	Flags: []cli.Flag{
 		&cli.BoolFlag{
