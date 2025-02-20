@@ -84,6 +84,7 @@ type FieldLabels struct {
 	Title    string
 	Labels   []string
 	MaxWidth int
+	MaxLines int
 }
 
 func (f *FieldLabels) Output() {
@@ -95,7 +96,9 @@ func (f *FieldLabels) Output() {
 	if f.MaxWidth == 0 {
 		f.MaxWidth = max(33*tools.TermWidth()/100, 40)
 	}
+
 	width := 0
+	lines := 1
 	for i, label := range f.Labels {
 		value(label)
 		if i != len(f.Labels)-1 {
@@ -106,6 +109,12 @@ func (f *FieldLabels) Output() {
 			newLine()
 			tab()
 			width = 0
+			lines++
+			if f.MaxLines != 0 && lines > f.MaxLines {
+				annot("(" + strconv.Itoa(len(f.Labels)-i-1) + " more)")
+				newLine()
+				break
+			}
 		}
 	}
 
