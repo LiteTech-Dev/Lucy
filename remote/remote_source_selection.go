@@ -35,7 +35,7 @@ const slow float64 = 0x7FF0000000000000 // inf
 //   - Speed test might not be representative
 func SelectSource(platform lucytypes.Platform) lucytypes.Source {
 	slowest := slow
-	fastestSource := lucytypes.Unknown
+	fastestSource := lucytypes.UnknownPlatform
 	wg := sync.WaitGroup{}
 	for _, source := range AvailableSources[platform] {
 		wg.Add(1)
@@ -50,7 +50,7 @@ func SelectSource(platform lucytypes.Platform) lucytypes.Source {
 	}
 
 	wg.Wait()
-	if fastestSource == lucytypes.Unknown {
+	if fastestSource == lucytypes.UnknownPlatform {
 		panic("No available source")
 	}
 

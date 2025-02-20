@@ -46,15 +46,13 @@ func actionInfo(ctx context.Context, cmd *cli.Command) error {
 
 	switch p.Platform {
 	case lucytypes.AllPlatform:
-		// TODO: Wide range search
-		modrinthProject, err := modrinth.GetProjectByName(p.Name)
-		if err != nil {
-			logger.Warning(err)
-			break
-		}
+		var packageFromModrinth lucytypes.Package
+		packageFromModrinth.Remote, _ = modrinth.Fetch(p)
+		packageFromModrinth.Information, _ = modrinth.Information(p.Name)
+		packageFromModrinth.Dependencies = modrinth.Dependencies(p)
 		multiSourceData = append(
 			multiSourceData,
-			modrinthProjectToInfo(modrinthProject),
+			cInfoOutput(packageFromModrinth),
 		)
 	case lucytypes.Fabric:
 		// TODO: Fabric specific search
@@ -155,18 +153,26 @@ func mcdrPluginInfoToInfo(source *datatypes.McdrPluginInfo) *lucytypes.OutputDat
 func cInfoOutput(p lucytypes.Package) *lucytypes.OutputData {
 	o := &lucytypes.OutputData{
 		Fields: []lucytypes.Field{
+			&output.FieldAnnotation{
+				Annotation: "(from " + p.Remote.Source.String() + ")",
+			},
 			&output.FieldShortText{
 				Title: "Name",
 				Text:  p.Information.Name,
 			},
 			&output.FieldShortText{
 				Title: "Description",
-				Text:  p.Information.Description,
+				Text:  p.Information.Brief,
 			},
-			// 	TODO: Authors
-			// TODO: Downloads
-
 		},
+	}
+
+	var authorNames []string
+	var authorLinks []string
+	for _, author := range p.Information.Author {
+		authorNames = append(authorNames, author.Name)
+		// TODO: Improve author info annotation format
+		authorLinks = append(authorLinks, author.Url)
 	}
 
 	for _, url := range p.Information.Urls {

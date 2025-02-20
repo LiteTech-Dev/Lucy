@@ -94,30 +94,34 @@ func Fetch(id lucytypes.PackageId) (
 	remote *lucytypes.PackageRemote,
 	err error,
 ) {
+	id = inferVersion(id)
+	project := getProjectByName(id.Name)
+	version, err := getVersion(id)
+	if err != nil {
+		logger.Fatal(err)
+	}
+	fileUrl, filename := getFile(version)
+
 	remote = &lucytypes.PackageRemote{
 		Source:   lucytypes.Modrinth,
-		RemoteId: getProjectId(id.Name),
+		RemoteId: project.Id,
+		FileUrl:  fileUrl,
+		Filename: filename,
 	}
 
-	fileUrl, filename, err := GetFile(id)
-	if err == nil {
-		remote.FileUrl = fileUrl
-		remote.Filename = filename
-	}
-
-	return remote, err
+	return remote, nil
 }
 
-func Information(id lucytypes.PackageId) (
+func Information(slug lucytypes.PackageName) (
 	information *lucytypes.PackageInformation,
 	err error,
 ) {
-	project := getProjectByName(id.Name)
+	project := getProjectByName(slug)
 	information = &lucytypes.PackageInformation{
 		Name:        project.Title,
 		Brief:       project.Description,
 		Description: tools.MarkdownToPlainText(project.Body),
-		Author:      nil,
+		Author:      []lucytypes.PackageMember{},
 		Urls:        []lucytypes.PackageUrl{},
 		License:     project.License.Name,
 	}
@@ -177,9 +181,10 @@ func Information(id lucytypes.PackageId) (
 
 // Dependencies from Modrinth API is extremely unreliable. A local check (if any
 // files were downloaded) is recommended.
-func Dependencies(packageId lucytypes.PackageId) (dependencies *lucytypes.PackageDependencies) {
-	project := getProjectByName(packageId.Name)
-	version, _ := getVersion(packageId)
+func Dependencies(id lucytypes.PackageId) (dependencies *lucytypes.PackageDependencies) {
+	id = inferVersion(id)
+	project := getProjectByName(id.Name)
+	version, _ := getVersion(id)
 	dependencies = &lucytypes.PackageDependencies{
 		SupportedVersions:  []lucytypes.PackageVersion{},
 		SupportedPlatforms: []lucytypes.Platform{},
@@ -203,7 +208,7 @@ func Dependencies(packageId lucytypes.PackageId) (dependencies *lucytypes.Packag
 	for _, dependency := range version.Dependencies {
 		switch dependency.DependencyType {
 		case datatypes.ModrinthVersionDependencyTypeIncompatible:
-			d, err := DependencyToPackage(packageId, &dependency)
+			d, err := DependencyToPackage(id, &dependency)
 			if err != nil {
 				logger.Warning(err)
 				continue
@@ -213,7 +218,7 @@ func Dependencies(packageId lucytypes.PackageId) (dependencies *lucytypes.Packag
 				d,
 			)
 		case datatypes.ModrinthVersionDependencyTypeOptional:
-			d, err := DependencyToPackage(packageId, &dependency)
+			d, err := DependencyToPackage(id, &dependency)
 			if err != nil {
 				logger.Warning(err)
 				continue
@@ -223,7 +228,7 @@ func Dependencies(packageId lucytypes.PackageId) (dependencies *lucytypes.Packag
 				d,
 			)
 		case datatypes.ModrinthVersionDependencyTypeRequired:
-			d, err := DependencyToPackage(packageId, &dependency)
+			d, err := DependencyToPackage(id, &dependency)
 			if err != nil {
 				logger.Warning(err)
 				continue
@@ -255,66 +260,20 @@ func GetProjectByName(packageName lucytypes.PackageName) (
 	return
 }
 
-func FullPackage(s *datatypes.ModrinthProject) *lucytypes.Package {
-	p := &lucytypes.Package{}
-	p.Dependencies = &lucytypes.PackageDependencies{}
+func inferVersion(p lucytypes.PackageId) (infer lucytypes.PackageId) {
+	infer.Platform = p.Platform
+	infer.Name = p.Name
 
-	// Fill in supported versions and platforms
-	for _, version := range s.GameVersions {
-		p.Dependencies.SupportedVersions = append(
-			p.Dependencies.SupportedVersions,
-			lucytypes.PackageVersion(version),
-		)
+	switch p.Version {
+	case lucytypes.AllVersion, lucytypes.NoVersion, lucytypes.LatestCompatibleVersion:
+		version := LatestCompatibleVersion(p.Name)
+		infer.Version = version.VersionNumber
+	case lucytypes.LatestVersion:
+		version := latestVersion(p.Name)
+		infer.Version = version.VersionNumber
+	default:
+		return p
 	}
 
-	for _, platform := range s.Loaders {
-		pf := lucytypes.Platform(platform)
-		if pf.Valid() {
-			p.Dependencies.SupportedPlatforms = append(
-				p.Dependencies.SupportedPlatforms,
-				pf,
-			)
-		}
-	}
-
-	p.Information = &lucytypes.PackageInformation{}
-
-	// Fill in URLs
-	if s.WikiUrl != "" {
-		p.Information.Urls = append(
-			p.Information.Urls, lucytypes.PackageUrl{
-				Name: lucytypes.WikiUrl.String(),
-				Type: lucytypes.WikiUrl,
-				Url:  s.WikiUrl,
-			},
-		)
-	}
-
-	if s.SourceUrl != "" {
-		p.Information.Urls = append(
-			p.Information.Urls, lucytypes.PackageUrl{
-				Name: lucytypes.HomepageUrl.String(),
-				Type: lucytypes.SourceUrl,
-				Url:  s.SourceUrl,
-			},
-		)
-	}
-
-	for _, donationUrl := range s.DonationUrls {
-		p.Information.Urls = append(
-			p.Information.Urls, lucytypes.PackageUrl{
-				Name: "Donation",
-				Type: lucytypes.OthersUrl,
-				Url:  donationUrl.Url,
-			},
-		)
-	}
-
-	// Fill in the rest of the info
-	p.Information.Brief = s.Description
-	p.Information.Description = s.Body // s.Body is markdown, so it needs further processing
-	p.Information.License = s.License.Name
-	// p.Information.Author TODO: Author info
-
-	return p
+	return infer
 }

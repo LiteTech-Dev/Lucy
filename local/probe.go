@@ -161,10 +161,13 @@ var getServerWorkPath = tools.Memoize(
 
 var getServerDotProperties = tools.Memoize(
 	func() MinecraftServerDotProperties {
+		exec := getExecutableInfo()
 		propertiesPath := path.Join(getServerWorkPath(), "server.properties")
 		file, err := ini.Load(propertiesPath)
 		if err != nil {
-			logger.Warning(errors.New("this server is missing a server.properties"))
+			if exec != UnknownExecutable {
+				logger.Warning(errors.New("this server is missing a server.properties"))
+			}
 			return nil
 		}
 

@@ -48,13 +48,19 @@ func actionAdd(_ context.Context, cmd *cli.Command) error {
 		return errors.New("lucy is not installed, run `lucy init` before downloading mods")
 	}
 
-	if p.Platform == lucytypes.Mcdr && serverInfo.Mcdr == nil {
+	if serverInfo.Executable == local.UnknownExecutable {
+		// Case where the server is not detected
+		return errors.New("no executable found, `lucy add` requires a server in current directory")
+	} else if p.Platform == lucytypes.Mcdr && serverInfo.Mcdr == nil {
+		// Case where MCDR is not installed but the user wants to download MCDR plugins
 		// TODO: Deal with this
-		println("MCDR is not installed, cannot download MCDR plugins")
-		return errors.New("no mcdr")
+		logger.Error(errors.New("no mcdr found, while mcdr plugins requested"))
+		return nil
 	} else if p.Platform != lucytypes.AllPlatform && p.Platform != serverInfo.Executable.Platform {
+		// Case where the platform of the mod is different from the server
 		// TODO: Deal with this
-		return errors.New("platform mismatch")
+		logger.Error(errors.New("platform mismatch"))
+		return nil
 	}
 
 	newestVersion := modrinth.LatestCompatibleVersion(p.Name)

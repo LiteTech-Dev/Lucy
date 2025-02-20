@@ -3,9 +3,7 @@ package local
 import (
 	"archive/zip"
 	"encoding/json"
-	"errors"
 	"io"
-	"log"
 	"os"
 	"path"
 	"strings"
@@ -33,7 +31,8 @@ var getExecutableInfo = tools.Memoize(
 		}
 
 		if len(valid) == 0 {
-			logger.Fatal(errors.New("no server executable found"))
+			logger.Info("no server under current directory")
+			return UnknownExecutable
 		} else if len(valid) == 1 {
 			return valid[0]
 		}
@@ -46,7 +45,8 @@ func findJar(dir string) (jarFiles []*os.File) {
 	jarFiles = []*os.File{}
 	entries, err := os.ReadDir(dir)
 	if err != nil {
-		log.Fatal(err)
+		logger.Info("cannot read current directory, most local-related features will be disabled")
+		return
 	}
 
 	for _, entry := range entries {
@@ -62,15 +62,14 @@ func findJar(dir string) (jarFiles []*os.File) {
 			jarFiles = append(jarFiles, file)
 		}
 	}
-
 	return
 }
 
-var unknownExecutable = &lucytypes.ExecutableInfo{
+var UnknownExecutable = &lucytypes.ExecutableInfo{
 	Path:        "",
 	GameVersion: "unknown",
 	BootCommand: nil,
-	Platform:    "unknown",
+	Platform:    lucytypes.UnknownPlatform,
 }
 
 const (
@@ -80,7 +79,7 @@ const (
 	fabricLauncherManifest       = "META-INF/MANIFEST.MF"
 )
 
-// analyzeExecutable gives nil if the jar file is invalid. The constant unknownExecutable
+// analyzeExecutable gives nil if the jar file is invalid. The constant UnknownExecutable
 // is not yet used in the codebase, however still reserved for future use.
 func analyzeExecutable(file *os.File) (exec *lucytypes.ExecutableInfo) {
 	// exec is a nil before an analysis function is called

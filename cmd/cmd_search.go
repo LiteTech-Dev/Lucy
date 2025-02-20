@@ -88,8 +88,8 @@ func actionSearch(_ context.Context, cmd *cli.Command) error {
 }
 
 func generateSearchOutput(
-res *lucytypes.SearchResults,
-showAll bool,
+	res *lucytypes.SearchResults,
+	showAll bool,
 ) *lucytypes.OutputData {
 	return &lucytypes.OutputData{
 		Fields: []lucytypes.Field{

@@ -1,7 +1,6 @@
 package lucytypes
 
 import (
-	"fmt"
 	"strings"
 
 	"lucy/tools"
@@ -14,12 +13,13 @@ import (
 type Platform string
 
 const (
-	Minecraft   Platform = "minecraft"
-	Fabric      Platform = "fabric"
-	Forge       Platform = "forge"
-	Neoforge    Platform = "neoforge"
-	Mcdr        Platform = "mcdr"
-	AllPlatform Platform = "all"
+	Minecraft       Platform = "minecraft"
+	Fabric          Platform = "fabric"
+	Forge           Platform = "forge"
+	Neoforge        Platform = "neoforge"
+	Mcdr            Platform = "mcdr"
+	AllPlatform     Platform = "all"
+	UnknownPlatform Platform = "unknown"
 )
 
 func (p Platform) Title() string {
@@ -38,16 +38,21 @@ func (p Platform) IsAll() bool {
 
 // Valid should be edited if you added a new platform.
 func (p Platform) Valid() bool {
-	for _, valid := range Platforms {
-		if p == valid {
-			return true
-		}
+	switch p {
+	case Minecraft, Fabric, Forge, Neoforge, Mcdr, AllPlatform:
+		return true
 	}
 	return false
 }
 
-var Platforms = []Platform{
-	Minecraft, Fabric, Forge, Neoforge, Mcdr, AllPlatform,
+func (p Platform) Eq(other Platform) bool {
+	if p == AllPlatform || other == AllPlatform {
+		return true
+	}
+	if p == UnknownPlatform || other == UnknownPlatform {
+		return false
+	}
+	return p == other
 }
 
 // PackageName is the slug of the package, using hyphens as separators. For example,
@@ -56,7 +61,7 @@ var Platforms = []Platform{
 // It is non-case-sensitive, though lowercase is recommended. Underlines '_' are
 // equivalent to hyphens.
 //
-// A slug from a upstream API is preferred, if possible. Otherwise, the slug is
+// A slug from an upstream API is preferred, if possible. Otherwise, the slug is
 // obtained from the executable file. No exceptions since a package must either
 // exist on a remote API or user's local files.
 type PackageName string
@@ -88,17 +93,16 @@ func (p *PackageId) NewPackage() *Package {
 }
 
 func (p *PackageId) String() string {
-	return fmt.Sprintln(
-		tools.Ternary(
-			p.Platform == AllPlatform,
-			"", string(p.Platform)+"/",
-		),
-		string(p.Name),
-		tools.Ternary(
-			p.Version == LatestVersion || p.Version == AllVersion || p.Version == NoVersion,
-			"", "@"+string(p.Version),
-		),
-	)
+	return tools.Ternary(
+		p.Platform == AllPlatform,
+		"", string(p.Platform)+"/",
+	) +
+		string(p.Name) +
+		tools.Ternary(p.Version == AllVersion, "", "@"+string(p.Version))
+}
+
+func (p *PackageId) FullString() string {
+	return string(p.Platform) + "/" + string(p.Name) + "@" + p.Version.String()
 }
 
 // PackageVersion is the version of a package. Here we expect mods and plugins
@@ -107,19 +111,23 @@ type PackageVersion string
 
 func (p PackageVersion) String() string {
 	if p == AllVersion || p == "" {
-		return "Any"
+		return "any"
 	}
 	if p == NoVersion {
-		return "None"
+		return "none"
 	}
 	if p == LatestVersion {
-		return "Latest"
+		return "latest"
+	}
+	if p == LatestCompatibleVersion {
+		return "compatible"
 	}
 	return string(p)
 }
 
 var (
-	AllVersion    PackageVersion = "all"
-	NoVersion     PackageVersion = "none"
-	LatestVersion PackageVersion = "latest"
+	AllVersion              PackageVersion = "all"
+	NoVersion               PackageVersion = "none"
+	LatestVersion           PackageVersion = "latest"
+	LatestCompatibleVersion PackageVersion = "compatible"
 )

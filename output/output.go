@@ -39,6 +39,15 @@ func Separator(len int, dim bool) {
 	newLine()
 }
 
+type FieldAnnotation struct {
+	Annotation string
+}
+
+func (f *FieldAnnotation) Output() {
+	annot(f.Annotation)
+	newLine()
+}
+
 type FieldShortText struct {
 	Title string
 	Text  string

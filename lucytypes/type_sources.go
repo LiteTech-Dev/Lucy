@@ -8,7 +8,7 @@ const (
 	Modrinth
 	GitHub
 	McdrRepo
-	Unknown
+	UnknownSource
 )
 
 func (s Source) String() string {

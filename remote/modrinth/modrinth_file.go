@@ -14,6 +14,11 @@ func GetFile(id lucytypes.PackageId) (url string, filename string, err error) {
 	return primary.Url, primary.Filename, nil
 }
 
+func getFile(version *datatypes.ModrinthVersion) (url string, filename string) {
+	primary := primaryFile(version.Files)
+	return primary.Url, primary.Filename
+}
+
 func primaryFile(files []datatypes.ModrinthVersionFile) (primary datatypes.ModrinthVersionFile) {
 	for _, file := range files {
 		if file.Primary {

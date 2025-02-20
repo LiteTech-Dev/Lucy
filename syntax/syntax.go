@@ -17,6 +17,7 @@ package syntax
 import (
 	"errors"
 	"log"
+	"lucy/logger"
 	"strings"
 
 	"lucy/lucytypes"
@@ -63,6 +64,7 @@ func Parse(s string) (p lucytypes.PackageId) {
 			log.Fatal(err)
 		}
 	}
+	logger.Debug("parsed input as package: " + p.FullString())
 	return
 }
 
@@ -85,6 +87,9 @@ func parseOperatorAt(s string) (
 		v = lucytypes.AllVersion
 	} else if len(split) == 2 {
 		v = lucytypes.PackageVersion(split[1])
+		if v == lucytypes.NoVersion || v == lucytypes.AllVersion {
+			return "", "", "", ESyntax
+		}
 	} else {
 		return "", "", "", ESyntax
 	}
