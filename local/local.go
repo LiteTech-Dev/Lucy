@@ -108,7 +108,7 @@ func buildServerInfo() lucytypes.ServerInfo {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		modList := getModList()
+		modList := getMods()
 		mu.Lock()
 		serverInfo.Mods = modList
 		mu.Unlock()
@@ -222,14 +222,14 @@ var checkHasLucy = tools.Memoize(
 	},
 )
 
-var getModList = tools.Memoize(
-	func() (mods []*lucytypes.Package) {
+var getMods = tools.Memoize(
+	func() (mods []lucytypes.Package) {
 		path := getServerModPath()
 		jars := findJar(path)
 		for _, jar := range jars {
 			mod := analyzeModJar(jar)
 			if mod != nil {
-				mods = append(mods, mod)
+				mods = append(mods, *mod)
 			}
 		}
 		sort.Slice(
