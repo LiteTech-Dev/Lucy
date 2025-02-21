@@ -32,7 +32,6 @@ package syntax
 
 import (
 	"errors"
-	"log"
 	"strings"
 
 	"lucy/logger"
@@ -67,7 +66,7 @@ var (
 
 // Parse is exported to parse a string into a PackageId struct. This function
 // should only be used on user inputs. Therefore, It does NOT return an
-// error but instead invokes a panic if the syntax is invalid.
+// error but instead invokes a fatal if the input is invalid.
 func Parse(s string) (p lucytypes.PackageId) {
 	s = sanitize(s)
 	p = lucytypes.PackageId{}
@@ -77,7 +76,7 @@ func Parse(s string) (p lucytypes.PackageId) {
 		if errors.Is(err, ESyntax) {
 			panic(err)
 		} else {
-			log.Fatal(err)
+			logger.Fatal(err)
 		}
 	}
 	logger.Debug("parsed input as package: " + p.FullString())

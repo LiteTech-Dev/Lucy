@@ -14,6 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// Package lucytypes is a general package for all types used in Lucy.
+//
+// TODO: Move some types that belongs to lower-level packages to their respective packages.
 package lucytypes
 
 import (

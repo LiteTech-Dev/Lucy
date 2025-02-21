@@ -14,8 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// Package output is a key-value based commandline output framework. It uses multiple
-// different types of field to generate output.
+// Package output is a key-value based commandline output framework.
+//
+// The core of this package it the lucytypes.OutputData struct. It is an array
+// of different types of fields that defines different types of output formats.
+// The OutputData struct can be simply passed to the Flush function to output
+// to the commandline.
 //
 // Note the field will not show if its content is empty
 package output

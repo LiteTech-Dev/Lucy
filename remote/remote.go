@@ -14,6 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// Package remote is an adapter to its nested packages, which are responsible for
+// fetching, searching, and providing information about packages from different
+// sources. They are eventually unified into a single interface lucytypes.Package.
+//
+// lucytypes.Package itself utilizes a composite pattern, where its most fields,
+// except the id, are optional and will be filled in as needed.
 package remote
 
 import (

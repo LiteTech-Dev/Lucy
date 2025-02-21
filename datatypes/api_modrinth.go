@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// Package datatypes stores types to store data
+// Package datatypes are types to store data from APIs and files.
 //
 // TODO: For web APIs, their types will be moved to where they are used.
 package datatypes

@@ -14,6 +14,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// Package local provides functionality to gather and manage server information
+// for a Minecraft server. It includes methods to retrieve server configuration,
+// mod list, executable information, and other relevant details. The package
+// utilizes memoization to avoid redundant calculations and resolve any data
+// dependencies issues. Therefore, all probe functions are 100% concurrent-safe.
+//
+// The main exposed function is GetServerInfo, which returns a comprehensive
+// ServerInfo struct containing all the gathered information. To avoid side
+// effects, the ServerInfo struct is returned as a copy, rather than reference.
 package local
 
 import (
@@ -36,19 +45,16 @@ import (
 
 const mcdrConfigFileName = "config.yml"
 
-// GetServerInfo is the exposed function for external packages to get serverInfo`.
-// As we can assume that the environment do not change while the program is
+// GetServerInfo is the exposed function for external packages to get serverInfo.
+// As we can assume that the environment does not change while the program is
 // running, a sync.Once is used to prevent further calls to this function. Rather,
 // the cached serverInfo is used as the return value.
 var GetServerInfo = tools.Memoize(buildServerInfo)
 
-// buildServerInfo
-// Sequence:
-//  1. Check for MCDR
-//  2. Locate and unzip the jar file, if multiple valid jar files exist, prompt
-//     the user to select one
-//  3. From the jar we can detect Minecraft, Forge and(or) Fabric versions
-//  4. Then search for related dirs (mods/, config/, plugins/, etc.)
+// buildServerInfo builds the server information by performing several checks
+// and gathering data from various sources. It uses goroutines to perform these
+// tasks concurrently and a sync.Mutex to ensure thread-safe updates to the
+// serverInfo struct.
 func buildServerInfo() lucytypes.ServerInfo {
 	var wg sync.WaitGroup
 	var mu sync.Mutex
@@ -270,7 +276,7 @@ func analyzeModJar(file *os.File) *lucytypes.Package {
 				Local: &lucytypes.PackageInstallation{
 					Path: file.Name(),
 				}, Information: nil, // Don't need this for now
-				Dependencies: nil, // TODO: This is not yet implemented, because the deps field is an expression, we need to parse it
+				Dependencies:   nil, // TODO: This is not yet implemented, because the deps field is an expression, we need to parse it
 			}
 			return p
 		}

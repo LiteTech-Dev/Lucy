@@ -39,7 +39,7 @@ var (
 
 const VersionManifestURL = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json"
 
-func GetVersionManifest() (manifest *datatypes.VersionManifest, err error) {
+func getVersionManifest() (manifest *datatypes.VersionManifest, err error) {
 	manifest = &datatypes.VersionManifest{}
 
 	// TODO: Add cache mechanism if http call is too slow or fails
@@ -94,7 +94,7 @@ func compareMinecraftVersions(v1, v2 lucytypes.PackageVersion) (
 	c int8,
 	err error,
 ) {
-	manifest, err := GetVersionManifest()
+	manifest, err := getVersionManifest()
 	if err != nil {
 		return 0, err
 	}
