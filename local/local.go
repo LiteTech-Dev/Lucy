@@ -247,6 +247,15 @@ const newForgeModIdentifierFile = "mods.toml"
 // const forgeModIdentifierFile =
 // TODO: forgeModIdentifierFile
 
+// analyzeModJar is now a single large function, but it will be later split into
+// smaller functions according to different mod loaders. This function will still
+// server as an entry point to the mod analysis process.
+//
+// According to current information, all mod analysis can be summarized into the
+// following process:
+// 1. Check for the identifier file
+// 2. Analyze informative files
+// 3. Fill in the Package struct
 func analyzeModJar(file *os.File) *lucytypes.Package {
 	stat, err := file.Stat()
 	if err != nil {
@@ -278,8 +287,9 @@ func analyzeModJar(file *os.File) *lucytypes.Package {
 				},
 				Local: &lucytypes.PackageInstallation{
 					Path: file.Name(),
-				}, Information: nil, // Don't need this for now
-				Dependencies:   nil, // TODO: This is not yet implemented, because the deps field is an expression, we need to parse it
+				},
+				Information:  nil, // Don't need this for now
+				Dependencies: nil, // TODO: This is not yet implemented, because the deps field is an expression, we need to parse it
 			}
 			return p
 		}
