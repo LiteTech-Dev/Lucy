@@ -19,13 +19,15 @@ package local
 import (
 	"archive/zip"
 	"encoding/json"
-	"gopkg.in/yaml.v3"
 	"io"
 	"log"
-	"lucy/datatypes"
-	"lucy/lucytypes"
 	"os"
 	"path"
+
+	"gopkg.in/yaml.v3"
+
+	"lucy/datatypes"
+	"lucy/lucytypes"
 
 	"lucy/logger"
 	"lucy/tools"

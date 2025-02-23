@@ -238,9 +238,11 @@ var getMods = tools.Memoize(
 	},
 )
 
-const fabricModIdentifierFile = "fabric.mod.json"
-const oldForgeModIdentifierFile = "mcmod.info"
-const newForgeModIdentifierFile = "mods.toml"
+const (
+	fabricModIdentifierFile   = "fabric.mod.json"
+	oldForgeModIdentifierFile = "mcmod.info"
+	newForgeModIdentifierFile = "mods.toml"
+)
 
 // const forgeModIdentifierFile =
 // TODO: forgeModIdentifierFile

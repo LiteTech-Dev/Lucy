@@ -14,8 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-//1.13+ forge&neoforge
-
+// 1.13+ forge&neoforge
 package datatypes
 
 type newForgeModIdentifier struct {

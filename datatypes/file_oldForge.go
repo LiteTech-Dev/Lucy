@@ -14,8 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-//1.12 and older forge mod, metadata in json
-
+// 1.12 and older forge mod, metadata in json
 package datatypes
 
 type oldForgeModIdentifier []struct {
