@@ -49,9 +49,13 @@ type PackageUrl struct {
 	Url  string
 }
 
-// Package is a package identifier with its related information.
+// Package is a package identifier with its related information. In principle,
+// only packages remote and local can provide a Package.
 //
-// In principle, only package remote and local can provide a package.
+// This is an adapter type that uses composition method to provide a unified
+// interface for both local and remote packages. It is used to represent a
+// package in the system, and can be used to store information about the package
+// such as its dependencies, installation path, and remote source.
 type Package struct {
 	// Id is the basic package identifier
 	Id PackageId
