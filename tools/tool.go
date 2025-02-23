@@ -67,8 +67,8 @@ func Insert[T any](slice []T, pos int, value ...T) []T {
 	return append(slice[:pos], append(value, slice[pos:]...)...)
 }
 
-// CloseReader closes a reader and warns if an error occurs. Call this with a
-// defer statement.
+// CloseReader closes a reader and runs failAction() if error occurs. Call this
+// with a defer statement.
 func CloseReader(reader io.ReadCloser, failAction func(error)) {
 	err := reader.Close()
 	if err != nil {
