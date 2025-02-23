@@ -293,57 +293,56 @@ func analyzeModJar(file *os.File) *lucytypes.Package {
 			}
 			return p
 		}
-		
+
 		//forge check
-		if f.Name == oldForgeModIdentifierFile{
+		if f.Name == oldForgeModIdentifierFile {
 			rr, err := f.Open()
 			data, err := io.ReadAll(rr)
 			if err != nil {
 				return nil
 			}
 			modInfo := &datatypes.oldForgeModIdentifier{}
-			
 			err = json.Unmarshal(data, modInfo)
 			if err != nil {
 				return nil
 			}
 			p := &lucytypes.Package{
 				Id: lucytypes.PackageId{
-					Platform: lucytypes.oldForge,//notice pkg name
+					Platform: lucytypes.oldForge, // notice pkg name
 					Name:     lucytypes.PackageName(modInfo.Id),
 					Version:  lucytypes.PackageVersion(modInfo.Version),
 				},
 				Local: &lucytypes.PackageInstallation{
 					Path: file.Name(),
 				}, Information: nil, // Don't need this for now
-				Dependencies:   nil, // TODO: This is not yet implemented, because the deps field is an expression, we need to parse it
+				Dependencies: nil, // TODO: This is not yet implemented, because the deps field is an expression, we need to parse it
 			}
 			return p
 		}
-		
+
 		//newForge check
-		if f.Name == newForgeModIdentifierFile{
+		if f.Name == newForgeModIdentifierFile {
 			rr, err := f.Open()
 			data, err := io.ReadAll(rr)
 			if err != nil {
 				return nil
 			}
-			modInfo := &datatypes.newForgeModIdentifier{}//notice name
-			
+			modInfo := &datatypes.newForgeModIdentifier{} // notice name
+
 			err = json.Unmarshal(data, modInfo)
 			if err != nil {
 				return nil
 			}
 			p := &lucytypes.Package{
 				Id: lucytypes.PackageId{
-					Platform: lucytypes.newForge,//notice pkg name
+					Platform: lucytypes.newForge, // notice pkg name
 					Name:     lucytypes.PackageName(modInfo.Id),
 					Version:  lucytypes.PackageVersion(modInfo.Version),
 				},
 				Local: &lucytypes.PackageInstallation{
 					Path: file.Name(),
 				}, Information: nil, // Don't need this for now
-				Dependencies:   nil, // TODO: This is not yet implemented, because the deps field is an expression, we need to parse it
+				Dependencies: nil, // TODO: This is not yet implemented, because the deps field is an expression, we need to parse it
 			}
 			return p
 		}
