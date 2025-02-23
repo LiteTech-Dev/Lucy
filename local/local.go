@@ -43,8 +43,6 @@ import (
 	"lucy/tools"
 )
 
-const mcdrConfigFileName = "config.yml"
-
 // GetServerInfo is the exposed function for external packages to get serverInfo.
 // As we can assume that the environment does not change while the program is
 // running, a sync.Once is used to prevent further calls to this function. Rather,
@@ -248,8 +246,8 @@ const newForgeModIdentifierFile = "mods.toml"
 // TODO: forgeModIdentifierFile
 
 // analyzeModJar is now a single large function, but it will be later split into
-// smaller functions according to different mod loaders. This function will still
-// server as an entry point to the mod analysis process.
+// smaller functions according to different mod loaders. This function will keep
+// serve as an entry point to the mod analysis process.
 //
 // According to current information, all mod analysis can be summarized into the
 // following process:
@@ -267,7 +265,7 @@ func analyzeModJar(file *os.File) *lucytypes.Package {
 	}
 
 	for _, f := range r.File {
-		//fabric check
+		// fabric check
 		if f.Name == fabricModIdentifierFile {
 			rr, err := f.Open()
 			data, err := io.ReadAll(rr)
@@ -288,13 +286,12 @@ func analyzeModJar(file *os.File) *lucytypes.Package {
 				Local: &lucytypes.PackageInstallation{
 					Path: file.Name(),
 				},
-				Information:  nil, // Don't need this for now
 				Dependencies: nil, // TODO: This is not yet implemented, because the deps field is an expression, we need to parse it
 			}
 			return p
 		}
 
-		//forge check
+		// forge check
 		if f.Name == oldForgeModIdentifierFile {
 			rr, err := f.Open()
 			data, err := io.ReadAll(rr)
@@ -320,7 +317,7 @@ func analyzeModJar(file *os.File) *lucytypes.Package {
 			return p
 		}
 
-		//newForge check
+		// newForge check
 		if f.Name == newForgeModIdentifierFile {
 			rr, err := f.Open()
 			data, err := io.ReadAll(rr)

@@ -48,5 +48,5 @@ type Activity struct {
 
 type McdrInstallation struct {
 	PluginPaths []string
-	PluginList  []Package // TODO: Implement probe func
+	PluginList  []Package
 }

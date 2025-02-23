@@ -17,15 +17,21 @@ limitations under the License.
 package local
 
 import (
+	"archive/zip"
+	"encoding/json"
+	"gopkg.in/yaml.v3"
 	"io"
 	"log"
+	"lucy/datatypes"
+	"lucy/lucytypes"
 	"os"
-
-	"gopkg.in/yaml.v3"
+	"path"
 
 	"lucy/logger"
 	"lucy/tools"
 )
+
+const mcdrConfigFileName = "config.yml"
 
 // For this part of code, refer to the original MCDR project
 // MCDR detects its installation under cwd by check whether the config.yml file exists
@@ -61,3 +67,79 @@ var getMcdrConfig = tools.Memoize(
 		return
 	},
 )
+
+var getMcdrPlugins = tools.Memoize(
+	func() (plugins []lucytypes.Package) {
+		plugins = make([]lucytypes.Package, 0)
+		// Remember that MCDR can have multiple plugin directories
+		PluginDirectories := getMcdrConfig().PluginDirectories
+		if PluginDirectories == nil {
+			return plugins
+		}
+		for _, pluginDirectory := range PluginDirectories {
+			pluginEntry, _ := os.ReadDir(pluginDirectory)
+			for _, pluginPath := range pluginEntry {
+				if path.Ext(pluginDirectory) != ".mcdr" {
+					continue
+				}
+				pluginFile, err := os.Open(pluginPath.Name())
+				defer tools.CloseReader(pluginFile, logger.Warning)
+				if err != nil {
+					logger.Warning(err)
+					continue
+				}
+				plugin, err := analyzeMcdrPlugin(pluginFile)
+				if err != nil {
+					logger.Warning(err)
+					continue
+				}
+				plugins = append(plugins, *plugin)
+			}
+		}
+		return plugins
+	},
+)
+
+const mcdrPluginIdentifierFile = "mcdreforged.plugin.json"
+
+func analyzeMcdrPlugin(file *os.File) (
+	plugin *lucytypes.Package,
+	err error,
+) {
+	stat, err := file.Stat()
+	if err != nil {
+		return nil, err
+	}
+	r, err := zip.NewReader(file, stat.Size())
+	if err != nil {
+		return nil, err
+	}
+
+	for _, f := range r.File {
+		if f.Name == mcdrPluginIdentifierFile {
+			rr, err := f.Open()
+			data, err := io.ReadAll(rr)
+			if err != nil {
+				return nil, err
+			}
+			pluginInfo := &datatypes.McdrPluginIdentifierFile{}
+			err = json.Unmarshal(data, pluginInfo)
+			if err != nil {
+				return nil, err
+			}
+			return &lucytypes.Package{
+				Id: lucytypes.PackageId{
+					Platform: lucytypes.Mcdr,
+					Name:     lucytypes.PackageName(pluginInfo.Name),
+					Version:  lucytypes.PackageVersion(pluginInfo.Version),
+				},
+				Local: &lucytypes.PackageInstallation{
+					Path: file.Name(),
+				},
+				Dependencies: nil, // TODO: This is not yet implemented, mcdr includes external (python packages) dependencies
+			}, nil
+		}
+	}
+
+	return
+}

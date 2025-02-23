@@ -31,3 +31,19 @@ type McdrPluginInfo struct {
 		ZhCn string `json:"zh_cn"`
 	} `json:"introduction"`
 }
+
+type McdrPluginIdentifierFile struct {
+	Id          string `json:"id"`
+	Version     string `json:"version"`
+	Name        string `json:"name"`
+	Description struct {
+		EnUs string `json:"en_us"`
+		ZhCn string `json:"zh_cn"`
+	} `json:"description"`
+	Author       []string `json:"author"`
+	Link         string   `json:"link"`
+	Dependencies struct {
+		Mcdreforged string `json:"mcdreforged"`
+	} `json:"dependencies"`
+	Resources []string `json:"resources"`
+}
