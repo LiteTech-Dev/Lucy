@@ -19,10 +19,15 @@ limitations under the License.
 package local
 
 import (
+	"bytes"
 	"errors"
+	"fmt"
 	"lucy/logger"
 	"os"
+	"os/exec"
 	"path"
+	"strconv"
+	"strings"
 	"syscall"
 
 	"lucy/lucytypes"
@@ -39,29 +44,54 @@ var checkServerFileLock = tools.Memoize(
 			getSavePath(),
 			"session.lock",
 		)
-		file, err := os.OpenFile(lockPath, os.O_RDWR, 0o666)
-		defer tools.CloseReader(file, logger.Warning)
-
+		// Try lsof before using the file lock check. As the file lock check is
+		// tested to be unstable on linux (Ubuntu 20.04, Linux 5.15.0-48-generic).
+		pid, err := lsof(lockPath)
 		if err != nil {
 			return nil
 		}
+		if pid != 0 {
+			return &lucytypes.Activity{
+				Active: true,
+				Pid:    pid,
+			}
+		}
 
+		file, err := os.OpenFile(lockPath, os.O_RDWR|os.O_APPEND, 0o666)
+		defer tools.CloseReader(file, logger.Warning)
+		if err != nil {
+			logger.Warning(err)
+			return nil
+		}
+
+		logger.Debug("checking lock on: " + file.Name())
 		err = syscall.Flock(int(file.Fd()), syscall.LOCK_EX|syscall.LOCK_NB)
 		if errors.Is(err, syscall.EWOULDBLOCK) {
-			var fl syscall.Flock_t
-			fl.Type = syscall.F_WRLCK
-			fl.Whence = 0
-			fl.Start = 0
-			fl.Len = 0
+			logger.Debug("found a lock on the file: " + err.Error())
+			fl := syscall.Flock_t{
+				Type: syscall.F_WRLCK,
+			}
 			err = syscall.FcntlFlock(file.Fd(), syscall.F_GETLK, &fl)
+			logger.Warning(
+				fmt.Errorf("activity detected but cannot get pid: %w", err),
+			)
+			if err != nil {
+				return &lucytypes.Activity{
+					Active: true,
+					Pid:    0,
+				}
+			}
 			return &lucytypes.Activity{
 				Active: true,
 				Pid:    int(fl.Pid),
 			}
+		} else if err != nil {
+			return nil
 		}
+		logger.Debug("no lock found on the file: " + file.Name())
 		err = syscall.Flock(int(file.Fd()), syscall.LOCK_UN)
 		if err != nil {
-			return nil
+			logger.Warning(err)
 		}
 
 		return &lucytypes.Activity{
@@ -70,3 +100,37 @@ var checkServerFileLock = tools.Memoize(
 		}
 	},
 )
+
+func lsof(filePath string) (pid int, err error) {
+	cmd := exec.Command("lsof", filePath)
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	err = cmd.Run()
+	if err != nil {
+		return 0, err
+	}
+	logger.Debug("got output from lsof:\n" + out.String())
+
+	lines := strings.Split(out.String(), "\n")
+	outputBegin := 0
+	for i, line := range lines {
+		if strings.Contains(line, "COMMAND") {
+			outputBegin = i + 1
+			break
+		}
+	}
+	for _, line := range lines[outputBegin:] {
+		if line == "" {
+			continue
+		}
+		fields := strings.Fields(line)
+		if len(fields) < 2 {
+			continue
+		}
+		if fields[0] == "java" {
+			return strconv.Atoi(fields[1])
+		}
+	}
+
+	return 0, nil
+}

@@ -107,32 +107,40 @@ longOutput bool,
 
 	// Modding related fields only shown when modding platform detected
 	if data.Executable.Platform != lucytypes.Minecraft {
-		modNames := make([]string, 0, len(data.Mods))
-		modPaths := make([]string, 0, len(modNames))
-		if len(data.Mods) == 0 {
-			modNames = append(modNames, tools.Dim("(None)"))
-		}
-		for _, mod := range data.Mods {
-			modNames = append(
-				modNames,
-				tools.Ternary(
-					longOutput,
-					mod.Id.FullString(),
-					mod.Id.StringVersion(),
-				),
-			)
-			if longOutput {
-				modPaths = append(modPaths, mod.Local.Path)
+		if len(data.Mods) > 0 {
+			modNames := make([]string, 0, len(data.Mods))
+			modPaths := make([]string, 0, len(modNames))
+			for _, mod := range data.Mods {
+				modNames = append(
+					modNames,
+					tools.Ternary(
+						longOutput,
+						mod.Id.FullString(),
+						mod.Id.StringVersion(),
+					),
+				)
+				if longOutput {
+					modPaths = append(modPaths, mod.Local.Path)
+				}
 			}
+			status.Fields = append(
+				status.Fields, &output.FieldMultiShortTextWithAnnot{
+					Title:     "Mods",
+					Texts:     modNames,
+					Annots:    modPaths,
+					ShowTotal: true,
+				},
+			)
+		} else {
+			status.Fields = append(
+				status.Fields, &output.FieldMultiShortTextWithAnnot{
+					Title:     "Mods",
+					Texts:     []string{tools.Dim("(None)")},
+					Annots:    nil,
+					ShowTotal: false,
+				},
+			)
 		}
-		status.Fields = append(
-			status.Fields, &output.FieldMultiShortTextWithAnnot{
-				Title:     "Mods",
-				Texts:     modNames,
-				Annots:    modPaths,
-				ShowTotal: true,
-			},
-		)
 	}
 
 	if data.Mcdr != nil {
