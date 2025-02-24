@@ -37,8 +37,8 @@ var subcmdStatus = &cli.Command{
 }
 
 var actionStatus cli.ActionFunc = func(
-	_ context.Context,
-	cmd *cli.Command,
+_ context.Context,
+cmd *cli.Command,
 ) error {
 	serverInfo := local.GetServerInfo()
 	if cmd.Bool("json") {
@@ -56,14 +56,14 @@ var actionStatus cli.ActionFunc = func(
 // 4. Modding Platform
 // 5. Mods
 
-const statusFieldCount = 5
-
 const (
 	statusFieldGameVersion = iota
 	statusFieldExecutablePath
 	statusFieldActivity
 	statusFieldModdingPlatform
 	statusFieldMods
+	statusMcdrPlugins
+	statusFieldCount
 )
 
 func serverInfoToStatus(data *lucytypes.ServerInfo) *lucytypes.OutputData {
@@ -120,13 +120,28 @@ func serverInfoToStatus(data *lucytypes.ServerInfo) *lucytypes.OutputData {
 		}
 
 		status.Fields[statusFieldMods] = &output.FieldMultiShortTextWithAnnot{
-			Title:  "Mod List",
+			Title:  "Mods",
 			Texts:  mods,
 			Annots: modPaths,
 		}
 	} else {
 		status.Fields[statusFieldModdingPlatform] = output.FieldNil
 		status.Fields[statusFieldMods] = output.FieldNil
+	}
+
+	if data.Mcdr != nil {
+		pluginNames := make([]string, 0, len(data.Mcdr.PluginList))
+		pluginPaths := make([]string, 0, len(data.Mcdr.PluginList))
+		for _, plugin := range data.Mcdr.PluginList {
+			pluginNames = append(pluginNames, plugin.Id.FullString())
+			pluginPaths = append(pluginPaths, plugin.Local.Path)
+		}
+		status.Fields[statusMcdrPlugins] = &output.FieldMultiShortTextWithAnnot{
+			Title:  "MCDR Plugins",
+			Texts:  pluginNames,
+			Annots: pluginPaths,
+		}
+
 	}
 
 	return status

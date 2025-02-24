@@ -72,6 +72,18 @@ func buildServerInfo() lucytypes.ServerInfo {
 		}
 	}()
 
+	// MCDR Plugins
+	if getMcdrConfig() != nil {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			plugins := getMcdrPlugins()
+			mu.Lock()
+			serverInfo.Mcdr.PluginList = plugins
+			mu.Unlock()
+		}()
+	}
+
 	// Server Work Path
 	wg.Add(1)
 	go func() {
