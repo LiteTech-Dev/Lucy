@@ -81,10 +81,15 @@ var getMcdrPlugins = tools.Memoize(
 		for _, pluginDirectory := range PluginDirectories {
 			pluginEntry, _ := os.ReadDir(pluginDirectory)
 			for _, pluginPath := range pluginEntry {
-				if path.Ext(pluginDirectory) != ".mcdr" {
+				if path.Ext(pluginPath.Name()) != ".mcdr" {
 					continue
 				}
-				pluginFile, err := os.Open(pluginPath.Name())
+				pluginFile, err := os.Open(
+					path.Join(
+						pluginDirectory,
+						pluginPath.Name(),
+					),
+				)
 				defer tools.CloseReader(pluginFile, logger.Warning)
 				if err != nil {
 					logger.Warning(err)
