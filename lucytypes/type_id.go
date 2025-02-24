@@ -121,7 +121,11 @@ func (p *PackageId) String() string {
 }
 
 func (p *PackageId) FullString() string {
-	return string(p.Platform) + "/" + string(p.Name) + "@" + p.Version.String()
+	return string(p.Platform) + "/" + p.StringVersion()
+}
+
+func (p *PackageId) StringVersion() string {
+	return string(p.Name) + "@" + p.Version.String()
 }
 
 // PackageVersion is the version of a package. Here we expect mods and plugins

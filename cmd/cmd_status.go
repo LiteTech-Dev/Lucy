@@ -33,6 +33,7 @@ var subcmdStatus = &cli.Command{
 	Action: tools.Decorate(actionStatus, globalFlagsDecorator),
 	Flags: []cli.Flag{
 		flagJsonOutput,
+		flagLongOutput,
 	},
 }
 
@@ -44,105 +45,121 @@ cmd *cli.Command,
 	if cmd.Bool("json") {
 		tools.PrintAsJson(serverInfo)
 	} else {
-		output.Flush(serverInfoToStatus(&serverInfo))
+
+		output.Flush(serverInfoToStatus(&serverInfo, cmd.Bool("long")))
 	}
 	return nil
 }
 
-// Output order:
-// 1. Game Version
-// 2. Executable Path
-// 3. Activity Status
-// 4. Modding Platform
-// 5. Mods
-
-const (
-	statusFieldGameVersion = iota
-	statusFieldExecutablePath
-	statusFieldActivity
-	statusFieldModdingPlatform
-	statusFieldMods
-	statusMcdrPlugins
-	statusFieldCount
-)
-
-func serverInfoToStatus(data *lucytypes.ServerInfo) *lucytypes.OutputData {
+func serverInfoToStatus(
+data *lucytypes.ServerInfo,
+longOutput bool,
+) *lucytypes.OutputData {
 	status := &lucytypes.OutputData{
-		Fields: make([]lucytypes.Field, statusFieldCount),
+		Fields: []lucytypes.Field{},
 	}
 
-	status.Fields[statusFieldGameVersion] = &output.FieldShortText{
-		Title: "Game Version",
-		Text:  data.Executable.GameVersion,
-	}
+	status.Fields = append(
+		status.Fields, &output.FieldAnnotatedShortText{
+			Title:      "Game",
+			Text:       data.Executable.GameVersion,
+			Annotation: data.Executable.Path,
+			NoTab:      true,
+		},
+	)
 
-	status.Fields[statusFieldExecutablePath] = &output.FieldShortText{
-		Title: "Executable",
-		Text:  data.Executable.Path,
+	if data.Executable.Platform != lucytypes.Minecraft {
+		status.Fields = append(
+			status.Fields, &output.FieldAnnotatedShortText{
+				Title:      "Modding",
+				Text:       data.Executable.Platform.Title(),
+				Annotation: data.Executable.LoaderVersion,
+				NoTab:      true,
+			},
+		)
 	}
 
 	if data.Activity != nil {
-		status.Fields[statusFieldActivity] = &output.FieldAnnotatedShortText{
-			Title: "Activity",
-			Text: tools.Ternary(
-				data.Activity.Active,
-				"Active",
-				"Inactive",
-			),
-			Annotation: tools.Ternary(
-				data.Activity.Active,
-				fmt.Sprintf("PID: %d", data.Activity.Pid),
-				"",
-			),
-		}
+		status.Fields = append(
+			status.Fields, &output.FieldAnnotatedShortText{
+				Title: "Activity",
+				Text: tools.Ternary(
+					data.Activity.Active,
+					"Active",
+					"Inactive",
+				),
+				Annotation: tools.Ternary(
+					data.Activity.Active,
+					fmt.Sprintf("PID: %d", data.Activity.Pid),
+					"",
+				),
+				NoTab: true,
+			},
+		)
 	} else {
-		status.Fields[statusFieldActivity] = &output.FieldShortText{
-			Title: "Activity",
-			Text:  tools.Dim("Unknown"),
-		}
+		status.Fields = append(
+			status.Fields, &output.FieldShortText{
+				Title: "Activity",
+				Text:  tools.Dim("(Unknown)"),
+			},
+		)
 	}
 
 	// Modding related fields only shown when modding platform detected
 	if data.Executable.Platform != lucytypes.Minecraft {
-		mods := make([]string, 0, len(data.Mods))
-		modPaths := make([]string, 0, len(mods))
+		modNames := make([]string, 0, len(data.Mods))
+		modPaths := make([]string, 0, len(modNames))
 		if len(data.Mods) == 0 {
-			mods = append(mods, tools.Dim("(None)"))
+			modNames = append(modNames, tools.Dim("(None)"))
 		}
 		for _, mod := range data.Mods {
-			mods = append(mods, mod.Id.FullString())
-			modPaths = append(modPaths, mod.Local.Path)
+			modNames = append(
+				modNames,
+				tools.Ternary(
+					longOutput,
+					mod.Id.FullString(),
+					mod.Id.StringVersion(),
+				),
+			)
+			if longOutput {
+				modPaths = append(modPaths, mod.Local.Path)
+			}
 		}
-
-		status.Fields[statusFieldModdingPlatform] = &output.FieldShortText{
-			Title: "Platform",
-			Text:  data.Executable.Platform.Title(),
-		}
-
-		status.Fields[statusFieldMods] = &output.FieldMultiShortTextWithAnnot{
-			Title:     "Mods",
-			Texts:     mods,
-			Annots:    modPaths,
-			ShowTotal: true,
-		}
-	} else {
-		status.Fields[statusFieldModdingPlatform] = output.FieldNil
-		status.Fields[statusFieldMods] = output.FieldNil
+		status.Fields = append(
+			status.Fields, &output.FieldMultiShortTextWithAnnot{
+				Title:     "Mods",
+				Texts:     modNames,
+				Annots:    modPaths,
+				ShowTotal: true,
+			},
+		)
 	}
 
 	if data.Mcdr != nil {
 		pluginNames := make([]string, 0, len(data.Mcdr.PluginList))
 		pluginPaths := make([]string, 0, len(data.Mcdr.PluginList))
 		for _, plugin := range data.Mcdr.PluginList {
-			pluginNames = append(pluginNames, plugin.Id.FullString())
-			pluginPaths = append(pluginPaths, plugin.Local.Path)
+			pluginNames = append(
+				pluginNames,
+				tools.Ternary(
+					longOutput,
+					plugin.Id.FullString(),
+					plugin.Id.StringVersion(),
+				),
+			)
+			pluginPaths = append(
+				pluginPaths,
+				tools.Ternary(longOutput, plugin.Local.Path, ""),
+			)
 		}
-		status.Fields[statusMcdrPlugins] = &output.FieldMultiShortTextWithAnnot{
-			Title:     "MCDR Plugins",
-			Texts:     pluginNames,
-			Annots:    pluginPaths,
-			ShowTotal: true,
-		}
+		status.Fields = append(
+			status.Fields, &output.FieldMultiShortTextWithAnnot{
+				Title:     "MCDR Plugins",
+				Texts:     pluginNames,
+				Annots:    pluginPaths,
+				ShowTotal: true,
+			},
+		)
 
 	}
 

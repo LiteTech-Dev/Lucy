@@ -83,12 +83,17 @@ type FieldAnnotatedShortText struct {
 	Title      string
 	Text       string
 	Annotation string
+	NoTab      bool
 }
 
 func (f *FieldAnnotatedShortText) Output() {
 	key(f.Title)
 	value(f.Text)
-	inlineAnnot(f.Annotation)
+	if f.NoTab {
+		value("  " + tools.Dim(f.Annotation))
+	} else {
+		inlineAnnot(f.Annotation)
+	}
 	newLine()
 }
 
@@ -206,13 +211,14 @@ func (f *FieldMultiShortTextWithAnnot) Output() {
 	}
 
 	for i, t := range f.Texts {
+		// key() has a tab() at the beginning, so we skip the first tab
 		if i == 0 {
 			key(f.Title)
 		} else {
 			tab()
 		}
 		value(t)
-		if i < len(f.Annots) {
+		if f.Annots != nil && i < len(f.Annots) {
 			inlineAnnot(f.Annots[i])
 		}
 		newLine()

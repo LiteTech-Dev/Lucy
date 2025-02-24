@@ -33,7 +33,7 @@ var flagLongOutput = &cli.BoolFlag{
 	Name:    "long",
 	Usage:   "Show hidden or collapsed output",
 	Value:   false,
-	Aliases: []string{"a"},
+	Aliases: []string{"l"},
 }
 
 func sourceFlag(absent lucytypes.Source) *cli.StringFlag {
