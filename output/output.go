@@ -267,7 +267,9 @@ func (f *FieldCheckBox) Output() {
 
 func Flush(data *lucytypes.OutputData) {
 	for _, field := range data.Fields {
-		field.Output()
+		if field != nil {
+			field.Output()
+		}
 	}
 	flush()
 }
