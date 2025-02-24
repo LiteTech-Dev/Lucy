@@ -27,9 +27,6 @@ import (
 // to the action function.
 func globalFlagsDecorator(f cli.ActionFunc) cli.ActionFunc {
 	return func(ctx context.Context, cmd *cli.Command) error {
-		if cmd.Args().Len() == 0 && len(cmd.FlagNames()) == 0 {
-			cli.ShowAppHelpAndExit(cmd, 0)
-		}
 		if cmd.Bool("log-file") {
 			println("Log file at", logger.LogFile.Name())
 		}
