@@ -24,7 +24,7 @@ import (
 var selectExecutableTemplate = &promptui.SelectTemplates{
 	Active:   `{{ "●" | blue }} {{ .Path | bold }} [2m(Minecraft {{ .GameVersion }}, {{ if eq .Platform "minecraft" }}Vanilla{{ else }}{{ .Platform }} {{ .LoaderVersion }}{{ end }})[0m`,
 	Inactive: `{{ "○" | blue }} {{ .Path }} [2m(Minecraft {{ .GameVersion }}, {{ if eq .Platform "minecraft" }}Vanilla{{ else }}{{ .Platform }} {{ .LoaderVersion }}{{ end }})[0m`,
-	Selected: `{{ "✔︎" | green }} {{ .Path | bold }} [2m(Minecraft {{ .GameVersion }}, {{ if eq .Platform "minecraft" }}vsanilla{{ else }}{{ .Platform }} {{ .LoaderVersion }}{{ end }})[0m`,
+	Selected: `{{ "✔︎" | green }} {{ .Path | bold }} [2m(Minecraft {{ .GameVersion }}, {{ if eq .Platform "minecraft" }}Vanilla{{ else }}{{ .Platform }} {{ .LoaderVersion }}{{ end }})[0m`,
 }
 
 func PromptSelectExecutable(executables []*lucytypes.ExecutableInfo) int {
