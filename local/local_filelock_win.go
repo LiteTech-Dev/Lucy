@@ -1,5 +1,4 @@
 //go:build windows
-// +build windows
 
 /*
 Copyright 2024 4rcadia
@@ -20,6 +19,7 @@ limitations under the License.
 package local
 
 import (
+	"lucy/logger"
 	"os"
 	"path"
 
@@ -28,8 +28,8 @@ import (
 	"lucy/tools"
 )
 
-// This is AI generated code, please check it before use.
-// I have no knowledge to Windows syscall.
+// This is AI generated code, please check it before use. I have no knowledge to
+// Windows syscall.
 var checkServerFileLock = tools.Memoize(
 	func() *lucytypes.Activity {
 		lockPath := path.Join(
@@ -37,7 +37,7 @@ var checkServerFileLock = tools.Memoize(
 			"session.lock",
 		)
 		file, err := os.OpenFile(lockPath, os.O_RDWR, 0o666)
-		defer file.Close()
+		defer tools.CloseReader(file, logger.Warning)
 
 		if err != nil {
 			return nil
@@ -64,15 +64,20 @@ var checkServerFileLock = tools.Memoize(
 				}
 			}
 		}
-
-		windows.UnlockFileEx(
+		err = windows.UnlockFileEx(
 			windows.Handle(file.Fd()),
 			0,
 			1,
 			0,
 			&windows.Overlapped{},
 		)
+		if err != nil {
+			return nil
+		}
 
-		return nil
+		return &lucytypes.Activity{
+			Active: false,
+			Pid:    0,
+		}
 	},
 )

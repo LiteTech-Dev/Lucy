@@ -1,4 +1,4 @@
-//go:build unix || linux || darwin
+//go:build unix || darwin || linux
 
 /*
 Copyright 2024 4rcadia
@@ -20,6 +20,7 @@ package local
 
 import (
 	"errors"
+	"lucy/logger"
 	"os"
 	"path"
 	"syscall"
@@ -39,7 +40,7 @@ var checkServerFileLock = tools.Memoize(
 			"session.lock",
 		)
 		file, err := os.OpenFile(lockPath, os.O_RDWR, 0o666)
-		defer file.Close()
+		defer tools.CloseReader(file, logger.Warning)
 
 		if err != nil {
 			return nil
@@ -58,8 +59,14 @@ var checkServerFileLock = tools.Memoize(
 				Pid:    int(fl.Pid),
 			}
 		}
-		syscall.Flock(int(file.Fd()), syscall.LOCK_UN)
+		err = syscall.Flock(int(file.Fd()), syscall.LOCK_UN)
+		if err != nil {
+			return nil
+		}
 
-		return nil
+		return &lucytypes.Activity{
+			Active: false,
+			Pid:    0,
+		}
 	},
 )

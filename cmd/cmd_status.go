@@ -90,7 +90,7 @@ longOutput bool,
 				),
 				Annotation: tools.Ternary(
 					data.Activity.Active,
-					fmt.Sprintf("PID: %d", data.Activity.Pid),
+					fmt.Sprintf("PID %d", data.Activity.Pid),
 					"",
 				),
 				NoTab: true,
