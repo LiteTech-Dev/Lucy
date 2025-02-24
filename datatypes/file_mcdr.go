@@ -16,6 +16,8 @@ limitations under the License.
 
 package datatypes
 
+import "lucy/tools"
+
 type McdrPluginInfo struct {
 	Id      string `json:"id"`
 	Authors []struct {
@@ -40,8 +42,8 @@ type McdrPluginIdentifierFile struct {
 		EnUs string `json:"en_us"`
 		ZhCn string `json:"zh_cn"`
 	} `json:"description"`
-	Author       []string `json:"author"`
-	Link         string   `json:"link"`
+	Author       tools.StringOrStringSlice `json:"author"`
+	Link         string                    `json:"link"`
 	Dependencies struct {
 		Mcdreforged string `json:"mcdreforged"`
 	} `json:"dependencies"`
