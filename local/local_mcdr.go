@@ -110,8 +110,8 @@ var getMcdrPlugins = tools.Memoize(
 const mcdrPluginIdentifierFile = "mcdreforged.plugin.json"
 
 func analyzeMcdrPlugin(file *os.File) (
-plugin *lucytypes.Package,
-err error,
+	plugin *lucytypes.Package,
+	err error,
 ) {
 	stat, err := file.Stat()
 	if err != nil {

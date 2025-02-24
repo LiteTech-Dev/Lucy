@@ -120,9 +120,10 @@ func serverInfoToStatus(data *lucytypes.ServerInfo) *lucytypes.OutputData {
 		}
 
 		status.Fields[statusFieldMods] = &output.FieldMultiShortTextWithAnnot{
-			Title:  "Mods",
-			Texts:  mods,
-			Annots: modPaths,
+			Title:     "Mods",
+			Texts:     mods,
+			Annots:    modPaths,
+			ShowTotal: true,
 		}
 	} else {
 		status.Fields[statusFieldModdingPlatform] = output.FieldNil
@@ -137,9 +138,10 @@ func serverInfoToStatus(data *lucytypes.ServerInfo) *lucytypes.OutputData {
 			pluginPaths = append(pluginPaths, plugin.Local.Path)
 		}
 		status.Fields[statusMcdrPlugins] = &output.FieldMultiShortTextWithAnnot{
-			Title:  "MCDR Plugins",
-			Texts:  pluginNames,
-			Annots: pluginPaths,
+			Title:     "MCDR Plugins",
+			Texts:     pluginNames,
+			Annots:    pluginPaths,
+			ShowTotal: true,
 		}
 
 	}

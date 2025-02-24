@@ -194,9 +194,10 @@ func (f *FieldDynamicColumnLabels) Output() {
 // FieldMultiShortTextWithAnnot accepts 2 arrays, Texts and Annots. len(Texts) determines
 // the length of the output. Any content in Annots after len(Texts) will be omitted.
 type FieldMultiShortTextWithAnnot struct {
-	Title  string
-	Texts  []string
-	Annots []string
+	Title     string
+	Texts     []string
+	Annots    []string
+	ShowTotal bool
 }
 
 func (f *FieldMultiShortTextWithAnnot) Output() {
@@ -216,11 +217,18 @@ func (f *FieldMultiShortTextWithAnnot) Output() {
 		}
 		newLine()
 	}
+
+	if f.ShowTotal {
+		tab()
+		annot("(" + strconv.Itoa(len(f.Texts)) + " total)")
+		newLine()
+	}
 }
 
 type FieldMultiShortText struct {
-	Title string
-	Texts []string
+	Title     string
+	Texts     []string
+	ShowTotal bool
 }
 
 func (f *FieldMultiShortText) Output() {
@@ -235,6 +243,12 @@ func (f *FieldMultiShortText) Output() {
 			tab()
 		}
 		value(t)
+		newLine()
+	}
+
+	if f.ShowTotal {
+		tab()
+		annot("(" + strconv.Itoa(len(f.Texts)) + " total)")
 		newLine()
 	}
 }
